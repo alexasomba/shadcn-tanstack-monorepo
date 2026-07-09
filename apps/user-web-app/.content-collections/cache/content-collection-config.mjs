@@ -15,7 +15,7 @@ var speakers = defineCollection({
     awards: z.array(z.string()).optional(),
     content: z.string(),
   }),
-  transform: async (doc) => {
+  transform: (doc) => {
     return {
       ...doc,
       slug: doc.name
@@ -38,7 +38,7 @@ var talks = defineCollection({
     topics: z.array(z.string()),
     content: z.string(),
   }),
-  transform: async (doc) => {
+  transform: (doc) => {
     return {
       ...doc,
       slug: doc.title

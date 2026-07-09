@@ -1,8 +1,7 @@
 import { Clock, User } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import type { Talk } from "content-collections";
-
-import { Card, CardContent } from "#/components/ui/card";
 
 interface TalkCardProps {
   talk: Talk;

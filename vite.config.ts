@@ -209,6 +209,17 @@ export default defineConfig({
           browser: true,
         },
       },
+      {
+        files: ["packages/ui/src/**/*.{js,ts,tsx}"],
+        rules: {
+          "no-shadow": "off",
+          "jsx-a11y/label-has-associated-control": "off",
+          "jsx-a11y/no-noninteractive-element-interactions": "off",
+          "jsx-a11y/click-events-have-key-events": "off",
+          "typescript/no-unnecessary-condition": "off",
+          "typescript/restrict-template-expressions": "off",
+        },
+      },
       // 2. TanStack Ecosystem Layer (Strictly scoped to Frontend Applications)
       {
         files: ["apps/web/src/**/*.{js,ts,tsx}", "apps/user-web-app/src/**/*.{js,ts,tsx}"],
