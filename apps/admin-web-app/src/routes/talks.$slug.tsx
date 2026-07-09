@@ -6,7 +6,7 @@ import { marked } from "marked";
 import RemyAssistant from "#/components/RemyAssistant";
 
 export const Route = createFileRoute("/talks/$slug")({
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     const talk = allTalks.find((t) => t.slug === params.slug);
     if (!talk) {
       throw new Error("Talk not found");

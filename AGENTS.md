@@ -6,13 +6,6 @@ This project is using Vite+, a unified toolchain built on top of Vite, Rolldown,
 
 Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
 
-## Review Checklist
-
-- [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes.
-- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
-- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
-
 <!--VITE PLUS END-->
 
 ## Package Source Inspection
@@ -26,3 +19,4 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 ## Git & Verification Rules
 
 - Never bypass git hooks (e.g., do not use `--no-verify`). Instead, always debug and resolve the underlying issues causing validation or hook failures.
+- If you want to start new work and the repo is dirty, start in a git worktree. We default to using worktrees and never create/use local branches; all work is done directly on the `preview` branch and pushed to remote when completed (completion of a task is defined as being pushed to remote).
