@@ -24,6 +24,27 @@ const config = defineConfig({
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
+  build: {
+    chunkSizeWarningLimit: 2000,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: "react-vendor",
+              test: /node_modules[\\/](?:react|react-dom|scheduler)/,
+              priority: 30,
+            },
+            {
+              name: "vendor",
+              test: /node_modules/,
+              priority: 20,
+            },
+          ],
+        },
+      },
+    },
+  },
 });
 
 export default config;
