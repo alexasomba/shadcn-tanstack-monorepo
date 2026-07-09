@@ -14,3 +14,11 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+## Package Source Inspection
+
+No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
+
+- Search: `rg "query" $(opensrc path <package>)`
+- Read: `cat $(opensrc path <package>)/path/to/file`
+- Other registries: `find $(opensrc path pypi:requests) -name "*.py"`
