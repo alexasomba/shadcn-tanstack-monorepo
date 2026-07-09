@@ -3,15 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "turbo format",
-    "typecheck": "turbo typecheck",
+    "build": "vp run repo:build",
+    "dev": "vp run repo:dev",
+    "lint": "vp run repo:lint",
+    "format": "vp run repo:format",
+    "typecheck": "vp run repo:typecheck",
     "prepare": "vp config"
   },
   "devDependencies": {
-    "turbo": "^2.10.4",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
     "typescript": "^6.0.3",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
     "vite-plus": "catalog:"

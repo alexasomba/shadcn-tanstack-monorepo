@@ -1,13 +1,13 @@
 {
   "name": "web",
   "version": "0.0.1",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vp dev --port 3000",
     "build": "vp build",
     "preview": "vp preview",
-    "lint": "eslint",
+    "lint": "vp lint",
     "format": "vp fmt \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
   },
@@ -26,12 +26,10 @@
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "latest",
-    "@tanstack/eslint-config": "latest",
-    "@types/node": "^22",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6",
-    "eslint": "^9",
     "typescript": "^6",
     "vite": "catalog:",
     "vite-plus": "catalog:"
