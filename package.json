@@ -7,22 +7,17 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "prepare": "vp config"
   },
   "devDependencies": {
-    "prettier": "^3.9.4",
-    "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.10.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
+    "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=24"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
   }
 }

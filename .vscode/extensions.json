@@ -2,7 +2,7 @@
   "recommendations": [
     "bradlc.vscode-tailwindcss",
     "oxc.oxc-vscode",
-    "void-zero.vite-plus-extension-pack",
-    "vitest.explorer"
+    "vitest.explorer",
+    "VoidZero.vite-plus-extension-pack"
   ]
 }

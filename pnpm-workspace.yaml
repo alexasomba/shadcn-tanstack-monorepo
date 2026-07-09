@@ -7,3 +7,16 @@ allowBuilds:
   lightningcss: true
   unrs-resolver: true
   msw: false
+onlyBuiltDependencies:
+  - esbuild
+  - lightningcss
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.4
+  vite-plus: 0.2.4
+overrides:
+  vite: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"
