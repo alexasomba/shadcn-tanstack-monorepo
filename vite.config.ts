@@ -69,7 +69,6 @@ export default defineConfig({
       "**/snap/**",
       "**/vite.config.*.timestamp-*.*",
       "eslint.config.js",
-      ".prettierrc",
       "legacy/**",
       ".specify/**",
       ".agents/**",
