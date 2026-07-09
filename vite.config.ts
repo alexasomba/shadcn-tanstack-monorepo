@@ -191,6 +191,7 @@ export default defineConfig({
         files: [
           "apps/web/src/**/*.{js,ts,tsx}",
           "apps/user-web-app/src/**/*.{js,ts,tsx}",
+          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
           "packages/ui/src/**/*.{js,ts,tsx}",
         ],
         rules: {
@@ -221,7 +222,11 @@ export default defineConfig({
       },
       // 2. TanStack Ecosystem Layer (Strictly scoped to Frontend Applications)
       {
-        files: ["apps/web/src/**/*.{js,ts,tsx}", "apps/user-web-app/src/**/*.{js,ts,tsx}"],
+        files: [
+          "apps/web/src/**/*.{js,ts,tsx}",
+          "apps/user-web-app/src/**/*.{js,ts,tsx}",
+          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
+        ],
         rules: {
           "@tanstack/router/create-route-property-order": "error",
           "@tanstack/router/route-param-names": "error",
