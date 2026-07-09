@@ -325,6 +325,9 @@ export default defineConfig({
       "repo:typecheck": {
         command: "vp run --filter !start-monorepo typecheck",
       },
+      "repo:deploy:dry-run": {
+        command: "vp run --filter !start-monorepo deploy --dry-run --temporary",
+      },
     },
   },
 });

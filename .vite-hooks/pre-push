@@ -2,3 +2,4 @@ vp install
 vp check
 vp test
 vpr build
+vpr repo:deploy:dry-run
