@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { m } from "#/paraglide/messages";
 
 import LocaleSwitcher from "../components/LocaleSwitcher";
-import logo from "../logo.svg";
 
 export const Route = createFileRoute("/demo/i18n")({
   component: App,
@@ -14,7 +13,7 @@ function App() {
     <main className="demo-page demo-center text-center">
       <section className="demo-panel flex w-full max-w-2xl flex-col items-center gap-4">
         <img
-          src={logo}
+          src="/drizzle.svg"
           className="pointer-events-none h-28 animate-[spin_20s_linear_infinite]"
           alt="logo"
         />

@@ -22,3 +22,7 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - Search: `rg "query" $(opensrc path <package>)`
 - Read: `cat $(opensrc path <package>)/path/to/file`
 - Other registries: `find $(opensrc path pypi:requests) -name "*.py"`
+
+## Git & Verification Rules
+
+- Never bypass git hooks (e.g., do not use `--no-verify`). Instead, always debug and resolve the underlying issues causing validation or hook failures.

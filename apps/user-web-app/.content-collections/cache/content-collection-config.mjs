@@ -1,4 +1,4 @@
-// apps/user-web-app/content-collections.ts
+// content-collections.ts
 import { defineCollection, defineConfig } from "@content-collections/core";
 import { z } from "zod";
 var speakers = defineCollection({

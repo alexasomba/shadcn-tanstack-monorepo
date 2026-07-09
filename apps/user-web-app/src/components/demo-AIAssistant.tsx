@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/react-store";
 import { Store } from "@tanstack/store";
-import { PaperPlaneRight, X, ChevronRight, Robot } from "@phosphor-icons/react";
+import { PaperPlaneRight, X, CaretRight, Robot } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 
@@ -83,7 +83,7 @@ export default function AIAssistant() {
           <Robot size={24} />
           <span className="font-medium">AI Assistant</span>
         </div>
-        <ChevronRight className="h-4 w-4" />
+        <CaretRight className="h-4 w-4" />
       </button>
 
       {isOpen && (
