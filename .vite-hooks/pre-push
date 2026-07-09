@@ -1,2 +1,4 @@
-vp check --fix
-vp run build
+vp install
+vp check
+vp test
+vpr build

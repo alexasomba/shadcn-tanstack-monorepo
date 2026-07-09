@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+current_branch=$(git branch --show-current 2>/dev/null || git symbolic-ref --short HEAD 2>/dev/null)
+
+if [ "$current_branch" = "preview" ] || [ "$current_branch" = "main" ]; then
+  echo "ERROR: Cannot rebase shared branch '$current_branch'"
+  exit 1
+fi

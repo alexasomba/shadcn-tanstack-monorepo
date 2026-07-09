@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+prev_head="$1"
+new_head="$2"
+branch_checkout="$3"
+
+if [ "$branch_checkout" = "1" ]; then
+  current_branch=$(git branch --show-current 2>/dev/null)
+
+  # Check if checking out a feature branch (not main, preview, or detached HEAD)
+  if [ -n "$current_branch" ] && [ "$current_branch" != "main" ] && [ "$current_branch" != "preview" ]; then
+    echo "WARNING: Feature branch '$current_branch' detected."
+    echo "AGENTS.md rule: 'No feature branches. Use clean preview branch + ephemeral .worktrees/<type>-<topic>_<purpose> (detached HEAD).'"
+  fi
+fi
