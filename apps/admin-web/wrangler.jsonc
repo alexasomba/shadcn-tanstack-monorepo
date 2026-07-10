@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "admin-web-app",
+  "compatibility_date": "2026-07-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "ai": {
+    "binding": "AI",
+    "remote": true,
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "data-service-db",
+      "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    },
+  ],
+  "dev": {
+    "inspector_port": 9231,
+  },
+}

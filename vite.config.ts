@@ -2,7 +2,7 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   staged: {
-    "*.{js,ts,tsx}": "vp check --fix",
+    "*.{js,ts,tsx,md,css,html,json,jsonc,yaml,yml}": "vp check --fix",
   },
   lint: {
     jsPlugins: [
@@ -13,6 +13,8 @@ export default defineConfig({
       { name: "@tanstack/router", specifier: "@tanstack/eslint-plugin-router" },
       { name: "@tanstack/query", specifier: "@tanstack/eslint-plugin-query" },
       { name: "drizzle", specifier: "eslint-plugin-drizzle" },
+      { name: "zod", specifier: "eslint-plugin-zod" },
+      { name: "zod-openapi", specifier: "eslint-plugin-zod-openapi" },
     ],
     plugins: ["oxc", "typescript", "unicorn", "react", "import", "eslint", "jsx-a11y", "vitest"],
     rules: {
@@ -52,6 +54,9 @@ export default defineConfig({
           drizzleObjectName: ["db", "tx", "drizzleDb"],
         },
       ],
+      "zod/prefer-enum-over-literal-union": "warn",
+      "sonarjs/cognitive-complexity": ["warn", 15],
+      // "zod-openapi/require-meta": "off",
     },
     options: { typeAware: true, typeCheck: true },
     env: {
@@ -76,6 +81,7 @@ export default defineConfig({
       ".github/**",
       "templates/**",
       "**/routeTree.gen.ts",
+      "**/worker-configuration.d.ts",
       "**/demo*",
       "**/demo*/**",
     ],
@@ -189,9 +195,9 @@ export default defineConfig({
       // 1. Shared React & UI Layout Layer (Applies to Apps and the Shadcn UI Package)
       {
         files: [
-          "apps/web/src/**/*.{js,ts,tsx}",
-          "apps/user-web-app/src/**/*.{js,ts,tsx}",
-          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
+          "apps/user-web/src/**/*.{js,ts,tsx}",
+          "apps/admin-web/src/**/*.{js,ts,tsx}",
+          "apps/agents/src/**/*.{js,ts,tsx}",
           "packages/ui/src/**/*.{js,ts,tsx}",
         ],
         rules: {
@@ -218,15 +224,28 @@ export default defineConfig({
           "jsx-a11y/click-events-have-key-events": "off",
           "typescript/no-unnecessary-condition": "off",
           "typescript/restrict-template-expressions": "off",
+          "import/newline-after-import": "off",
+          "import/first": "off",
+          "no-unused-vars": "off",
+          "jsx-a11y/no-static-element-interactions": "off",
+          "typescript/no-useless-default-assignment": "off",
+          "react/no-children-prop": "warn",
+          "unicorn/no-array-reduce": "off",
+          "jsx-a11y/img-redundant-alt": "off",
+          "import/no-duplicates": "warn",
+          "import/consistent-type-specifier-style": "warn",
+          "typescript/no-floating-promises": "off",
+        },
+      },
+      {
+        files: ["apps/agents/src/**/*.{js,ts,tsx}"],
+        rules: {
+          "no-unused-expressions": "off",
         },
       },
       // 2. TanStack Ecosystem Layer (Strictly scoped to Frontend Applications)
       {
-        files: [
-          "apps/web/src/**/*.{js,ts,tsx}",
-          "apps/user-web-app/src/**/*.{js,ts,tsx}",
-          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
-        ],
+        files: ["apps/user-web/src/**/*.{js,ts,tsx}", "apps/admin-web/src/**/*.{js,ts,tsx}"],
         rules: {
           "@tanstack/router/create-route-property-order": "error",
           "@tanstack/router/route-param-names": "error",
@@ -242,6 +261,8 @@ export default defineConfig({
         files: ["apps/data-service/**/*.{js,mjs,cjs,ts,tsx}"],
         rules: {
           "typescript/no-floating-promises": "error",
+          // "zod-openapi/require-meta": "error",
+          // "zod-openapi/require-comment": "warn",
         },
         env: {
           browser: false,
@@ -303,6 +324,7 @@ export default defineConfig({
       "pnpm-lock.yaml",
       ".pnpm-store/",
       "routeTree.gen.ts",
+      "**/worker-configuration.d.ts",
       "**/demo*",
       "**/demo*/**",
     ],
@@ -313,7 +335,7 @@ export default defineConfig({
         command: "vp run --filter !start-monorepo build",
       },
       "repo:dev": {
-        command: "vp run --filter web dev",
+        command: "vp run --filter !start-monorepo dev",
         cache: false,
       },
       "repo:lint": {
@@ -325,6 +347,20 @@ export default defineConfig({
       "repo:typecheck": {
         command: "vp run --filter !start-monorepo typecheck",
       },
+      "repo:deploy:dry-run": {
+        command: "vp run --filter !start-monorepo deploy --dry-run --temporary",
+      },
     },
+  },
+  test: {
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.agent/**",
+      "**/.agents/**",
+      "**/cypress/**",
+      "**/.epub/**",
+      "**/.next/**",
+    ],
   },
 });

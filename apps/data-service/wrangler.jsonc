@@ -21,13 +21,13 @@
   //     "bucket_name": "my-bucket"
   //   }
   // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "data-service-db",
+      "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    },
+  ],
   // "ai": {
   //   "binding": "AI"
   // },
@@ -35,4 +35,7 @@
   //   "enabled": true,
   //   "head_sampling_rate": 1
   // }
+  "dev": {
+    "inspector_port": 9233,
+  },
 }

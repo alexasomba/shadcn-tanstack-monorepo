@@ -1,1 +1,10 @@
+#!/usr/bin/env sh
+
+# Prevent direct commits on the main branch
+current_branch=$(git symbolic-ref --short HEAD)
+if [ "$current_branch" = "main" ]; then
+  echo "ERROR: Cannot commit directly to the main branch. Please work on and commit to the preview branch instead."
+  exit 1
+fi
+
 vp staged

@@ -1,15 +1,29 @@
 {
   "name": "data-service",
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false"
   },
   "dependencies": {
-    "hono": "catalog:"
+    "@better-auth/drizzle-adapter": "catalog:",
+    "@hono/zod-openapi": "^1.4.0",
+    "better-auth": "catalog:",
+    "data-ops": "workspace:*",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "wrangler": "catalog:"
   }
 }

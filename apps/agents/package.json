@@ -1,0 +1,58 @@
+{
+  "name": "agents",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Starter template for building AI chat agents on Cloudflare",
+  "keywords": [
+    "agents",
+    "ai",
+    "cloudflare"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "start": "vp dev",
+    "deploy": "vp build && wrangler deploy",
+    "types": "wrangler types env.d.ts --include-runtime false",
+    "format": "vp check --fix",
+    "lint": "vp check",
+    "check": "vp check && tsc"
+  },
+  "dependencies": {
+    "@cloudflare/ai-chat": "catalog:",
+    "@cloudflare/kumo": "catalog:",
+    "@phosphor-icons/react": "catalog:",
+    "@streamdown/code": "catalog:",
+    "agents": "catalog:",
+    "ai": "catalog:",
+    "better-result": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "streamdown": "catalog:",
+    "workers-ai-provider": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "catalog:",
+    "@cloudflare/vite-plugin": "catalog:",
+    "@cloudflare/workers-types": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "allowScripts": {
+    "core-js-pure@3.49.0": true,
+    "esbuild@0.28.1": true,
+    "workerd@1.20260625.1": true,
+    "sharp@0.34.5": true,
+    "fsevents@2.3.3": true
+  }
+}

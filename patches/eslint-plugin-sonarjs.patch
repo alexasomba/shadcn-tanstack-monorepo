@@ -1,0 +1,16 @@
+diff --git a/cjs/S2201/rule.js b/cjs/S2201/rule.js
+index 9378376a51b65ada5c409372824c298caab4fafb..4c3874f8e9e173c95f1c1a94ad712575c6a21b2b 100644
+--- a/cjs/S2201/rule.js
++++ b/cjs/S2201/rule.js
+@@ -241,9 +241,9 @@ exports.rule = {
+         };
+     },
+ };
+-const FunctionTypeNodeKind = typescript_1.default.SyntaxKind.FunctionType;
+ const isFunctionTypeNode = (candidate) => {
+-    return candidate.kind === FunctionTypeNodeKind;
++    const ts = typescript_1.default || typescript_1;
++    return ts ? candidate.kind === ts.SyntaxKind.FunctionType : false;
+ };
+ function isReplaceWithCallback(methodName, callArguments, services) {
+     if (methodName === 'replace' && callArguments.length > 1) {

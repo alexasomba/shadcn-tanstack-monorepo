@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Check if package.json or pnpm-lock.yaml changed during merge/pull
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep -Eq "package.json|pnpm-lock.yaml"; then
+  echo "Detected dependency changes. Running 'vp up'..."
+  vp up
+fi

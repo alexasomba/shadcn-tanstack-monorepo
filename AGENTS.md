@@ -6,6 +6,13 @@ This project is using Vite+, a unified toolchain built on top of Vite, Rolldown,
 
 Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
 
+## Review Checklist
+
+- [ ] Run `vp install` after pulling remote changes and before getting started.
+- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes.
+- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
+- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
+
 <!--VITE PLUS END-->
 
 ## Package Source Inspection
@@ -19,4 +26,23 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 ## Git & Verification Rules
 
 - Never bypass git hooks (e.g., do not use `--no-verify`). Instead, always debug and resolve the underlying issues causing validation or hook failures.
-- If you want to start new work and the repo is dirty, start in a git worktree. We default to using worktrees and never create/use local branches; all work is done directly on the `preview` branch and pushed to remote when completed (completion of a task is defined as being pushed to remote).
+
+# Workflow Guidelines:
+
+- Issue Tracking: Use GitHub Issues. Meaningful work -> new issue.
+- Commits must contain 'Fixes #123' (enforced by commit-msg hook).
+- Worktree default convention: git ltp-setup <type>-<topic>\_<purpose>
+- Inspect status and compare with remote preview: `ltp-inspect`
+- Save uncommitted changes to a temp worktree: `ltp-checkpoint`
+- Setup a fresh ephemeral worktree from origin/preview using name convention: <type>-<topic>\_<purpose>: `ltp-setup`
+- Squash-merge worktree commits and commit (with optional issue number): `ltp-merge`
+- Sync local preview with remote preview (FF only): `ltp-sync`
+- Push preview: `ltp-push`
+- Clean up a worktree safely: `ltp-cleanup`
+
+## Testing & TDD
+
+- **Flow**: Enforce Red-Green-Refactor testing flow before writing implementation.
+- **Coverage**: Map changed acceptance scenarios and failure paths to deterministic public-interface
+  tests. Test Cloudflare-dependent integration behavior with Miniflare or `wrangler dev`.
+- **Skills**: `tdd`.
