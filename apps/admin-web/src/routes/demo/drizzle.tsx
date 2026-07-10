@@ -1,23 +1,34 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { desc } from "drizzle-orm";
-
-import { db } from "#/db/index";
-import { todos } from "#/db/schema";
+import { getDB, todos, desc } from "data-ops";
 
 const getTodos = createServerFn({
   method: "GET",
 }).handler(async () => {
+  // @ts-expect-error - vinxi/http is a platform-specific import
+  const { getEvent } = await import("vinxi/http");
+  const d1 = getEvent()?.context?.cloudflare?.env?.DB;
+  const db = getDB(d1);
   return await db.query.todos.findMany({
     orderBy: [desc(todos.createdAt)],
   });
 });
 
+import { z } from "zod";
+
 const createTodo = createServerFn({
   method: "POST",
 })
-  .validator((data: { title: string }) => data)
+  .validator(
+    z.object({
+      title: z.string().min(1, "Title is required"),
+    }),
+  )
   .handler(async ({ data }) => {
+    // @ts-expect-error - vinxi/http is a platform-specific import
+    const { getEvent } = await import("vinxi/http");
+    const d1 = getEvent()?.context?.cloudflare?.env?.DB;
+    const db = getDB(d1);
     await db.insert(todos).values({ title: data.title });
     return { success: true };
   });

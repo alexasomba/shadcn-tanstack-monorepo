@@ -13,6 +13,8 @@ export default defineConfig({
       { name: "@tanstack/router", specifier: "@tanstack/eslint-plugin-router" },
       { name: "@tanstack/query", specifier: "@tanstack/eslint-plugin-query" },
       { name: "drizzle", specifier: "eslint-plugin-drizzle" },
+      { name: "zod", specifier: "eslint-plugin-zod" },
+      { name: "zod-openapi", specifier: "eslint-plugin-zod-openapi" },
     ],
     plugins: ["oxc", "typescript", "unicorn", "react", "import", "eslint", "jsx-a11y", "vitest"],
     rules: {
@@ -52,6 +54,8 @@ export default defineConfig({
           drizzleObjectName: ["db", "tx", "drizzleDb"],
         },
       ],
+      "zod/prefer-enum-over-literal-union": "warn",
+      // "zod-openapi/require-meta": "off",
     },
     options: { typeAware: true, typeCheck: true },
     env: {
@@ -255,6 +259,8 @@ export default defineConfig({
         files: ["apps/data-service/**/*.{js,mjs,cjs,ts,tsx}"],
         rules: {
           "typescript/no-floating-promises": "error",
+          // "zod-openapi/require-meta": "error",
+          // "zod-openapi/require-comment": "warn",
         },
         env: {
           browser: false,

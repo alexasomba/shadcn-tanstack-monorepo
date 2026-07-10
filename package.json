@@ -19,6 +19,8 @@
     "eslint-plugin-no-instanceof": "catalog:",
     "eslint-plugin-react": "catalog:",
     "eslint-plugin-sonarjs": "catalog:",
+    "eslint-plugin-zod": "^4.7.1",
+    "eslint-plugin-zod-openapi": "^2.0.0",
     "typescript": "catalog:",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
     "vite-plus": "catalog:"

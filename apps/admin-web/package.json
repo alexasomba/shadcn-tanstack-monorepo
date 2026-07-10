@@ -23,6 +23,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "catalog:",
     "@cloudflare/tanstack-ai": "catalog:",
     "@cloudflare/vite-plugin": "catalog:",
     "@faker-js/faker": "catalog:",
@@ -53,10 +54,11 @@
     "better-sqlite3": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "data-ops": "workspace:*",
     "dotenv-cli": "catalog:",
     "drizzle-kit": "catalog:",
-    "drizzle-orm": "catalog:",
     "highlight.js": "catalog:",
+    "hono": "catalog:",
     "marked": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -68,6 +70,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@content-collections/core": "catalog:",
     "@content-collections/vite": "catalog:",
     "@inlang/paraglide-js": "catalog:",

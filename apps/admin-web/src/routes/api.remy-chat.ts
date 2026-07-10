@@ -2,6 +2,7 @@ import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { chat, maxIterations, toServerSentEventsResponse } from "@tanstack/ai";
 import { ollamaText } from "@tanstack/ai-ollama";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 
 import {
   getSpeakerBySlug,
@@ -10,6 +11,12 @@ import {
   getAllTalks,
   searchConference,
 } from "#/lib/conference-tools";
+
+const chatInputSchema = z.object({
+  messages: z.array(z.any()).optional(),
+  speakerSlug: z.string().optional(),
+  talkSlug: z.string().optional(),
+});
 
 export const Route = createFileRoute("/api/remy-chat")({
   server: {
@@ -24,8 +31,7 @@ export const Route = createFileRoute("/api/remy-chat")({
         const abortController = new AbortController();
 
         try {
-          const body = await request.json();
-          const { messages, speakerSlug, talkSlug } = body;
+          const { messages, speakerSlug, talkSlug } = chatInputSchema.parse(await request.json());
 
           const SYSTEM_PROMPT = `You are Remy, a charming and knowledgeable culinary assistant for the Haute Pâtisserie 2026 conference in Paris. You have a warm, enthusiastic personality and deep appreciation for the art of pastry and baking.
 

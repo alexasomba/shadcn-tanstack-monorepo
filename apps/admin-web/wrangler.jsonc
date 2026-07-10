@@ -8,6 +8,13 @@
     "binding": "AI",
     "remote": true,
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "data-service-db",
+      "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    },
+  ],
   "dev": {
     "inspector_port": 9231,
   },

@@ -12,8 +12,13 @@ import { ChevronLeft, X, ArrowRight, Fingerprint } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { SVGProps } from "react";
 import { BsWallet2 } from "react-icons/bs";
-import { FaGithub as Github, FaChrome as Chrome, FaTwitter as Twitter } from "react-icons/fa6";
-import { FaApple, FaDiscord } from "react-icons/fa6";
+import {
+  FaGithub as Github,
+  FaChrome as Chrome,
+  FaTwitter as Twitter,
+  FaApple,
+  FaDiscord,
+} from "react-icons/fa6";
 import useMeasure from "react-use-measure";
 
 /* ---------------- ENUMS ---------------- */

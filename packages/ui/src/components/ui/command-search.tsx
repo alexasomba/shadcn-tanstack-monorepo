@@ -3,8 +3,7 @@
 import { Search, User, Bell, HelpCircle, MessageSquare, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useMemo, useEffect, useRef } from "react";
-import type { KeyboardEvent, FC } from "react";
-import type { ReactNode } from "react";
+import type { KeyboardEvent, FC, ReactNode } from "react";
 
 export interface CommandItem {
   id: string;
