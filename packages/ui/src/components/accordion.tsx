@@ -2,7 +2,12 @@ import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
 
-function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
+function Accordion({
+  className,
+  type,
+  collapsible,
+  ...props
+}: AccordionPrimitive.Root.Props & { type?: "single" | "multiple"; collapsible?: boolean }) {
   return (
     <AccordionPrimitive.Root
       data-slot="accordion"

@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
 import { cn } from "@workspace/ui/lib/utils";
 import * as React from "react";
