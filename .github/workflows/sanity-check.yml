@@ -26,5 +26,5 @@ jobs:
 
       - uses: actions/setup-node@v3
 
-      - run: npm install
-      - run: npm run check
+      - run: pnpm install
+      - run: pnpm run check
