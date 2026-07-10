@@ -18,6 +18,6 @@ jobs:
           node-version: "24"
           cache: true
       - run: vp install
-      - run: vp build
+      - run: vpr build
       - run: vp check
       - run: vp test
