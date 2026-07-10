@@ -94,8 +94,8 @@
     "eslint": "catalog:",
     "jsdom": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
+    "typescript": "6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },

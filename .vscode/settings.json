@@ -30,7 +30,8 @@
     "**/routeTree.gen.ts": true
   },
   "files.associations": {
-    ".dev.vars": "dotenv"
+    ".dev.vars": "dotenv",
+    "wrangler.json": "jsonc"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.inlayHints.parameterNames.enabled": "all",
