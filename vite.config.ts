@@ -350,6 +350,42 @@ export default defineConfig({
       "repo:deploy:dry-run": {
         command: "vp run --filter !start-monorepo deploy --dry-run --temporary",
       },
+      "admin-web:build": {
+        command: "vp run --filter admin-web-app build",
+      },
+      "admin-web:deploy": {
+        command: "vp run --filter admin-web-app deploy",
+      },
+      "admin-web:deploy:preview": {
+        command: "vp run --filter admin-web-app deploy:preview",
+      },
+      "user-web:build": {
+        command: "vp run --filter user-web-app build",
+      },
+      "user-web:deploy": {
+        command: "vp run --filter user-web-app deploy",
+      },
+      "user-web:deploy:preview": {
+        command: "vp run --filter user-web-app deploy:preview",
+      },
+      "agents:build": {
+        command: "vp run --filter agents build",
+      },
+      "agents:deploy": {
+        command: "vp run --filter agents deploy",
+      },
+      "agents:deploy:preview": {
+        command: "vp run --filter agents deploy:preview",
+      },
+      "data-service:build": {
+        command: "vp run --filter data-service build",
+      },
+      "data-service:deploy": {
+        command: "vp run --filter data-service deploy",
+      },
+      "data-service:deploy:preview": {
+        command: "vp run --filter data-service deploy:preview",
+      },
     },
   },
   test: {

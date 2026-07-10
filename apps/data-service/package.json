@@ -11,8 +11,10 @@
   },
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false"
+    "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false",
+    "build": "pnpm run cf-typegen",
+    "deploy": "vp run build && wrangler deploy --minify",
+    "deploy:preview": "vp run build && wrangler versions upload"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",

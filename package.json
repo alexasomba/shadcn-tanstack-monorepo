@@ -8,6 +8,14 @@
     "lint": "vp run repo:lint",
     "format": "vp run repo:format",
     "typecheck": "vp run repo:typecheck",
+    "admin-web:deploy": "vp run admin-web:deploy",
+    "admin-web:deploy:preview": "vp run admin-web:deploy:preview",
+    "user-web:deploy": "vp run user-web:deploy",
+    "user-web:deploy:preview": "vp run user-web:deploy:preview",
+    "agents:deploy": "vp run agents:deploy",
+    "agents:deploy:preview": "vp run agents:deploy:preview",
+    "data-service:deploy": "vp run data-service:deploy",
+    "data-service:deploy:preview": "vp run data-service:deploy:preview",
     "prepare": "vp config"
   },
   "devDependencies": {

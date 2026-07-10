@@ -13,7 +13,9 @@
   "scripts": {
     "dev": "vp dev",
     "start": "vp dev",
-    "deploy": "vp build && wrangler deploy",
+    "build": "vp build",
+    "deploy": "vp run build && wrangler deploy",
+    "deploy:preview": "vp run build && wrangler versions upload",
     "types": "wrangler types env.d.ts --include-runtime false",
     "format": "vp check --fix",
     "lint": "vp check",
