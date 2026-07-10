@@ -1,8 +1,6 @@
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { chat, maxIterations, toServerSentEventsResponse } from "@tanstack/ai";
-import { anthropicText } from "@tanstack/ai-anthropic";
-import { geminiText } from "@tanstack/ai-gemini";
 import { ollamaText } from "@tanstack/ai-ollama";
-import { openaiText } from "@tanstack/ai-openai";
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
@@ -57,31 +55,30 @@ ${talkSlug ? `CONTEXT: The user is viewing the session with slug "${talkSlug}".`
 
 Remember: You are the friendly face of Haute Pâtisserie 2026. Make every attendee feel welcome and excited about the culinary journey ahead!`;
 
-          // Adapter factory pattern for multi-vendor support
-          const adapterConfig = {
-            anthropic: () =>
-              anthropicText((model || "claude-haiku-4-5") as Parameters<typeof anthropicText>[0]),
-            openai: () => openaiText((model || "gpt-4o") as Parameters<typeof openaiText>[0]),
-            gemini: () =>
-              geminiText((model || "gemini-2.0-flash-exp") as Parameters<typeof geminiText>[0]),
-            ollama: () => ollamaText(model || "mistral:7b"),
-          };
-
-          // Determine the best available provider
-          let provider: keyof typeof adapterConfig = "ollama";
-          let model = "mistral:7b";
-          if (process.env.ANTHROPIC_API_KEY) {
-            provider = "anthropic";
-            model = "claude-haiku-4-5";
-          } else if (process.env.OPENAI_API_KEY) {
-            provider = "openai";
-            model = "gpt-4o";
-          } else if (process.env.GEMINI_API_KEY) {
-            provider = "gemini";
-            model = "gemini-2.0-flash-exp";
+          let binding: unknown = undefined;
+          try {
+            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
+            const { getEvent } = await import("vinxi/http");
+            const event = getEvent();
+            binding = event?.context?.cloudflare?.env?.AI;
+          } catch {
+            // Fallback
           }
 
-          const adapter = adapterConfig[provider]();
+          if (!binding) {
+            binding =
+              (process.env as Record<string, unknown>).AI ||
+              (globalThis as Record<string, unknown>).AI;
+          }
+
+          const adapter = binding
+            ? createWorkersAiChat("@cf/meta/llama-3-8b-instruct", {
+                binding: binding as Extract<
+                  Parameters<typeof createWorkersAiChat>[1],
+                  { binding: { gateway: unknown } }
+                >["binding"],
+              })
+            : ollamaText("mistral:7b");
 
           const stream = chat({
             adapter,

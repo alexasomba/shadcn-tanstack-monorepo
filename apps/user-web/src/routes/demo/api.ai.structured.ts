@@ -1,5 +1,6 @@
 import { chat } from "@tanstack/ai";
-import { openaiText } from "@tanstack/ai-openai";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
+import { ollamaText } from "@tanstack/ai-ollama";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
@@ -55,10 +56,35 @@ export const Route = createFileRoute("/demo/api/ai/structured")({
         }
 
         try {
+          let binding: any = undefined;
+          try {
+            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
+            const { getEvent } = await import("vinxi/http");
+            const event = getEvent();
+            binding = event?.context?.cloudflare?.env?.AI;
+          } catch {
+            // Fallback
+          }
+
+          if (!binding) {
+            binding =
+              (process.env as Record<string, unknown>).AI ||
+              (globalThis as Record<string, unknown>).AI;
+          }
+
+          const adapter = binding
+            ? createWorkersAiChat("@cf/meta/llama-3-8b-instruct", {
+                binding: binding as Extract<
+                  Parameters<typeof createWorkersAiChat>[1],
+                  { binding: { gateway: unknown } }
+                >["binding"],
+              })
+            : ollamaText("mistral:7b");
+
           if (mode === "structured") {
             // Structured output mode - returns validated object
             const result = await chat({
-              adapter: openaiText("gpt-4o"),
+              adapter,
               messages: [
                 {
                   role: "user",
@@ -72,8 +98,8 @@ export const Route = createFileRoute("/demo/api/ai/structured")({
               JSON.stringify({
                 mode: "structured",
                 recipe: result,
-                provider: "openai",
-                model: "gpt-4o",
+                provider: binding ? "cloudflare" : "ollama",
+                model: binding ? "@cf/meta/llama-3-8b-instruct" : "mistral:7b",
               }),
               {
                 status: 200,
@@ -83,7 +109,7 @@ export const Route = createFileRoute("/demo/api/ai/structured")({
           } else {
             // One-shot markdown mode - returns text
             const markdown = await chat({
-              adapter: openaiText("gpt-4o"),
+              adapter,
               stream: false,
               messages: [
                 {
@@ -108,8 +134,8 @@ Make it detailed and easy to follow.`,
               JSON.stringify({
                 mode: "oneshot",
                 markdown,
-                provider: "openai",
-                model: "gpt-4o",
+                provider: binding ? "cloudflare" : "ollama",
+                model: binding ? "@cf/meta/llama-3-8b-instruct" : "mistral:7b",
               }),
               {
                 status: 200,

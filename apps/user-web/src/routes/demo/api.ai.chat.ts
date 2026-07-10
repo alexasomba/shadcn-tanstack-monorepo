@@ -1,8 +1,6 @@
 import { chat, maxIterations, toServerSentEventsResponse } from "@tanstack/ai";
-import { anthropicText } from "@tanstack/ai-anthropic";
-import { geminiText } from "@tanstack/ai-gemini";
+import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { ollamaText } from "@tanstack/ai-ollama";
-import { openaiText } from "@tanstack/ai-openai";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { getGuitars, recommendGuitarToolDef } from "#/lib/demo-guitar-tools";
@@ -42,29 +40,30 @@ export const Route = createFileRoute("/demo/api/ai/chat")({
           const body = await request.json();
           const { messages } = body;
 
-          // Determine the best available provider
-          let provider: string = "ollama";
-          let model: string = "mistral:7b";
-          if (process.env.ANTHROPIC_API_KEY) {
-            provider = "anthropic";
-            model = "claude-haiku-4-5";
-          } else if (process.env.OPENAI_API_KEY) {
-            provider = "openai";
-            model = "gpt-4o";
-          } else if (process.env.GEMINI_API_KEY) {
-            provider = "gemini";
-            model = "gemini-2.0-flash-exp";
+          let binding: any = undefined;
+          try {
+            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
+            const { getEvent } = await import("vinxi/http");
+            const event = getEvent();
+            binding = event?.context?.cloudflare?.env?.AI;
+          } catch {
+            // Fallback
           }
 
-          // Adapter factory pattern for multi-vendor support
-          const adapterConfig = {
-            anthropic: () => anthropicText((model || "claude-haiku-4-5") as any),
-            openai: () => openaiText((model || "gpt-4o") as any),
-            gemini: () => geminiText((model || "gemini-2.0-flash-exp") as any),
-            ollama: () => ollamaText((model || "mistral:7b") as any),
-          };
+          if (!binding) {
+            binding =
+              (process.env as Record<string, unknown>).AI ||
+              (globalThis as Record<string, unknown>).AI;
+          }
 
-          const adapter = adapterConfig[provider]();
+          const adapter = binding
+            ? createWorkersAiChat("@cf/meta/llama-3-8b-instruct", {
+                binding: binding as Extract<
+                  Parameters<typeof createWorkersAiChat>[1],
+                  { binding: { gateway: unknown } }
+                >["binding"],
+              })
+            : ollamaText("mistral:7b");
 
           const stream = chat({
             adapter,

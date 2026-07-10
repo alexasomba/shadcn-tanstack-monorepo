@@ -23,6 +23,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@cloudflare/tanstack-ai": "catalog:",
     "@cloudflare/vite-plugin": "catalog:",
     "@faker-js/faker": "catalog:",
     "@phosphor-icons/react": "catalog:",
@@ -30,11 +31,8 @@
     "@t3-oss/env-core": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/ai": "catalog:",
-    "@tanstack/ai-anthropic": "catalog:",
     "@tanstack/ai-client": "catalog:",
-    "@tanstack/ai-gemini": "catalog:",
     "@tanstack/ai-ollama": "catalog:",
-    "@tanstack/ai-openai": "catalog:",
     "@tanstack/ai-react": "catalog:",
     "@tanstack/match-sorter-utils": "catalog:",
     "@tanstack/query-db-collection": "catalog:",
@@ -60,7 +58,6 @@
     "drizzle-orm": "catalog:",
     "highlight.js": "catalog:",
     "marked": "catalog:",
-    "radix-ui": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "streamdown": "catalog:",

@@ -7,7 +7,7 @@ import RemyAssistant from "#/components/RemyAssistant";
 import TalkCard from "#/components/TalkCard";
 
 export const Route = createFileRoute("/speakers/$slug")({
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     const speaker = allSpeakers.find((s) => s.slug === params.slug);
     if (!speaker) {
       throw new Error("Speaker not found");

@@ -2,7 +2,7 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   staged: {
-    "*.{js,ts,tsx}": "vp check --fix",
+    "*.{js,ts,tsx,md,css,html,json,jsonc,yaml,yml}": "vp check --fix",
   },
   lint: {
     jsPlugins: [
@@ -189,9 +189,9 @@ export default defineConfig({
       // 1. Shared React & UI Layout Layer (Applies to Apps and the Shadcn UI Package)
       {
         files: [
-          "apps/web/src/**/*.{js,ts,tsx}",
-          "apps/user-web-app/src/**/*.{js,ts,tsx}",
-          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
+          "apps/user-web/src/**/*.{js,ts,tsx}",
+          "apps/admin-web/src/**/*.{js,ts,tsx}",
+          "apps/agents/src/**/*.{js,ts,tsx}",
           "packages/ui/src/**/*.{js,ts,tsx}",
         ],
         rules: {
@@ -220,13 +220,15 @@ export default defineConfig({
           "typescript/restrict-template-expressions": "off",
         },
       },
+      {
+        files: ["apps/agents/src/**/*.{js,ts,tsx}"],
+        rules: {
+          "no-unused-expressions": "off",
+        },
+      },
       // 2. TanStack Ecosystem Layer (Strictly scoped to Frontend Applications)
       {
-        files: [
-          "apps/web/src/**/*.{js,ts,tsx}",
-          "apps/user-web-app/src/**/*.{js,ts,tsx}",
-          "apps/admin-web-app/src/**/*.{js,ts,tsx}",
-        ],
+        files: ["apps/user-web/src/**/*.{js,ts,tsx}", "apps/admin-web/src/**/*.{js,ts,tsx}"],
         rules: {
           "@tanstack/router/create-route-property-order": "error",
           "@tanstack/router/route-param-names": "error",
@@ -313,7 +315,7 @@ export default defineConfig({
         command: "vp run --filter !start-monorepo build",
       },
       "repo:dev": {
-        command: "vp run --filter web dev",
+        command: "vp run --filter !start-monorepo dev",
         cache: false,
       },
       "repo:lint": {

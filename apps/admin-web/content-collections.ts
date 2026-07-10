@@ -52,5 +52,5 @@ const talks = defineCollection({
 });
 
 export default defineConfig({
-  collections: [speakers, talks],
+  content: [speakers, talks],
 });

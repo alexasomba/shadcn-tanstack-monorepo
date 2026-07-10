@@ -1,5 +1,3 @@
-import { generateImage, createImageOptions } from "@tanstack/ai";
-import { openaiImage } from "@tanstack/ai-openai";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/demo/api/ai/image")({
@@ -7,7 +5,7 @@ export const Route = createFileRoute("/demo/api/ai/image")({
     handlers: {
       POST: async ({ request }) => {
         const body = await request.json();
-        const { prompt, numberOfImages = 1, size = "1024x1024" } = body;
+        const { prompt } = body;
 
         if (!prompt || prompt.trim().length === 0) {
           return new Response(
@@ -21,34 +19,48 @@ export const Route = createFileRoute("/demo/api/ai/image")({
           );
         }
 
-        if (!process.env.OPENAI_API_KEY) {
-          return new Response(
-            JSON.stringify({
-              error: "OPENAI_API_KEY is not configured",
-            }),
-            {
-              status: 500,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
-        }
-
         try {
-          const options = createImageOptions({
-            adapter: openaiImage("gpt-image-1"),
-          });
+          let binding: any = undefined;
+          try {
+            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
+            const { getEvent } = await import("vinxi/http");
+            const event = getEvent();
+            binding = event?.context?.cloudflare?.env?.AI;
+          } catch {
+            // Fallback
+          }
 
-          const result = await generateImage({
-            ...options,
-            prompt,
-            numberOfImages,
-            size,
-          });
+          if (!binding) {
+            binding =
+              (process.env as Record<string, unknown>).AI ||
+              (globalThis as Record<string, unknown>).AI;
+          }
+
+          if (!binding) {
+            return new Response(
+              JSON.stringify({
+                error: "Cloudflare AI binding is not configured. Image generation is not available offline with Ollama.",
+              }),
+              {
+                status: 503,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
+          }
+
+          // Generate image bytes from Cloudflare Workers AI
+          const response = await binding.run("@cf/lykon/dreamshaper-8-lcm", { prompt });
+
+          const buffer = await response.arrayBuffer();
+          const base64 = typeof Buffer !== "undefined"
+            ? Buffer.from(buffer).toString("base64")
+            : btoa(String.fromCharCode(...new Uint8Array(buffer)));
+          const imageUrl = `data:image/jpeg;base64,${base64}`;
 
           return new Response(
             JSON.stringify({
-              images: result.images,
-              model: "gpt-image-1",
+              images: [imageUrl],
+              model: "@cf/lykon/dreamshaper-8-lcm",
             }),
             {
               status: 200,
