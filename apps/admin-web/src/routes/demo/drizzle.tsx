@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getDB, todos, desc } from "data-ops";
+import { z } from "zod";
 
 const getTodos = createServerFn({
   method: "GET",
@@ -13,8 +14,6 @@ const getTodos = createServerFn({
     orderBy: [desc(todos.createdAt)],
   });
 });
-
-import { z } from "zod";
 
 const createTodo = createServerFn({
   method: "POST",

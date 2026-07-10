@@ -21,7 +21,7 @@
     "eslint-plugin-sonarjs": "catalog:",
     "eslint-plugin-zod": "^4.7.1",
     "eslint-plugin-zod-openapi": "^2.0.0",
-    "typescript": "catalog:",
+    "typescript": "6.0.3",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
     "vite-plus": "catalog:"
   },
