@@ -55,6 +55,7 @@ export default defineConfig({
         },
       ],
       "zod/prefer-enum-over-literal-union": "warn",
+      "sonarjs/cognitive-complexity": ["warn", 15],
       // "zod-openapi/require-meta": "off",
     },
     options: { typeAware: true, typeCheck: true },
@@ -348,5 +349,16 @@ export default defineConfig({
         command: "vp run --filter !start-monorepo deploy --dry-run --temporary",
       },
     },
+  },
+  test: {
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.agent/**",
+      "**/.agents/**",
+      "**/cypress/**",
+      "**/.epub/**",
+      "**/.next/**",
+    ],
   },
 });

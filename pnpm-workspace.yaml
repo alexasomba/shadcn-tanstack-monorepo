@@ -138,6 +138,7 @@ catalog:
   "zod": "^4.4.3"
 overrides:
   vite: "catalog:"
+  typescript: "6.0.3"
 peerDependencyRules:
   allowAny:
     - vite
@@ -154,3 +155,5 @@ minimumReleaseAgeExclude:
   - "@tanstack/form-core@1.33.1"
   - "@tanstack/react-form@1.33.1"
   - ai@7.0.19
+patchedDependencies:
+  eslint-plugin-sonarjs: patches/eslint-plugin-sonarjs.patch
