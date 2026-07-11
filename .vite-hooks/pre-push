@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 vp install
 vpr build
 vp check

@@ -21,6 +21,7 @@
     "allowJs": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Linting */
     "skipLibCheck": true,
