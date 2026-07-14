@@ -4,6 +4,12 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+  },
   // When run via wrangler dev alone, always persist to user-web so D1 is shared:
   //   wrangler dev --persist-to ../user-web/.wrangler/state
   // Prefer starting user-web (auxiliaryWorkers) so the service binding is live.

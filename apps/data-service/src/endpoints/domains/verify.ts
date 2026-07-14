@@ -104,15 +104,26 @@ export async function verifyDomainHandler(c: AppContext) {
       catch: (cause) => cause,
     });
     if (Result.isError(getResult)) {
+      const errMessage =
+        getResult.error && typeof getResult.error === "object" && "message" in getResult.error
+          ? String((getResult.error as Record<string, unknown>).message)
+          : String(getResult.error);
+
+      console.error(
+        JSON.stringify({
+          message: "Failed to verify custom domain status with Cloudflare SaaS",
+          organizationId,
+          hostname,
+          error: errMessage,
+        }),
+      );
+
       return c.json(
         {
           success: false,
           error: {
             code: "PROVIDER_ERROR",
-            message:
-              getResult.error && typeof getResult.error === "object" && "message" in getResult.error
-                ? String((getResult.error as Record<string, unknown>).message)
-                : String(getResult.error),
+            message: errMessage,
           },
         },
         500,
@@ -125,6 +136,16 @@ export async function verifyDomainHandler(c: AppContext) {
   if (domain.status !== domainRow.status) {
     await updateDomainStatus(db, hostname, domain.status);
   }
+
+  console.log(
+    JSON.stringify({
+      message: "Custom domain DNS verification check executed",
+      organizationId,
+      hostname,
+      oldStatus: domainRow.status,
+      newStatus: domain.status,
+    }),
+  );
 
   return c.json(
     {

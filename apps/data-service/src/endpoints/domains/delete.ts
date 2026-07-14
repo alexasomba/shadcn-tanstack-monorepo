@@ -99,15 +99,26 @@ export async function deleteDomainHandler(c: AppContext) {
   });
 
   if (Result.isError(sdkResult)) {
+    const errMessage =
+      sdkResult.error && typeof sdkResult.error === "object" && "message" in sdkResult.error
+        ? String((sdkResult.error as Record<string, unknown>).message)
+        : String(sdkResult.error);
+
+    console.error(
+      JSON.stringify({
+        message: "Failed to remove custom domain from Cloudflare SaaS",
+        organizationId,
+        hostname,
+        error: errMessage,
+      }),
+    );
+
     return c.json(
       {
         success: false,
         error: {
           code: "PROVIDER_ERROR",
-          message:
-            sdkResult.error && typeof sdkResult.error === "object" && "message" in sdkResult.error
-              ? String((sdkResult.error as Record<string, unknown>).message)
-              : String(sdkResult.error),
+          message: errMessage,
         },
       },
       500,
@@ -117,11 +128,27 @@ export async function deleteDomainHandler(c: AppContext) {
   // 3. Delete from DB
   const deleteResult = await deleteDomain(db, hostname);
   if (Result.isError(deleteResult)) {
+    console.error(
+      JSON.stringify({
+        message: "Failed to delete custom domain from database",
+        organizationId,
+        hostname,
+        error: deleteResult.error.message,
+      }),
+    );
     return c.json(
       appErrorBody(deleteResult.error),
       appErrorStatus(deleteResult.error) as 404 | 500,
     );
   }
+
+  console.log(
+    JSON.stringify({
+      message: "Custom domain deleted successfully",
+      organizationId,
+      hostname,
+    }),
+  );
 
   return c.json({ success: true }, 200);
 }

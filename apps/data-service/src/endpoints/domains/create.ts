@@ -76,6 +76,14 @@ export async function createDomainHandler(c: AppContext) {
   // 1. Create in local database first (validates duplicates and constraints)
   const dbResult = await createDomain(db, organizationId, hostname);
   if (Result.isError(dbResult)) {
+    console.error(
+      JSON.stringify({
+        message: "Failed to create custom domain in local database",
+        organizationId,
+        hostname,
+        error: dbResult.error.message,
+      }),
+    );
     return c.json(appErrorBody(dbResult.error), appErrorStatus(dbResult.error) as 400 | 500);
   }
 
@@ -87,6 +95,20 @@ export async function createDomainHandler(c: AppContext) {
   });
 
   if (Result.isError(sdkResult)) {
+    const errMessage =
+      sdkResult.error && typeof sdkResult.error === "object" && "message" in sdkResult.error
+        ? String((sdkResult.error as Record<string, unknown>).message)
+        : String(sdkResult.error);
+
+    console.error(
+      JSON.stringify({
+        message: "Failed to register custom domain with Cloudflare SaaS",
+        organizationId,
+        hostname,
+        error: errMessage,
+      }),
+    );
+
     // Rollback DB record if provider registration fails
     await deleteDomain(db, hostname);
     return c.json(
@@ -94,10 +116,7 @@ export async function createDomainHandler(c: AppContext) {
         success: false,
         error: {
           code: "PROVIDER_ERROR",
-          message:
-            sdkResult.error && typeof sdkResult.error === "object" && "message" in sdkResult.error
-              ? String((sdkResult.error as Record<string, unknown>).message)
-              : String(sdkResult.error),
+          message: errMessage,
         },
       },
       500,
@@ -110,6 +129,16 @@ export async function createDomainHandler(c: AppContext) {
   if (domain.status !== "pending") {
     await updateDomainStatus(db, hostname, domain.status);
   }
+
+  console.log(
+    JSON.stringify({
+      message: "Custom domain registered successfully",
+      organizationId,
+      hostname,
+      domainId: domain.id,
+      status: domain.status,
+    }),
+  );
 
   return c.json(
     {
