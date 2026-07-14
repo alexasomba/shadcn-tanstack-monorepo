@@ -4,18 +4,31 @@
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Local D1 state lives under apps/user-web/.wrangler/state.
+  // Other apps persist to this path so the monorepo shares one local DB.
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8300,
+    "inspector_port": 9230,
+  },
   "ai": {
     "binding": "AI",
     "remote": true,
   },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "data-service-db",
+      "binding": "DATABASE",
+      "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "migrations_dir": "../../packages/data-ops/src/drizzle",
     },
   ],
-  "dev": {
-    "inspector_port": 9232,
-  },
+  // Frontends talk to data-service only via this Worker service binding
+  // (never public HTTP between Workers in production).
+  "services": [
+    {
+      "binding": "DATA_SERVICE",
+      "service": "data-service",
+    },
+  ],
 }

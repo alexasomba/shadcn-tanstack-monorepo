@@ -51,9 +51,10 @@ function Button({
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       render={asChild ? (children as React.ReactElement) : undefined}
-      children={asChild ? undefined : children}
       {...props}
-    />
+    >
+      {asChild ? undefined : children}
+    </ButtonPrimitive>
   );
 }
 

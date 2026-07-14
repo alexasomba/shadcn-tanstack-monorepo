@@ -4,36 +4,41 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "MY_KV_NAMESPACE",
-  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
-  // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
+  // When run via wrangler dev alone, always persist to user-web so D1 is shared:
+  //   wrangler dev --persist-to ../user-web/.wrangler/state
+  // Prefer starting user-web (auxiliaryWorkers) so the service binding is live.
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8302,
+    "inspector_port": 9232,
+  },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "data-service-db",
+      "binding": "DATABASE",
+      "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "migrations_dir": "../../packages/data-ops/src/drizzle",
     },
   ],
-  // "ai": {
-  //   "binding": "AI"
-  // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
-  "dev": {
-    "inspector_port": 9233,
+  // Background jobs stub — create the queue once:
+  //   wrangler queues create app-jobs
+  "queues": {
+    "producers": [
+      {
+        "binding": "JOBS_QUEUE",
+        "queue": "app-jobs",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "app-jobs",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+      },
+    ],
+  },
+  // Outbox drain / housekeeping — adjust cadence for your product.
+  "triggers": {
+    "crons": ["*/15 * * * *"],
   },
 }

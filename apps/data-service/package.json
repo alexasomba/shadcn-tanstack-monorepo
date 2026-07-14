@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --persist-to ../user-web/.wrangler/state --ip 127.0.0.1 --port 8302",
     "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false",
     "build": "pnpm run cf-typegen",
     "deploy": "vp run build && wrangler deploy --minify",
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
-    "@hono/zod-openapi": "^1.4.0",
+    "@hono/zod-openapi": "catalog:",
     "better-auth": "catalog:",
     "data-ops": "workspace:*",
     "hono": "catalog:",

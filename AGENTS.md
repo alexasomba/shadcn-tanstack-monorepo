@@ -15,6 +15,19 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 <!--VITE PLUS END-->
 
+## Cloudflare D1 + data-service architecture
+
+- **Shared D1** binding is `DATABASE` on database `app-db`. Schema/migrations only in `packages/data-ops`.
+- **Local D1 owner**: `apps/user-web/.wrangler/state`. admin-web, data-service, and agents persist to that path.
+- **Dev ports** (strict): user-web `8300`, admin-web `8301`, data-service `8302`, agents `8303`.
+- **user-web / admin-web → data-service**: only via Cloudflare **service binding** `DATA_SERVICE` (`env.DATA_SERVICE.fetch`). Use `dataServiceClient` from `src/lib/data-client.ts`. No public HTTP between Workers.
+- Use `import { env } from "cloudflare:workers"` for bindings (current CF + TanStack Start API). Do **not** use `vinxi/http` `getEvent()` for env.
+- Use `createDatabase(env.DATABASE)` from `data-ops`. Shared queries live under `data-ops/queries/*`; Zod under `data-ops/zod-schema/*`.
+- **Auth**: `createAuth` + `createBaseAuthPlugins()` (includes **organization**) in `data-ops/auth`. Mailer: `createMailerFromEnv` (Resend or console). Apps append `tanstackStartCookies()` last. Client: `createBaseAuthClientPlugins()`. After plugin changes: `vpr auth:generate` → `vpr db:generate` → `vpr db:migrate:local`.
+- **data-ops pack**: `pnpm --filter data-ops build` → `vp pack` (tsdown `dist/`); workspace still resolves `src/` for DX.
+- **data-service** endpoints: `@hono/zod-openapi` under `src/endpoints/<resource>/`. Prefer data-ops queries. **Queues/cron stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
+- **SEO discovery (user-web)**: `/sitemap.xml`, `/robots.txt`, `/llms.txt` server routes (`src/lib/discovery.ts`).
+
 ## Package Source Inspection
 
 No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
@@ -23,26 +36,8 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - Read: `cat $(opensrc path <package>)/path/to/file`
 - Other registries: `find $(opensrc path pypi:requests) -name "*.py"`
 
-## Git & Verification Rules
-
-- Never bypass git hooks (e.g., do not use `--no-verify`). Instead, always debug and resolve the underlying issues causing validation or hook failures.
-
-# Workflow Guidelines:
-
-- Issue Tracking: Use GitHub Issues. Meaningful work -> new issue.
-- Commits must contain 'Fixes #123' (enforced by commit-msg hook).
-- Worktree default convention: git ltp-setup <type>-<topic>\_<purpose>
-- Inspect status and compare with remote preview: `ltp-inspect`
-- Save uncommitted changes to a temp worktree: `ltp-checkpoint`
-- Setup a fresh ephemeral worktree from origin/preview using name convention: <type>-<topic>\_<purpose>: `ltp-setup`
-- Squash-merge worktree commits and commit (with optional issue number): `ltp-merge`
-- Sync local preview with remote preview (FF only): `ltp-sync`
-- Push preview: `ltp-push`
-- Clean up a worktree safely: `ltp-cleanup`
-
 ## Testing & TDD
 
-- **Flow**: Enforce Red-Green-Refactor testing flow before writing implementation.
-- **Coverage**: Map changed acceptance scenarios and failure paths to deterministic public-interface
-  tests. Test Cloudflare-dependent integration behavior with Miniflare or `wrangler dev`.
+- **Flow**: Red-Green-Refactor before implementation.
+- **Coverage**: Acceptance + failure paths on public interfaces; Cloudflare integration via Miniflare or `wrangler dev`.
 - **Skills**: `tdd`.

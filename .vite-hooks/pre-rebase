@@ -1,8 +1,13 @@
 #!/usr/bin/env sh
+# Policy: multi-agent worktrees (AGENTS.md + setup-git-workflow.mjs)
+# Do not rewrite shared integration/release history under concurrent agents.
 
-current_branch=$(git branch --show-current 2>/dev/null || git symbolic-ref --short HEAD 2>/dev/null)
+branch=$(git branch --show-current 2>/dev/null || true)
 
-if [ "$current_branch" = "preview" ] || [ "$current_branch" = "main" ]; then
-  echo "ERROR: Cannot rebase shared branch '$current_branch'"
+if [ "$branch" = "preview" ] || [ "$branch" = "main" ]; then
+  echo "ERROR: Do not rebase shared branch '$branch' (multi-agent safety)."
+  echo "  Docs: AGENTS.md → Multi-agent–safe Git"
   exit 1
 fi
+
+exit 0

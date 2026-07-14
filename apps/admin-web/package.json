@@ -6,23 +6,18 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "dotenv -e .env.local -- sh -c \"NODE_OPTIONS='--import ./instrument.server.mjs' vp dev --port 3000\"",
+    "dev": "dotenv -e .env.local -- sh -c \"NODE_OPTIONS='--import ./instrument.server.mjs' vp dev --port 8301 --host 127.0.0.1\"",
     "generate-routes": "tsr generate",
     "build": "pnpm types && vp build && mkdir -p .output/server && cp instrument.server.mjs .output/server",
     "types": "wrangler types worker-configuration.d.ts --include-runtime false",
-    "preview": "vp preview",
+    "preview": "vp preview --port 8301",
     "test": "vitest run",
     "lint": "eslint",
     "format": "eslint --fix",
     "check": "eslint",
     "deploy": "vp run build && wrangler deploy",
     "deploy:preview": "vp run build && wrangler versions upload",
-    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio"
+    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
@@ -57,8 +52,8 @@
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "data-ops": "workspace:*",
+    "data-service": "workspace:*",
     "dotenv-cli": "catalog:",
-    "drizzle-kit": "catalog:",
     "highlight.js": "catalog:",
     "hono": "catalog:",
     "marked": "catalog:",
@@ -95,7 +90,7 @@
     "jsdom": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
+    "vite": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },

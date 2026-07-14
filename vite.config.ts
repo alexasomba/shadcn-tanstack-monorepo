@@ -79,6 +79,7 @@ export default defineConfig({
       ".agents/**",
       ".agent/**",
       ".github/**",
+      // Cloudflare starter templates are reference copies, not monorepo product code.
       "templates/**",
       "**/routeTree.gen.ts",
       "**/worker-configuration.d.ts",
@@ -235,6 +236,8 @@ export default defineConfig({
           "import/no-duplicates": "warn",
           "import/consistent-type-specifier-style": "warn",
           "typescript/no-floating-promises": "off",
+          // Large presentational demos (inline-edit / split-to-edit particles).
+          "sonarjs/cognitive-complexity": "off",
         },
       },
       {
@@ -327,67 +330,123 @@ export default defineConfig({
       "**/worker-configuration.d.ts",
       "**/demo*",
       "**/demo*/**",
+      "templates/**",
     ],
   },
+  /**
+   * Vite Task monorepo runner (`vp run` / `vpr`).
+   * @see node_modules/vite-plus/docs/guide/run.md
+   * @see node_modules/vite-plus/docs/guide/monorepo.md
+   *
+   * Rules:
+   * - Task names live in either `run.tasks` OR package.json scripts, never both
+   *   (root only defines tasks here; packages keep their own scripts).
+   * - Nested `vp run` is inlined; root `build` → `-r build` self-ref is pruned.
+   * - Workspace package order follows package.json dependency graph.
+   */
   run: {
+    // Cache package.json scripts as well as vite.config tasks (default: scripts off).
+    cache: {
+      scripts: true,
+      tasks: true,
+    },
     tasks: {
-      "repo:build": {
-        command: "vp run --filter !start-monorepo build",
+      // Build all apps + packages that define `build` (workspace dep order).
+      // Note: `--filter` and `--recursive` cannot be combined (Vite Task CLI).
+      // Packages without `build` (e.g. @workspace/ui) are skipped.
+      // Usage: `vpr build` | `vp run build`
+      build: {
+        command: 'vp run --filter "./apps/*" --filter "./packages/*" --fail-if-no-match build',
       },
-      "repo:dev": {
-        command: "vp run --filter !start-monorepo dev",
+
+      // All app `dev` scripts concurrently (no dependsOn ordering).
+      // Usage: `vpr dev` | `vp run dev`
+      dev: {
+        command: 'vp run --filter "./apps/*" --parallel --fail-if-no-match dev',
         cache: false,
       },
-      "repo:lint": {
-        command: "vp run --filter !start-monorepo lint",
+
+      // Cached wrappers for CI (`vp check` / `vp test` built-ins are not task-cached;
+      // only `vp run` / `vpr` uses Vite Task cache). Prefer these in workflows.
+      // Local agents can still call `vp check` / `vp test` directly.
+      "ci:check": "vp check",
+      "ci:test": "vp test",
+
+      "deploy:dry-run": {
+        command: 'vp run --filter "./apps/*" --fail-if-no-match deploy --dry-run --temporary',
       },
-      "repo:format": {
-        command: "vp run --filter !start-monorepo format",
+
+      // Per-app shortcuts (strict ports: user 8300, admin 8301, data-service 8302, agents 8303)
+      "dev:user": {
+        command: "vp run --filter user-web-app --fail-if-no-match dev",
+        cache: false,
       },
-      "repo:typecheck": {
-        command: "vp run --filter !start-monorepo typecheck",
+      "dev:admin": {
+        command: "vp run --filter admin-web-app --fail-if-no-match dev",
+        cache: false,
       },
-      "repo:deploy:dry-run": {
-        command: "vp run --filter !start-monorepo deploy --dry-run --temporary",
+      "dev:data-service": {
+        command: "vp run --filter data-service --fail-if-no-match dev",
+        cache: false,
       },
-      "admin-web:build": {
-        command: "vp run --filter admin-web-app build",
+      "dev:agents": {
+        command: "vp run --filter agents --fail-if-no-match dev",
+        cache: false,
       },
-      "admin-web:deploy": {
-        command: "vp run --filter admin-web-app deploy",
+
+      "user-web:build": "vp run --filter user-web-app --fail-if-no-match build",
+      "user-web:deploy": "vp run --filter user-web-app --fail-if-no-match deploy",
+      "user-web:deploy:preview": "vp run --filter user-web-app --fail-if-no-match deploy:preview",
+
+      "admin-web:build": "vp run --filter admin-web-app --fail-if-no-match build",
+      "admin-web:deploy": "vp run --filter admin-web-app --fail-if-no-match deploy",
+      "admin-web:deploy:preview": "vp run --filter admin-web-app --fail-if-no-match deploy:preview",
+
+      "agents:build": "vp run --filter agents --fail-if-no-match build",
+      "agents:deploy": "vp run --filter agents --fail-if-no-match deploy",
+      "agents:deploy:preview": "vp run --filter agents --fail-if-no-match deploy:preview",
+
+      "data-service:build": "vp run --filter data-service --fail-if-no-match build",
+      "data-service:deploy": "vp run --filter data-service --fail-if-no-match deploy",
+      "data-service:deploy:preview":
+        "vp run --filter data-service --fail-if-no-match deploy:preview",
+
+      // Better Auth CLI (Drizzle schema regenerate / diagnostics / secret)
+      // After auth:generate → db:generate → db:migrate:local
+      "auth:generate": {
+        command: "vp run --filter data-ops --fail-if-no-match auth:generate",
+        cache: false,
       },
-      "admin-web:deploy:preview": {
-        command: "vp run --filter admin-web-app deploy:preview",
+      "auth:info": {
+        command: "vp run --filter data-ops --fail-if-no-match auth:info",
+        cache: false,
       },
-      "user-web:build": {
-        command: "vp run --filter user-web-app build",
+      "auth:secret": {
+        command: "vp run --filter data-ops --fail-if-no-match auth:secret",
+        cache: false,
       },
-      "user-web:deploy": {
-        command: "vp run --filter user-web-app deploy",
+
+      // data-ops D1 tooling (not cached — mutates DB / interactive)
+      "db:generate": {
+        command: "vp run --filter data-ops --fail-if-no-match db:generate",
+        cache: false,
       },
-      "user-web:deploy:preview": {
-        command: "vp run --filter user-web-app deploy:preview",
+      "db:migrate:local": {
+        command: "vp run --filter data-ops --fail-if-no-match db:migrate:local",
+        cache: false,
       },
-      "agents:build": {
-        command: "vp run --filter agents build",
+      "db:migrate:remote": {
+        command: "vp run --filter data-ops --fail-if-no-match db:migrate:remote",
+        cache: false,
       },
-      "agents:deploy": {
-        command: "vp run --filter agents deploy",
-      },
-      "agents:deploy:preview": {
-        command: "vp run --filter agents deploy:preview",
-      },
-      "data-service:build": {
-        command: "vp run --filter data-service build",
-      },
-      "data-service:deploy": {
-        command: "vp run --filter data-service deploy",
-      },
-      "data-service:deploy:preview": {
-        command: "vp run --filter data-service deploy:preview",
+      "db:studio": {
+        command: "vp run --filter data-ops --fail-if-no-match db:studio",
+        cache: false,
       },
     },
   },
+
+  // Vitest at monorepo root (package apps keep their own vitest via package configs).
   test: {
     exclude: [
       "**/node_modules/**",
@@ -397,6 +456,11 @@ export default defineConfig({
       "**/cypress/**",
       "**/.epub/**",
       "**/.next/**",
+      "**/templates/**",
     ],
+    environment: "node",
+    include: ["cli/**/*.test.ts"],
+    // Root currently has no cli tests; apps run vitest via package scripts.
+    passWithNoTests: true,
   },
 });

@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { getAiBinding } from "#/lib/cloudflare-env";
+
 export const Route = createFileRoute("/demo/api/ai/image")({
   server: {
     handlers: {
@@ -20,21 +22,7 @@ export const Route = createFileRoute("/demo/api/ai/image")({
         }
 
         try {
-          let binding: any = undefined;
-          try {
-            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
-            const { getEvent } = await import("vinxi/http");
-            const event = getEvent();
-            binding = event?.context?.cloudflare?.env?.AI;
-          } catch {
-            // Fallback
-          }
-
-          if (!binding) {
-            binding =
-              (process.env as Record<string, unknown>).AI ||
-              (globalThis as Record<string, unknown>).AI;
-          }
+          const binding = getAiBinding();
 
           if (!binding) {
             return new Response(

@@ -20,9 +20,10 @@ function DropdownMenuTrigger({
     <MenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
       render={asChild ? (children as React.ReactElement) : undefined}
-      children={asChild ? undefined : children}
       {...props}
-    />
+    >
+      {asChild ? undefined : children}
+    </MenuPrimitive.Trigger>
   );
 }
 

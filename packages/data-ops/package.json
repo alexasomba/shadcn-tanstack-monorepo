@@ -2,32 +2,95 @@
   "name": "data-ops",
   "version": "0.0.1",
   "private": true,
+  "files": [
+    "dist",
+    "src",
+    "drizzle.config.ts",
+    "wrangler.jsonc"
+  ],
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": {
+      "types": "./src/index.ts",
       "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "default": "./src/index.ts"
     },
     "./schema": {
+      "types": "./src/schema.ts",
       "import": "./src/schema.ts",
-      "types": "./src/schema.ts"
-    }
+      "default": "./src/schema.ts"
+    },
+    "./auth-schema": {
+      "types": "./src/auth-schema.ts",
+      "import": "./src/auth-schema.ts",
+      "default": "./src/auth-schema.ts"
+    },
+    "./database/setup": {
+      "types": "./src/database/setup.ts",
+      "import": "./src/database/setup.ts",
+      "default": "./src/database/setup.ts"
+    },
+    "./auth": {
+      "types": "./src/auth/create-auth.ts",
+      "import": "./src/auth/create-auth.ts",
+      "default": "./src/auth/create-auth.ts"
+    },
+    "./auth/*": {
+      "types": "./src/auth/*.ts",
+      "import": "./src/auth/*.ts",
+      "default": "./src/auth/*.ts"
+    },
+    "./queries/*": {
+      "types": "./src/queries/*.ts",
+      "import": "./src/queries/*.ts",
+      "default": "./src/queries/*.ts"
+    },
+    "./zod-schema/*": {
+      "types": "./src/zod-schema/*.ts",
+      "import": "./src/zod-schema/*.ts",
+      "default": "./src/zod-schema/*.ts"
+    },
+    "./email/*": {
+      "types": "./src/email/*.ts",
+      "import": "./src/email/*.ts",
+      "default": "./src/email/*.ts"
+    },
+    "./seo/*": {
+      "types": "./src/seo/*.ts",
+      "import": "./src/seo/*.ts",
+      "default": "./src/seo/*.ts"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "build": "vp pack && tsc --noEmit",
+    "pack": "vp pack",
+    "typecheck": "tsc --noEmit",
+    "auth:generate": "npx @better-auth/cli@latest generate --config ./src/auth/auth.ts --output ./src/auth-schema.ts --yes",
+    "auth:info": "npx @better-auth/cli@latest info --config ./src/auth/auth.ts",
+    "auth:secret": "npx @better-auth/cli@latest secret",
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply app-db --cwd ../../apps/user-web --config wrangler.jsonc --local",
+    "db:migrate:remote": "wrangler d1 migrations apply app-db --config wrangler.jsonc --remote",
+    "db:query:local": "wrangler d1 execute app-db --cwd ../../apps/user-web --config wrangler.jsonc --local --command",
+    "db:query:remote": "wrangler d1 execute app-db --config wrangler.jsonc --remote --command"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "catalog:",
+    "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
     "drizzle-kit": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "catalog:"
   }
 }

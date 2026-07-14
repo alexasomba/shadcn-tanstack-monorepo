@@ -1,15 +1,14 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getDB, todos, desc } from "data-ops";
+import { createDatabase, todos, desc } from "data-ops";
 import { z } from "zod";
+
+import { getDatabase } from "#/lib/cloudflare-env";
 
 const getTodos = createServerFn({
   method: "GET",
 }).handler(async () => {
-  // @ts-expect-error - vinxi/http is a platform-specific import
-  const { getEvent } = await import("vinxi/http");
-  const d1 = getEvent()?.context?.cloudflare?.env?.DB;
-  const db = getDB(d1);
+  const db = createDatabase(getDatabase());
   return await db.query.todos.findMany({
     orderBy: [desc(todos.createdAt)],
   });
@@ -24,10 +23,7 @@ const createTodo = createServerFn({
     }),
   )
   .handler(async ({ data }) => {
-    // @ts-expect-error - vinxi/http is a platform-specific import
-    const { getEvent } = await import("vinxi/http");
-    const d1 = getEvent()?.context?.cloudflare?.env?.DB;
-    const db = getDB(d1);
+    const db = createDatabase(getDatabase());
     await db.insert(todos).values({ title: data.title });
     return { success: true };
   });
@@ -39,7 +35,7 @@ export const Route = createFileRoute("/demo/drizzle")({
 
 function DemoDrizzle() {
   const router = useRouter();
-  const todos = Route.useLoaderData();
+  const todosList = Route.useLoaderData();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,14 +62,14 @@ function DemoDrizzle() {
           </span>
           <div>
             <p className="island-kicker mb-2">Database</p>
-            <h1 className="demo-title">Drizzle Demo</h1>
+            <h1 className="demo-title">Drizzle + D1 Demo</h1>
           </div>
         </header>
 
-        <h2 className="demo-section-title mb-4">Todos</h2>
+        <h2 className="demo-section-title mb-4">Todos (shared app-db)</h2>
 
         <ul className="mb-6 space-y-3">
-          {todos.map((todo) => (
+          {todosList.map((todo) => (
             <li key={todo.id} className="demo-list-item">
               <div className="flex items-center justify-between">
                 <span className="font-medium">{todo.title}</span>
@@ -81,7 +77,7 @@ function DemoDrizzle() {
               </div>
             </li>
           ))}
-          {todos.length === 0 && (
+          {todosList.length === 0 && (
             <li className="demo-list-item demo-muted text-center">
               No todos yet. Create one below!
             </li>
@@ -101,27 +97,12 @@ function DemoDrizzle() {
         </form>
 
         <div className="demo-card mt-8">
-          <h3 className="demo-section-title mb-2">Powered by Drizzle ORM</h3>
+          <h3 className="demo-section-title mb-2">Shared D1 with user-web</h3>
           <p className="demo-muted mb-4 text-sm">
-            Next-generation ORM for Node.js & TypeScript with PostgreSQL
+            Admin reads/writes the same <code>app-db</code> D1. Local state is under{" "}
+            <code>apps/user-web/.wrangler/state</code>. Bindings via{" "}
+            <code>cloudflare:workers</code>.
           </p>
-          <div className="space-y-2 text-sm">
-            <p className="font-medium">Setup Instructions:</p>
-            <ol className="demo-muted list-inside list-decimal space-y-2">
-              <li>
-                Configure your <code>DATABASE_URL</code> in .env.local
-              </li>
-              <li>
-                Run: <code>npx -y drizzle-kit generate</code>
-              </li>
-              <li>
-                Run: <code>npx -y drizzle-kit migrate</code>
-              </li>
-              <li>
-                Optional: <code>npx -y drizzle-kit studio</code>
-              </li>
-            </ol>
-          </div>
         </div>
       </section>
     </main>
