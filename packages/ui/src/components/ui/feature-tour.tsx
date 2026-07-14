@@ -1,6 +1,5 @@
 "use client";
-
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
 import React, { useState, useEffect, useRef, useCallback } from "react";

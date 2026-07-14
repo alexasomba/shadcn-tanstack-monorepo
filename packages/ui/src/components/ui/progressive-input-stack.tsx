@@ -1,5 +1,5 @@
+import { ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowRight, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState } from "react";
 import { FaCheck } from "react-icons/fa6";

@@ -1,13 +1,14 @@
+import { adminClient, organizationClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import { createBaseAuthClientPlugins } from "data-ops";
+import { inboxClient } from "better-inbox/client";
 
 /**
- * Browser auth client. baseURL defaults to same origin (`/api/auth`).
- * Includes organization client plugin (matches server base plugins).
+ * Admin console auth client: organization + **admin** + **inbox**.
+ * Referral client stays on user-web; admins use the /referrals overview for stats.
  */
 export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_BETTER_AUTH_URL as string | undefined,
-  plugins: createBaseAuthClientPlugins(),
+  plugins: [organizationClient(), adminClient(), inboxClient()],
 });
 
 export const { signIn, signUp, signOut, useSession, getSession } = authClient;

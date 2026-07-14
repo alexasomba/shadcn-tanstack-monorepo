@@ -1,4 +1,4 @@
-import { Minus, Plus, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Minus, Plus, X, CaretUp, CaretDown } from "@phosphor-icons/react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import React, { useState } from "react";
 import { BiSolidPencil } from "react-icons/bi";
@@ -241,8 +241,8 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                       <AnimatedWord word={reminder.type} />
                     </div>
                     <div className="flex flex-col -space-y-1 text-neutral-400">
-                      <ChevronUp size={14} strokeWidth={3} />
-                      <ChevronDown size={14} strokeWidth={3} />
+                      <CaretUp size={14} strokeWidth={3} />
+                      <CaretDown size={14} strokeWidth={3} />
                     </div>
                   </motion.div>
 
@@ -283,8 +283,8 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                     >
                       <AnimatedWord word={reminder.unit} />
                       <div className="flex flex-col -space-y-1 text-neutral-400">
-                        <ChevronUp size={14} strokeWidth={3} />
-                        <ChevronDown size={14} strokeWidth={3} />
+                        <CaretUp size={14} strokeWidth={3} />
+                        <CaretDown size={14} strokeWidth={3} />
                       </div>
                     </motion.div>
 

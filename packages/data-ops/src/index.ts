@@ -18,8 +18,13 @@ export {
   type CreateAuthEnv,
   type Session,
 } from "./auth/create-auth";
-export { createBaseAuthPlugins } from "./auth/plugins";
-export { createBaseAuthClientPlugins } from "./auth/client-plugins";
+export { createBaseAuthPlugins, readAdminUserIds } from "./auth/plugins";
+export {
+  createBaseAuthClientPlugins,
+  createUserAuthClientPlugins,
+  createAdminAuthClientPlugins,
+} from "./auth/client-plugins";
+export { parseUserRoles, userHasAdminRole, isAdminUser } from "./auth/roles";
 export {
   listTodos,
   getTodoById,
@@ -29,6 +34,13 @@ export {
   todoToApi,
   type TodoRow,
 } from "./queries/todos";
+export {
+  listReferralLeaderboard,
+  listRecentReferrals,
+  countReferrals,
+  type ReferralLeaderboardRow,
+  type RecentReferralRow,
+} from "./queries/referrals";
 export {
   enqueueOutboxEvent,
   listPendingOutboxEvents,

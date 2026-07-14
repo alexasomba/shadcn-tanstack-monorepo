@@ -1,7 +1,6 @@
 "use client";
-
+import { CaretDown } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import useMeasure from "react-use-measure";
 
@@ -49,7 +48,7 @@ export default function ExpandDetails() {
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
               className="flex items-center justify-center"
             >
-              <ChevronDown className="size-5 stroke-2" />
+              <CaretDown className="size-5 stroke-2" />
             </motion.div>
 
             <span className="text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100">

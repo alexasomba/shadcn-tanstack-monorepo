@@ -1,6 +1,5 @@
 "use client";
-
-import { ArrowUp, ImageIcon, Mic } from "lucide-react";
+import { ArrowUp, Image, Microphone } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
@@ -215,11 +214,11 @@ export const PredictiveText: React.FC<PredictiveInputProps> = ({
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-3 pr-1 text-neutral-400 sm:gap-4 sm:pr-2 dark:text-neutral-600"
                 >
-                  <ImageIcon
+                  <Image
                     size={20}
                     className="cursor-pointer transition-colors hover:text-neutral-600 dark:hover:text-neutral-400"
                   />
-                  <Mic
+                  <Microphone
                     size={20}
                     className="cursor-pointer transition-colors hover:text-neutral-600 dark:hover:text-neutral-400"
                   />

@@ -1,8 +1,7 @@
 "use client";
-
+import { ArrowRight, ArrowDown, Play, CaretDown } from "@phosphor-icons/react";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowRight, ArrowDown, Play, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Variants } from "motion/react";
 import React, { useState } from "react";
@@ -63,9 +62,12 @@ export function Hero2({
   ),
   description = "Say goodbye to repetitive tasks. Our AI-driven platform streamlines\nyour workflows so your team can focus on what really matters.",
   primaryCtaLabel = "See It In Action",
+  primaryCtaHref = "#",
   secondaryCtaLabel = "Book a demo",
+  secondaryCtaHref = "#",
   socialLinks = DEFAULT_SOCIAL,
   signInLabel = "Sign in",
+  signInHref = "#",
   className,
 }: Hero2Props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -142,7 +144,7 @@ export function Hero2({
                   >
                     {link.label}
                     {link.hasDropdown && (
-                      <ChevronDown className="h-3.5 w-3.5 stroke-[2.5] opacity-50 transition-transform duration-200 group-hover:rotate-180" />
+                      <CaretDown className="h-3.5 w-3.5 stroke-[2.5] opacity-50 transition-transform duration-200 group-hover:rotate-180" />
                     )}
                   </a>
                   {/* Active/Hover Indicator Dot */}
@@ -163,8 +165,9 @@ export function Hero2({
             <Button
               variant="outline"
               className="h-10 rounded-full border-0 bg-white/60 px-7 text-sm font-medium text-slate-900 shadow-[0_0_0_1px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.02)] backdrop-blur-md transition-all hover:text-black"
+              asChild
             >
-              {signInLabel}
+              <a href={signInHref}>{signInLabel}</a>
             </Button>
           </div>
 
@@ -226,8 +229,11 @@ export function Hero2({
               ))}
             </nav>
             <div className="mt-auto">
-              <Button className="h-12 w-full rounded-full bg-[oklch(0.6378_0.1051_172.72)] text-base text-white hover:opacity-90">
-                {signInLabel}
+              <Button
+                className="h-12 w-full rounded-full bg-[oklch(0.6378_0.1051_172.72)] text-base text-white hover:opacity-90"
+                asChild
+              >
+                <a href={signInHref}>{signInLabel}</a>
               </Button>
             </div>
           </motion.div>
@@ -260,17 +266,25 @@ export function Hero2({
             variants={itemVariants}
             className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center"
           >
-            <Button className="group h-12 rounded-full border-0 bg-[oklch(0.6378_0.1051_172.72)] px-8 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_16px_rgba(0,0,0,0.1)] transition-all hover:brightness-105 md:text-base">
-              {primaryCtaLabel}
-              <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Button
+              className="group h-12 rounded-full border-0 bg-[oklch(0.6378_0.1051_172.72)] px-8 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_16px_rgba(0,0,0,0.1)] transition-all hover:brightness-105 md:text-base"
+              asChild
+            >
+              <a href={primaryCtaHref}>
+                {primaryCtaLabel}
+                <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </a>
             </Button>
 
             <Button
               variant="secondary"
               className="h-12 rounded-full border-0 bg-[#eaeff1]/80 px-8 text-sm font-medium text-slate-900 shadow-[0_0_0_1px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_4px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-all hover:bg-[#eaeff1] md:text-base"
+              asChild
             >
-              {secondaryCtaLabel}
-              <Play className="ml-2 h-3.5 w-3.5 fill-slate-900" />
+              <a href={secondaryCtaHref}>
+                {secondaryCtaLabel}
+                <Play className="ml-2 h-3.5 w-3.5 fill-slate-900" />
+              </a>
             </Button>
           </motion.div>
         </div>

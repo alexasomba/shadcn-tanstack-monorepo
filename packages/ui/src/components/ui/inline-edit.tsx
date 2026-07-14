@@ -1,17 +1,17 @@
 "use client";
 
 import {
-  AlarmClockFreeIcons,
-  Calendar03Icon,
-  Cancel01Icon,
-  Edit03Icon,
-  Link01Icon,
-  Menu02Icon,
-  Task02Icon,
-  Tick02Icon,
-  Ticket02Icon,
-} from "@hugeicons/core-free-icons/index";
-import { HugeiconsIcon } from "@hugeicons/react";
+  Alarm,
+  CalendarBlank,
+  Check,
+  Link as LinkIcon,
+  List,
+  NoteBlank,
+  PencilSimple,
+  Ticket,
+  X,
+} from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Transition } from "motion/react";
 import { useState, useId } from "react";
@@ -19,8 +19,7 @@ import type { FC } from "react";
 
 /* --- Types --- */
 interface EditableRowProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: any;
+  icon: Icon;
   label: string;
   value: string;
   secondaryValue?: string;
@@ -86,7 +85,10 @@ const EditableRow: FC<EditableRowProps> = ({
       <div
         className={`flex shrink-0 items-center gap-3 ${multiline ? "w-full" : "w-full sm:w-[130px]"}`}
       >
-        <HugeiconsIcon icon={icon} size={24} color="#b3b2b7" strokeWidth={1.5} />
+        {(() => {
+          const RowIcon = icon;
+          return <RowIcon size={24} color="#b3b2b7" />;
+        })()}
         <label
           htmlFor={inputId}
           className="cursor-pointer text-[16px] font-medium text-[#8E8E91] dark:text-[#636366]"
@@ -133,18 +135,13 @@ const EditableRow: FC<EditableRowProps> = ({
                     </div>
                   )}
                   {type === "url" && (
-                    <HugeiconsIcon
-                      icon={Task02Icon}
-                      size={20}
-                      color="#b3b2b7"
-                      className="ml-1 inline"
-                    />
+                    <NoteBlank size={20} color="#b3b2b7" className="ml-1 inline" />
                   )}
                 </div>
                 <div
                   className={`flex size-7 items-center justify-center rounded-lg border border-gray-200 bg-[#fefefe] opacity-0 shadow-sm group-hover/content:opacity-100 dark:border-zinc-800 dark:bg-zinc-900 ${multiline ? "mt-1 self-end" : ""}`}
                 >
-                  <HugeiconsIcon icon={Edit03Icon} size={18} color="#B7B7B9" />
+                  <PencilSimple size={18} color="#B7B7B9" />
                 </div>
               </motion.div>
             ) : (
@@ -204,7 +201,7 @@ const EditableRow: FC<EditableRowProps> = ({
                     onClick={handleSave}
                     className="flex size-7 items-center justify-center rounded-lg bg-black text-white dark:bg-zinc-100 dark:text-black"
                   >
-                    <HugeiconsIcon icon={Tick02Icon} size={18} />
+                    <Check size={18} />
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -212,7 +209,7 @@ const EditableRow: FC<EditableRowProps> = ({
                     onClick={() => setEditing(false)}
                     className="flex size-7 items-center justify-center rounded-lg bg-black text-white dark:bg-zinc-800"
                   >
-                    <HugeiconsIcon icon={Cancel01Icon} size={18} color="#ffffff" />
+                    <X size={18} color="#ffffff" />
                   </motion.button>
                 </div>
               </motion.div>
@@ -241,19 +238,19 @@ export const InlineEditCard: FC<InlineEditCardProps> = ({
 
         <div className="space-y-4 px-4 py-3 sm:space-y-1">
           <EditableRow
-            icon={Ticket02Icon}
+            icon={Ticket}
             label="Event"
             value={data.event}
             onSave={(v) => onDataChange({ ...data, event: v })}
           />
           <EditableRow
-            icon={Calendar03Icon}
+            icon={CalendarBlank}
             label="Date"
             value={data.date}
             onSave={(v) => onDataChange({ ...data, date: v })}
           />
           <EditableRow
-            icon={AlarmClockFreeIcons}
+            icon={Alarm}
             label="Time"
             type="time"
             value={data.start}
@@ -261,7 +258,7 @@ export const InlineEditCard: FC<InlineEditCardProps> = ({
             onSaveRange={(a, b) => onDataChange({ ...data, start: a, end: b })}
           />
           <EditableRow
-            icon={Link01Icon}
+            icon={LinkIcon}
             label="URL"
             type="url"
             value={data.url}
@@ -269,7 +266,7 @@ export const InlineEditCard: FC<InlineEditCardProps> = ({
           />
           <div className="mt-2 border-t border-gray-50 pt-4 dark:border-zinc-900">
             <EditableRow
-              icon={Menu02Icon}
+              icon={List}
               label="Description"
               multiline
               value={data.desc}

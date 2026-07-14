@@ -1,4 +1,19 @@
 import {
+  Cpu,
+  Stack,
+  GitBranch,
+  TerminalWindow,
+  ArrowUpRight,
+  MagnifyingGlass,
+  CaretDown,
+  List,
+  User,
+  Gear,
+  SignOut,
+  MoonStars,
+  Bookmark,
+} from "@phosphor-icons/react";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -26,21 +41,6 @@ import {
 } from "@workspace/ui/components/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-  Cpu,
-  Layers,
-  GitBranch,
-  Terminal,
-  ArrowUpRight,
-  Search,
-  ChevronDown,
-  Menu,
-  User,
-  Settings,
-  LogOut,
-  MoonStar,
-  Bookmark,
-} from "lucide-react";
 
 export function Navigation4() {
   return (
@@ -128,7 +128,7 @@ export function Navigation4() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Layers className="h-3.5 w-3.5" /> Pipelines
+                            <Stack className="h-3.5 w-3.5" /> Pipelines
                           </Button>
                           <Button
                             variant="outline"
@@ -140,7 +140,7 @@ export function Navigation4() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Terminal className="h-3.5 w-3.5" /> CLI Tool
+                            <TerminalWindow className="h-3.5 w-3.5" /> CLI Tool
                           </Button>
                         </div>
                       </div>
@@ -237,7 +237,7 @@ export function Navigation4() {
         {/* Search Bar */}
         <div className="mx-8 hidden max-w-md flex-1 lg:block">
           <div className="group relative">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <MagnifyingGlass className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <Input
               type="text"
               placeholder="Search components..."
@@ -254,7 +254,7 @@ export function Navigation4() {
               size="icon"
               className="rounded-lg p-0 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
             >
-              <MoonStar className="h-5 w-5" />
+              <MoonStars className="h-5 w-5" />
               <span className="sr-only">Toggle theme</span>
             </Button>
             <Button
@@ -281,7 +281,7 @@ export function Navigation4() {
                     <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
-                  <ChevronDown className="h-4 w-4 text-neutral-400" />
+                  <CaretDown className="h-4 w-4 text-neutral-400" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -293,14 +293,14 @@ export function Navigation4() {
                 <User className="h-4 w-4" /> Profile
               </DropdownMenuItem>
               <DropdownMenuItem className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm">
-                <Settings className="h-4 w-4" /> Settings
+                <Gear className="h-4 w-4" /> Gear
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
                 className="!focus:bg-red-600/10 flex items-center gap-2 rounded-lg px-2 py-2 text-sm"
               >
-                <LogOut className="h-4 w-4" /> Logout
+                <SignOut className="h-4 w-4" /> Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -312,7 +312,7 @@ export function Navigation4() {
                   variant="ghost"
                   className="h-10 w-10 rounded-xl p-0 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
-                  <Menu className="h-6 w-6" />
+                  <List className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-full sm:max-w-xs">
@@ -341,7 +341,7 @@ export function Navigation4() {
 
                   {/* Sheet Search */}
                   <div className="relative mb-6">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                    <MagnifyingGlass className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                     <Input placeholder="Search..." className="rounded-lg pl-10" />
                   </div>
 

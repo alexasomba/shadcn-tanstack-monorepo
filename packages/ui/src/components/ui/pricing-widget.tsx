@@ -1,7 +1,6 @@
 "use client";
-
 import NumberFlow from "@number-flow/react";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import type { Transition } from "motion/react";
 import { useState } from "react";

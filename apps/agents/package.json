@@ -26,6 +26,7 @@
     "@cloudflare/kumo": "catalog:",
     "@phosphor-icons/react": "catalog:",
     "@streamdown/code": "catalog:",
+    "@workspace/result": "workspace:*",
     "agents": "catalog:",
     "ai": "catalog:",
     "better-result": "catalog:",

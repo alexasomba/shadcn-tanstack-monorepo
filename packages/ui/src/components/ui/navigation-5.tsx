@@ -1,4 +1,14 @@
 import {
+  Cpu,
+  Stack,
+  GitBranch,
+  TerminalWindow,
+  Command,
+  User,
+  List,
+  ArrowUpRight,
+} from "@phosphor-icons/react";
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -16,7 +26,6 @@ import {
 } from "@workspace/ui/components/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
-import { Cpu, Layers, GitBranch, Terminal, Command, User, Menu, ArrowUpRight } from "lucide-react";
 
 export function Navigation5() {
   return (
@@ -109,7 +118,7 @@ export function Navigation5() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Layers className="h-3.5 w-3.5" />
+                            <Stack className="h-3.5 w-3.5" />
                             Pipelines
                           </Button>
                           <Button
@@ -123,7 +132,7 @@ export function Navigation5() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Terminal className="h-3.5 w-3.5" />
+                            <TerminalWindow className="h-3.5 w-3.5" />
                             CLI Tool
                           </Button>
                         </div>
@@ -266,7 +275,7 @@ export function Navigation5() {
               Get started
             </Button>
 
-            {/* Mobile Menu Trigger */}
+            {/* Mobile List Trigger */}
             <div className="lg:hidden">
               <Sheet>
                 <SheetTrigger asChild>
@@ -275,7 +284,7 @@ export function Navigation5() {
                     size="icon-lg"
                     className="rounded-full text-neutral-700 dark:text-neutral-300"
                   >
-                    <Menu className="size-5" />
+                    <List className="size-5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent

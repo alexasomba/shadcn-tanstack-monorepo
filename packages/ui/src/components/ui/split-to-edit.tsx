@@ -1,7 +1,6 @@
 "use client";
-
+import { Check, PencilSimple } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
-import { Check, Pencil } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import type { Transition } from "motion/react";
 import React, { useState, useRef, useEffect } from "react";
@@ -183,7 +182,7 @@ export const SplitToEdit: FC<SplitToEditProps> = ({
                 {isExpanded ? (
                   <Check className="size-5 text-zinc-500" />
                 ) : (
-                  <Pencil className="size-5 text-zinc-500" />
+                  <PencilSimple className="size-5 text-zinc-500" />
                 )}
               </motion.div>
             </AnimatePresence>

@@ -1,19 +1,18 @@
 "use client";
-
+import { Plus } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 
 interface Action {
-  icon: LucideIcon;
+  icon: Icon;
   label: string;
 }
 
 interface SplitActionsProps {
   actions: Action[];
-  triggerIcon?: LucideIcon;
+  triggerIcon?: Icon;
 }
 
 export default function SplitActions({

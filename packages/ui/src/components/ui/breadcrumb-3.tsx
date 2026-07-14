@@ -1,3 +1,5 @@
+import { CaretRight, FileText, Folder, House } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,27 +8,25 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb";
-import type { LucideIcon } from "lucide-react";
-import { ChevronRightIcon, FileTextIcon, FolderIcon, HomeIcon } from "lucide-react";
 
 type BreadcrumbSegment =
   | {
       label: string;
       href: string;
-      icon: LucideIcon;
+      icon: Icon;
       current?: false;
     }
   | {
       label: string;
-      icon: LucideIcon;
+      icon: Icon;
       current: true;
       href?: never;
     };
 
 const segments: readonly BreadcrumbSegment[] = [
-  { label: "Home", href: "#", icon: HomeIcon },
-  { label: "Reports", href: "#", icon: FolderIcon },
-  { label: "Revenue Summary", icon: FileTextIcon, current: true },
+  { label: "Home", href: "#", icon: House },
+  { label: "Reports", href: "#", icon: Folder },
+  { label: "Revenue Summary", icon: FileText, current: true },
 ] as const;
 
 const Breadcrumb3 = () => {
@@ -54,7 +54,7 @@ const Breadcrumb3 = () => {
               )}
               {index < segments.length - 1 ? (
                 <BreadcrumbSeparator className="text-muted-foreground/70">
-                  <ChevronRightIcon />
+                  <CaretRight />
                 </BreadcrumbSeparator>
               ) : null}
             </BreadcrumbItem>

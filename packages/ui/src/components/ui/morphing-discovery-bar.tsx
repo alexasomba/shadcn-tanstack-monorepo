@@ -1,6 +1,5 @@
 "use client";
-
-import { Search, X } from "lucide-react";
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import React, { useState, useRef, useEffect } from "react";
 
@@ -66,7 +65,7 @@ export const MorphingDiscoveryBar: React.FC<MorphingDiscoveryBarProps> = ({
             >
               <div className="flex h-full w-full items-center justify-center px-3 sm:px-4">
                 <motion.div layout="position" transition={transition}>
-                  <Search
+                  <MagnifyingGlass
                     size={18}
                     strokeWidth={3}
                     className="shrink-0 text-neutral-900 transition-colors dark:text-neutral-400"

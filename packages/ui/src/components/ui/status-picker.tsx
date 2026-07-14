@@ -1,4 +1,4 @@
-import { CircleDashed, EllipsisIcon, X } from "lucide-react";
+import { CircleDashed, DotsThree, X } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import React from "react";
 
@@ -273,7 +273,7 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
                   ))}
 
                   <div className="flex items-center justify-center gap-1 rounded-full bg-[#F4F4F9] p-2 dark:bg-zinc-800">
-                    <EllipsisIcon className="size-6 text-sm text-neutral-400" />
+                    <DotsThree className="size-6 text-sm text-neutral-400" />
                   </div>
                 </div>
               </motion.div>

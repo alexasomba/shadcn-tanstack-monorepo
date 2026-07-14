@@ -1,10 +1,9 @@
 "use client";
-
+import { ArrowRight, Bookmark, Heart, UserCircle, UsersThree } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowRight, Bookmark, Heart, UserRound, UsersRound } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Blog4Accent = "violet" | "green" | "blue";
@@ -17,7 +16,7 @@ export interface Blog5Article {
   accent: Blog4Accent;
   imageSrc: string;
   imageAlt: string;
-  icon: LucideIcon;
+  icon: Icon;
 }
 
 export interface Blog4Data {
@@ -87,7 +86,7 @@ const defaultBlog4Data: Blog4Data = {
       href: "#",
       accent: "violet",
       imageSrc: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
-      icon: UsersRound,
+      icon: UsersThree,
       imageAlt: "Developer workspace with monitor and keyboard",
     },
     {
@@ -107,7 +106,7 @@ const defaultBlog4Data: Blog4Data = {
       href: "#",
       accent: "blue",
       imageSrc: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
-      icon: UserRound,
+      icon: UserCircle,
       imageAlt: "Code editor open on a desktop setup",
     },
   ],

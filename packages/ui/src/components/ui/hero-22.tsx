@@ -1,7 +1,6 @@
 "use client";
-
+import { ArrowRight, Waveform, Globe, ShieldCheck } from "@phosphor-icons/react";
 import LogoIcon from "@workspace/ui/components/ui/logo-icon";
-import { ArrowRight, AudioLines, Globe2, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import type { Variants } from "motion/react";
 
@@ -49,9 +48,9 @@ const featuresDefault: FeatureItem[] = [
 ];
 
 const iconMap = {
-  audio: AudioLines,
+  audio: Waveform,
   shield: ShieldCheck,
-  globe: Globe2,
+  globe: Globe,
 };
 
 const sectionVariants: Variants = {

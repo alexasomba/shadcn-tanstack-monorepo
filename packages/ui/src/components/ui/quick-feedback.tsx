@@ -1,7 +1,6 @@
 "use client";
-
+import { ArrowCounterClockwise } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
-import { Undo2 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig, LayoutGroup } from "motion/react";
 import type { Transition } from "motion/react";
 import { useState } from "react";
@@ -148,7 +147,7 @@ export const QuickFeedbackButton: FC<QuickFeedbackButtonProps> = ({
                 }}
                 className="flex shrink-0 items-center gap-1 rounded-full bg-[#E0DCD4] px-3 py-2 text-xs font-bold text-[#020200] transition hover:bg-[#d6d2ca] active:scale-95 sm:text-base dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
               >
-                <Undo2 size={16} className="sm:h-5 sm:w-5" strokeWidth={2.5} />
+                <ArrowCounterClockwise size={16} className="sm:h-5 sm:w-5" strokeWidth={2.5} />
                 Undo
               </button>
             </motion.div>

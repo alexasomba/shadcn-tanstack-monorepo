@@ -1,6 +1,5 @@
 "use client";
-
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 import type { FC } from "react";
 
@@ -70,7 +69,7 @@ export const CarouselNavigator: FC<CarouselNavigatorProps> = ({
       className="flex items-center justify-center gap-1 rounded-full px-4 py-3 transition-colors duration-300"
     >
       <ArrowButton onClick={goPrev} themeColor={theme.button} disabled={currentIndex === 0}>
-        <ChevronLeft size={24} strokeWidth={3} />
+        <CaretLeft size={24} strokeWidth={3} />
       </ArrowButton>
 
       <div className="flex items-center gap-2 px-2">
@@ -86,7 +85,7 @@ export const CarouselNavigator: FC<CarouselNavigatorProps> = ({
       </div>
 
       <ArrowButton onClick={goNext} themeColor={theme.button}>
-        <ChevronRight size={24} strokeWidth={3} />
+        <CaretRight size={24} strokeWidth={3} />
       </ArrowButton>
     </motion.div>
   );

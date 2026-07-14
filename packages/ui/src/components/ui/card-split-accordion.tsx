@@ -1,6 +1,5 @@
 "use client";
-
-import { ChevronDown, Layers, Send } from "lucide-react";
+import { CaretDown, Stack, PaperPlaneTilt } from "@phosphor-icons/react";
 import { motion, MotionConfig } from "motion/react";
 import type { Transition } from "motion/react";
 import React, { useState } from "react";
@@ -47,7 +46,7 @@ const DEFAULT_ITEMS: AccordionItemData[] = [
   {
     id: 2,
     title: "Principles & Patterns",
-    icon: <Layers size={24} />,
+    icon: <Stack size={24} />,
     content:
       "Fundamental guidelines and repeated solutions that ensure consistency and usability in design.",
   },
@@ -61,7 +60,7 @@ const DEFAULT_ITEMS: AccordionItemData[] = [
   {
     id: 4,
     title: "Prototyping & Testing",
-    icon: <Send size={24} />,
+    icon: <PaperPlaneTilt size={24} />,
     content:
       "Rapid experimentation and validation of ideas through prototypes and real user testing.",
   },
@@ -149,7 +148,7 @@ const AccordionItem: FC<AccordionItemProps> = ({ item, setOpenId, index, total, 
             </div>
 
             <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
-              <ChevronDown className="size-5 text-neutral-400 md:size-[1.625rem] dark:text-zinc-600" />
+              <CaretDown className="size-5 text-neutral-400 md:size-[1.625rem] dark:text-zinc-600" />
             </motion.div>
           </button>
 

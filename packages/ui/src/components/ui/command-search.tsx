@@ -1,6 +1,12 @@
 "use client";
-
-import { Search, User, Bell, HelpCircle, MessageSquare, ArrowRight } from "lucide-react";
+import {
+  MagnifyingGlass,
+  User,
+  Bell,
+  Question,
+  ChatTeardropText,
+  ArrowRight,
+} from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useMemo, useEffect, useRef } from "react";
 import type { KeyboardEvent, FC, ReactNode } from "react";
@@ -59,14 +65,14 @@ const DEFAULT_ITEMS: CommandItem[] = [
     id: "6",
     title: "FAQ",
     section: "Help",
-    icon: <HelpCircle size={16} />,
+    icon: <Question size={16} />,
     action: () => console.log("FAQ"),
   },
   {
     id: "7",
     title: "Messages",
     section: "Help",
-    icon: <MessageSquare size={16} />,
+    icon: <ChatTeardropText size={16} />,
     action: () => console.log("Messages"),
   },
 ];
@@ -180,7 +186,7 @@ export const CommandSearch: FC<Props> = ({ items = DEFAULT_ITEMS }) => {
               transition={sharedTransition}
             >
               <motion.div layoutId="search-icon" transition={sharedTransition}>
-                <Search size={16} className="opacity-40" />
+                <MagnifyingGlass size={16} className="opacity-40" />
               </motion.div>
               <motion.span
                 layoutId="search-text"
@@ -207,7 +213,7 @@ export const CommandSearch: FC<Props> = ({ items = DEFAULT_ITEMS }) => {
               {/* Search Header */}
               <div className="flex items-center border-b-[1.4px] border-zinc-100 px-4 py-3.5 dark:border-zinc-800/50">
                 <motion.div layoutId="search-icon" transition={sharedTransition}>
-                  <Search
+                  <MagnifyingGlass
                     size={18}
                     className="mr-3 text-zinc-400 dark:text-zinc-500"
                     strokeWidth={2.5}

@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, getTodoById, todoToApi } from "data-ops";
 
 import type { AppContext } from "../../types";
@@ -29,23 +30,25 @@ export const readTodoRoute = createRoute({
         },
       },
     },
+    500: {
+      description: "Database error",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
   },
 });
 
 export async function readTodoHandler(c: AppContext) {
   const { id } = c.req.valid("param" as never) as { id: number };
   const db = createDatabase(c.env.DATABASE);
-  const row = await getTodoById(db, id);
+  const result = await getTodoById(db, id);
 
-  if (!row) {
-    return c.json(
-      {
-        success: false as const,
-        error: { code: "NOT_FOUND", message: `Todo ${id} not found` },
-      },
-      404,
-    );
+  if (Result.isError(result)) {
+    return c.json(appErrorBody(result.error), appErrorStatus(result.error) as 404 | 500);
   }
 
-  return c.json(todoToApi(row), 200);
+  return c.json(todoToApi(result.value), 200);
 }

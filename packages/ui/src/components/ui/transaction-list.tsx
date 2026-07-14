@@ -1,4 +1,4 @@
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X } from "@phosphor-icons/react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import type { Transition } from "motion/react";
 import { useState } from "react";

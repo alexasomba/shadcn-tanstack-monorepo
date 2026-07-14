@@ -7,7 +7,9 @@
     "./globals.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./blocks/*": "./src/blocks/*",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./components/ui/*": "./src/components/ui/*.tsx"
   },
   "scripts": {
     "lint": "vp lint",
@@ -21,8 +23,6 @@
     "@dnd-kit/sortable": "catalog:",
     "@dnd-kit/utilities": "catalog:",
     "@fontsource-variable/dm-sans": "catalog:",
-    "@hugeicons/core-free-icons": "catalog:",
-    "@hugeicons/react": "catalog:",
     "@number-flow/react": "catalog:",
     "@phosphor-icons/react": "catalog:",
     "@shadcn/react": "catalog:",
@@ -34,7 +34,6 @@
     "embla-carousel-react": "catalog:",
     "framer-motion": "catalog:",
     "input-otp": "catalog:",
-    "lucide-react": "catalog:",
     "motion": "catalog:",
     "next-themes": "catalog:",
     "qrcode.react": "catalog:",

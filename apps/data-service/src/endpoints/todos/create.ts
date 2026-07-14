@@ -1,8 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
+import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, createTodo, todoToApi } from "data-ops";
 
 import type { AppContext } from "../../types";
-import { TodoCreateSchema, TodoSchema } from "./schemas";
+import { ErrorSchema, TodoCreateSchema, TodoSchema } from "./schemas";
 
 export const createTodoRoute = createRoute({
   method: "post",
@@ -28,12 +29,33 @@ export const createTodoRoute = createRoute({
         },
       },
     },
+    400: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+    500: {
+      description: "Database error",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
   },
 });
 
 export async function createTodoHandler(c: AppContext) {
   const { title } = c.req.valid("json" as never) as { title: string };
   const db = createDatabase(c.env.DATABASE);
-  const row = await createTodo(db, title);
-  return c.json(todoToApi(row), 201);
+  const result = await createTodo(db, title);
+
+  if (Result.isError(result)) {
+    return c.json(appErrorBody(result.error), appErrorStatus(result.error) as 400 | 500);
+  }
+
+  return c.json(todoToApi(result.value), 201);
 }

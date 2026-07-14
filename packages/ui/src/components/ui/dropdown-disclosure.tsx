@@ -1,8 +1,5 @@
 "use client";
-
-import { GoogleGeminiIcon, QwenFreeIcons } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ChevronDown, X, ArrowUpRight, Check } from "lucide-react";
+import { CaretDown, X, ArrowUpRight, Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { useRef, useEffect } from "react";
 import type { ReactNode, FC } from "react";
@@ -44,13 +41,13 @@ const DEFAULT_MODELS: Model[] = [
     id: "qwen",
     name: "Qwen 2.5",
     description: "Rapid text generation",
-    icon: <HugeiconsIcon icon={QwenFreeIcons} size={24} color="#7c7b82" strokeWidth={1.5} />,
+    icon: <span className="text-xs font-bold text-[#7c7b82]">Qw</span>,
   },
   {
     id: "gemma",
     name: "Gemma 2",
     description: "Efficient task completion",
-    icon: <HugeiconsIcon icon={GoogleGeminiIcon} size={24} color="#7c7b82" strokeWidth={1.5} />,
+    icon: <span className="text-xs font-bold text-[#7c7b82]">G</span>,
   },
 ];
 
@@ -142,7 +139,7 @@ export const DropdownDisclosure: FC<DropdownDisclosureProps> = ({
                   //   layoutId="toggle"
                   className="ml-4"
                 >
-                  <ChevronDown className="h-6 w-6 text-neutral-800 dark:text-neutral-400" />
+                  <CaretDown className="h-6 w-6 text-neutral-800 dark:text-neutral-400" />
                 </motion.div>
               </motion.button>
             ) : (

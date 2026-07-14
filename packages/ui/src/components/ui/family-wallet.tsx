@@ -1,5 +1,5 @@
 "use client";
-
+import { CaretLeft, X, ArrowRight, Fingerprint } from "@phosphor-icons/react";
 import {
   Drawer,
   DrawerContent,
@@ -8,7 +8,6 @@ import {
   DrawerClose,
 } from "@workspace/ui/components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, X, ArrowRight, Fingerprint } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { SVGProps } from "react";
 import { BsWallet2 } from "react-icons/bs";
@@ -312,7 +311,7 @@ export default function FamilyWallet() {
           onClick={() => setView(View.SIGN_IN)}
           className="rounded-full bg-white p-2 dark:bg-zinc-800"
         >
-          <ChevronLeft className="size-6 text-zinc-400" />
+          <CaretLeft className="size-6 text-zinc-400" />
         </button>
 
         <h2 className="text-xl font-medium text-zinc-900">Passkey</h2>
@@ -391,7 +390,7 @@ export default function FamilyWallet() {
           onClick={() => setView(View.SIGN_IN)}
           className="rounded-full bg-white p-2 dark:bg-zinc-800"
         >
-          <ChevronLeft className="size-6 text-zinc-400" />
+          <CaretLeft className="size-6 text-zinc-400" />
         </button>
 
         <h2 className="text-lg font-medium text-zinc-900">Connect Wallet</h2>

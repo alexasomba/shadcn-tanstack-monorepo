@@ -1,5 +1,4 @@
-import { Mail01Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { CaretDown, Envelope } from "@phosphor-icons/react";
 import LogoIcon from "@workspace/ui/components/ui/logo-icon";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
@@ -71,9 +70,7 @@ export default function Cta5() {
                   className="flex items-center gap-1.5 text-sm font-medium text-zinc-300 transition-colors hover:text-white"
                 >
                   {link.name}
-                  {link.hasDropdown && (
-                    <HugeiconsIcon icon={ArrowDown01Icon} className="size-3.5 text-zinc-500" />
-                  )}
+                  {link.hasDropdown && <CaretDown className="size-3.5 text-zinc-500" />}
                 </a>
               ))}
             </nav>
@@ -139,9 +136,7 @@ export default function Cta5() {
                       className="flex items-center justify-between py-4 text-base font-medium text-zinc-300 transition-colors hover:text-white"
                     >
                       {link.name}
-                      {link.hasDropdown && (
-                        <HugeiconsIcon icon={ArrowDown01Icon} className="size-4 text-zinc-500" />
-                      )}
+                      {link.hasDropdown && <CaretDown className="size-4 text-zinc-500" />}
                     </a>
                   ))}
                   <button className="mt-6 flex h-12 w-full items-center justify-center rounded-lg border border-white/20 text-base font-medium text-white transition-all hover:bg-white/5 active:scale-[0.96]">
@@ -197,7 +192,7 @@ export default function Cta5() {
                   className="flex items-center gap-5"
                 >
                   <div className="flex size-12 items-center justify-center rounded-full bg-white/5 text-white">
-                    <HugeiconsIcon icon={Mail01Icon} className="size-6" />
+                    <Envelope className="size-6" />
                   </div>
                   <div>
                     <p className="text-sm text-zinc-400">E-mail</p>

@@ -1,32 +1,7 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { createDatabase, todos, desc } from "data-ops";
-import { z } from "zod";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 
-import { getDatabase } from "#/lib/cloudflare-env";
-
-const getTodos = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  const db = createDatabase(getDatabase());
-  return await db.query.todos.findMany({
-    orderBy: [desc(todos.createdAt)],
-  });
-});
-
-const createTodo = createServerFn({
-  method: "POST",
-})
-  .validator(
-    z.object({
-      title: z.string().min(1, "Title is required"),
-    }),
-  )
-  .handler(async ({ data }) => {
-    const db = createDatabase(getDatabase());
-    await db.insert(todos).values({ title: data.title });
-    return { success: true };
-  });
+import { createTodo, getTodos } from "#/lib/todos.functions";
 
 export const Route = createFileRoute("/demo/drizzle")({
   component: DemoDrizzle,
@@ -36,6 +11,7 @@ export const Route = createFileRoute("/demo/drizzle")({
 function DemoDrizzle() {
   const router = useRouter();
   const todosList = Route.useLoaderData();
+  const createTodoFn = useServerFn(createTodo);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,8 +21,8 @@ function DemoDrizzle() {
     if (!title) return;
 
     try {
-      await createTodo({ data: { title } });
-      router.invalidate();
+      await createTodoFn({ data: { title } });
+      await router.invalidate();
       (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error("Failed to create todo:", error);
@@ -63,10 +39,17 @@ function DemoDrizzle() {
           <div>
             <p className="island-kicker mb-2">Database</p>
             <h1 className="demo-title">Drizzle + D1 Demo</h1>
+            <p className="demo-muted mt-1 text-sm">
+              Authenticated RPCs via <code>requireAuthMiddleware</code>.{" "}
+              <Link to="/login" search={{ redirect: "/demo/drizzle" }} className="underline">
+                Sign in
+              </Link>{" "}
+              if the loader redirects.
+            </p>
           </div>
         </header>
 
-        <h2 className="demo-section-title mb-4">Todos (shared app-db)</h2>
+        <h2 className="demo-section-title mb-4">Todos</h2>
 
         <ul className="mb-6 space-y-3">
           {todosList.map((todo) => (
@@ -97,11 +80,10 @@ function DemoDrizzle() {
         </form>
 
         <div className="demo-card mt-8">
-          <h3 className="demo-section-title mb-2">Shared D1 with user-web</h3>
-          <p className="demo-muted mb-4 text-sm">
-            Admin reads/writes the same <code>app-db</code> D1. Local state is under{" "}
-            <code>apps/user-web/.wrangler/state</code>. Bindings via{" "}
-            <code>cloudflare:workers</code>.
+          <h3 className="demo-section-title mb-2">Security note</h3>
+          <p className="demo-muted text-sm">
+            <code>getTodos</code> / <code>createTodo</code> enforce session on the server function
+            itself — route guards alone are not enough for RPCs.
           </p>
         </div>
       </section>

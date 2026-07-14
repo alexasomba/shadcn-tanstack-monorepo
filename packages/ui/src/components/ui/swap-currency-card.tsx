@@ -1,6 +1,5 @@
 "use client";
-
-import { ChevronDown, Check } from "lucide-react";
+import { CaretDown, Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { FC, ChangeEvent } from "react";
@@ -91,7 +90,7 @@ const Dropdown: FC<DropdownProps> = ({ selected, onSelect, currencies }) => {
         <span className="text-xs font-semibold text-gray-700 sm:text-sm dark:text-zinc-200">
           {selected.code}
         </span>
-        <ChevronDown
+        <CaretDown
           className={`h-4 w-4 text-gray-400 transition-transform sm:h-5 sm:w-5 ${
             isOpen ? "rotate-180" : ""
           }`}

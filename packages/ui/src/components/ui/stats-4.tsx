@@ -1,7 +1,13 @@
 "use client";
-
+import {
+  ArrowUpRight,
+  Pulse,
+  Lightning,
+  ShieldCheck,
+  CaretRight,
+  Sparkle,
+} from "@phosphor-icons/react";
 import { Badge } from "@workspace/ui/components/badge";
-import { ArrowUpRight, Activity, Zap, ShieldCheck, ChevronRight, Sparkles } from "lucide-react";
 import React, { useRef, useState } from "react";
 
 function GlowingBorderCard({
@@ -66,7 +72,7 @@ export default function FinanceSplitSection() {
                 variant="secondary"
                 className="flex w-fit items-center gap-2 rounded-full px-4 py-1.5 text-sm"
               >
-                <Sparkles className="h-4 w-4 text-foreground" />
+                <Sparkle className="h-4 w-4 text-foreground" />
                 <span className="font-medium text-foreground">Next-Gen Fintech</span>
               </Badge>
             </div>
@@ -99,7 +105,7 @@ export default function FinanceSplitSection() {
             >
               <div>
                 <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 bg-background text-foreground shadow-sm">
-                  <Activity className="h-5 w-5 text-blue-500" />
+                  <Pulse className="h-5 w-5 text-blue-500" />
                 </div>
                 <div className="mb-2 text-5xl font-bold tracking-tight text-foreground">
                   99.9
@@ -119,7 +125,7 @@ export default function FinanceSplitSection() {
             >
               <div>
                 <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-lg border border-border/50 bg-background text-foreground shadow-sm">
-                  <Zap className="h-5 w-5 text-purple-500" />
+                  <Lightning className="h-5 w-5 text-purple-500" />
                 </div>
                 <div className="mb-2 text-5xl font-bold tracking-tight text-foreground">
                   10
@@ -159,7 +165,7 @@ export default function FinanceSplitSection() {
                   </p>
 
                   <div className="mt-6 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-foreground hover:underline">
-                    Read the case study <ChevronRight className="h-4 w-4" />
+                    Read the case study <CaretRight className="h-4 w-4" />
                   </div>
                 </div>
               </div>

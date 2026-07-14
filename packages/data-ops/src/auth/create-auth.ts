@@ -87,8 +87,8 @@ function defaultTrustedOrigins(): Array<string> {
 /**
  * Shared Better Auth factory for D1 + Drizzle (data-ops schema).
  *
- * Base plugins include `organization`. Apps using TanStack Start should pass
- * `tanstackStartCookies()` as the last plugin.
+ * Base plugins: organization, referral, admin, better-inbox.
+ * Apps using TanStack Start should pass `tanstackStartCookies()` last.
  */
 export function createAuth(db: Database, env: CreateAuthEnv = {}) {
   const isProduction =

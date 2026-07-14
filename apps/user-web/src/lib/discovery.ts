@@ -20,10 +20,13 @@ export function getPublicBaseUrl(): string {
 export function conferenceDiscoveryUrls(): Array<DiscoveryUrl> {
   const staticPages: Array<DiscoveryUrl> = [
     { path: "/", changefreq: "weekly", priority: 1 },
-    { path: "/talks", changefreq: "weekly", priority: 0.9 },
-    { path: "/speakers", changefreq: "weekly", priority: 0.9 },
-    { path: "/schedule", changefreq: "weekly", priority: 0.8 },
-    { path: "/about", changefreq: "monthly", priority: 0.5 },
+    { path: "/about", changefreq: "monthly", priority: 0.7 },
+    { path: "/contact", changefreq: "monthly", priority: 0.6 },
+    { path: "/pricing", changefreq: "monthly", priority: 0.8 },
+    { path: "/faq", changefreq: "monthly", priority: 0.6 },
+    { path: "/talks", changefreq: "weekly", priority: 0.5 },
+    { path: "/speakers", changefreq: "weekly", priority: 0.5 },
+    { path: "/schedule", changefreq: "weekly", priority: 0.4 },
   ];
 
   const talks = allTalks.map((t) => ({
@@ -52,14 +55,20 @@ export function renderRobots(): string {
 export function renderLlms(): string {
   const base = getPublicBaseUrl();
   return buildLlmsTxt(base, {
-    title: "Conference site",
-    description: "Talks, speakers, and schedule for the monorepo demo storefront.",
+    title: "Starter storefront",
+    description: "Marketing site, auth, portfolio dashboard, and demo routes.",
     links: [
       { title: "Home", path: "/", description: "Landing page" },
-      { title: "Talks", path: "/talks", description: "All sessions" },
-      { title: "Speakers", path: "/speakers", description: "Speaker roster" },
-      { title: "Schedule", path: "/schedule", description: "Day-by-day schedule" },
-      ...allTalks.slice(0, 20).map((t) => ({
+      { title: "About", path: "/about", description: "Product story" },
+      { title: "Contact", path: "/contact", description: "Get in touch" },
+      { title: "Pricing", path: "/pricing", description: "Plans" },
+      { title: "FAQ", path: "/faq", description: "Common questions" },
+      {
+        title: "Dashboard",
+        path: "/dashboard",
+        description: "Authenticated portfolio (login required)",
+      },
+      ...allTalks.slice(0, 10).map((t) => ({
         title: t.title,
         path: `/talks/${t.slug}`,
         description: t.content.slice(0, 120).replace(/\s+/g, " ").trim(),

@@ -1,5 +1,13 @@
 "use client";
-
+import {
+  ChatCircle,
+  Tray,
+  Circle,
+  Crosshair,
+  DownloadSimple,
+  List,
+  Command,
+} from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -10,8 +18,6 @@ export type TooltipItem = {
   hasBadge?: boolean;
 };
 
-import { MessageCircle, Inbox, Circle, Crosshair, Download, Menu, CommandIcon } from "lucide-react";
-
 interface TooltipNavbarProps {
   items: TooltipItem[];
   tooltipDelay?: number; // in ms
@@ -19,13 +25,13 @@ interface TooltipNavbarProps {
 
 const DEFAULT_ITEMS: TooltipItem[] = [
   {
-    icon: <MessageCircle className="h-full w-full" />,
+    icon: <ChatCircle className="h-full w-full" />,
     label: "Comment",
     labelHasKeyword: ["C"],
     hasBadge: false,
   },
   {
-    icon: <Inbox className="h-full w-full" />,
+    icon: <Tray className="h-full w-full" />,
     label: "Inbox",
     labelHasKeyword: ["I"],
     hasBadge: true,
@@ -43,13 +49,13 @@ const DEFAULT_ITEMS: TooltipItem[] = [
     hasBadge: false,
   },
   {
-    icon: <Download className="h-full w-full" />,
+    icon: <DownloadSimple className="h-full w-full" />,
     label: "Share",
     labelHasKeyword: ["S"],
     hasBadge: false,
   },
   {
-    icon: <Menu className="h-full w-full" />,
+    icon: <List className="h-full w-full" />,
     label: "Menu",
     labelHasKeyword: ["M"],
     hasBadge: false,
@@ -159,7 +165,7 @@ export const TooltipNavbar = ({
                         {item.hasBadge && (
                           <div className="flex items-center gap-0.5 text-white/40">
                             <span className="flex items-center justify-center rounded-sm border border-white/20 p-1">
-                              <CommandIcon className="size-3 text-neutral-500" />
+                              <Command className="size-3 text-neutral-500" />
                             </span>
                           </div>
                         )}
@@ -216,7 +222,7 @@ export const TooltipNavbar = ({
             {item.hasBadge && (
               <div className="flex items-center gap-0.5 text-white/40">
                 <span className="flex items-center justify-center rounded-sm border border-white/20 p-1">
-                  <CommandIcon className="size-3 text-neutral-500" />
+                  <Command className="size-3 text-neutral-500" />
                 </span>
               </div>
             )}

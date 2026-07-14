@@ -1,16 +1,16 @@
-import { motion } from "framer-motion";
-import type { Variants } from "framer-motion";
 import {
   Plus,
   Calendar,
-  MoreVertical,
-  Upload,
-  RotateCw,
-  Search,
-  Sparkles,
+  DotsThreeVertical,
+  UploadSimple,
+  ArrowsClockwise,
+  MagnifyingGlass,
+  Sparkle,
   Sun,
   Moon,
-} from "lucide-react";
+} from "@phosphor-icons/react";
+import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import React, { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 
@@ -293,10 +293,10 @@ export const PortfolioDashboard: React.FC<PortfolioComponentProps> = ({ data }) 
         {/* Bottom Bar  */}
         <div className="flex items-center justify-between bg-[#0d0d0d] px-5 py-3.5">
           <div className="flex items-center gap-3.5 text-[#555]">
-            <MoreVertical size={16} className="cursor-pointer hover:text-white" />
-            <Upload size={16} className="cursor-pointer hover:text-white" />
-            <RotateCw size={16} className="cursor-pointer hover:text-white" />
-            <Search size={16} className="cursor-pointer hover:text-white" />
+            <DotsThreeVertical size={16} className="cursor-pointer hover:text-white" />
+            <UploadSimple size={16} className="cursor-pointer hover:text-white" />
+            <ArrowsClockwise size={16} className="cursor-pointer hover:text-white" />
+            <MagnifyingGlass size={16} className="cursor-pointer hover:text-white" />
           </div>
 
           <div className="flex items-center gap-2">
@@ -322,7 +322,7 @@ export const PortfolioDashboard: React.FC<PortfolioComponentProps> = ({ data }) 
             whileTap={{ scale: 0.98 }}
             className="flex items-center gap-1.5 rounded-full border border-[#2a2a2a] bg-transparent px-3 py-1 text-[10px] font-bold text-white transition-all hover:bg-[#1a1a1a]"
           >
-            <Sparkles size={12} className="text-[#A17DFF]" />
+            <Sparkle size={12} className="text-[#A17DFF]" />
             Rebalance
           </motion.button>
         </div>

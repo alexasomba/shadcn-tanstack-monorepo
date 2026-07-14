@@ -80,7 +80,11 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@marinedotsh/better-auth-referral": "catalog:",
+    "@workspace/result": "workspace:*",
     "better-auth": "catalog:",
+    "better-inbox": "catalog:",
+    "better-result": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"

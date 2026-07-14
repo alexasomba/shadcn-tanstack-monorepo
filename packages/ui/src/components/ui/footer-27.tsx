@@ -1,16 +1,10 @@
 "use client";
 
-import {
-  ArrowRight01Icon,
-  Facebook01Icon,
-  NewTwitterIcon,
-  InstagramIcon,
-  Linkedin01Icon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight } from "@phosphor-icons/react";
 import LogoIcon from "@workspace/ui/components/ui/logo-icon";
 import { motion } from "motion/react";
 import type { Variants } from "motion/react";
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 
 const footerColumns = [
   {
@@ -53,10 +47,10 @@ const footerColumns = [
 ];
 
 const socialIcons = [
-  { icon: Facebook01Icon, label: "Facebook" },
-  { icon: NewTwitterIcon, label: "Twitter" },
-  { icon: InstagramIcon, label: "Instagram" },
-  { icon: Linkedin01Icon, label: "LinkedIn" },
+  { icon: FaFacebookF, label: "Facebook" },
+  { icon: FaXTwitter, label: "Twitter" },
+  { icon: FaInstagram, label: "Instagram" },
+  { icon: FaLinkedinIn, label: "LinkedIn" },
 ];
 
 const imageReveal: Variants = {
@@ -207,7 +201,7 @@ export default function Footer27() {
                 Optical: icon side has 2px less padding (pr-1.5 vs pl-5).
               */}
               <span className="flex size-7 items-center justify-center rounded-full bg-black/10 transition-transform duration-200 group-hover:translate-x-0.5">
-                <HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5" />
+                <ArrowRight className="size-3.5" />
               </span>
             </motion.a>
           </motion.div>
@@ -247,10 +241,7 @@ export default function Footer27() {
               className="inline-flex w-fit items-center gap-2 rounded-full px-5 py-2 text-[13px] font-medium text-white shadow-[0_0_0_1px_rgba(255,255,255,0.2)] transition-[background-color,box-shadow,transform] duration-200 hover:bg-white/5 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.35)] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none"
             >
               Let&apos;s Connect
-              <HugeiconsIcon
-                icon={ArrowRight01Icon}
-                className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-              />
+              <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </motion.a>
           </motion.div>
 
@@ -289,7 +280,7 @@ export default function Footer27() {
             </p>
 
             <div className="flex items-center gap-2">
-              {socialIcons.map(({ icon, label }) => (
+              {socialIcons.map(({ icon: SocialIcon, label }) => (
                 <motion.a
                   key={label}
                   href="#"
@@ -297,7 +288,7 @@ export default function Footer27() {
                   whileTap={{ scale: 0.96 }}
                   className="flex size-10 items-center justify-center rounded-full bg-white/5 text-neutral-400 shadow-[0_0_0_1px_rgba(255,255,255,0.08)] transition-[background-color,color,box-shadow] duration-150 hover:bg-white/10 hover:text-white hover:shadow-[0_0_0_1px_rgba(255,255,255,0.15)] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none"
                 >
-                  <HugeiconsIcon icon={icon} className="size-[18px]" />
+                  <SocialIcon className="size-[18px]" />
                 </motion.a>
               ))}
             </div>

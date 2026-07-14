@@ -1,12 +1,27 @@
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate, useRouter } from "@tanstack/react-router";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import { z } from "zod";
 
+import SiteFooter from "#/components/marketing/SiteFooter";
+import SiteHeader from "#/components/marketing/SiteHeader";
+import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 import { getSession } from "#/lib/auth.functions";
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),
+  /** Referral code (8 uppercase alnum). Also accepts lowercase and normalizes. */
+  ref: z.string().optional(),
 });
 
 export const Route = createFileRoute("/login")({
@@ -14,28 +29,40 @@ export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
     const session = await getSession();
     if (session) {
-      throw redirect({ to: "/account" });
+      throw redirect({ to: "/dashboard" });
     }
   },
   component: LoginPage,
+  head: () => ({
+    meta: [{ title: "Sign in — Starter" }],
+  }),
 });
+
+function normalizeReferralCode(value: string) {
+  return value.trim().toUpperCase();
+}
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { redirect: redirectTo } = Route.useSearch();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const router = useRouter();
+  const { redirect: redirectTo, ref: refFromSearch } = Route.useSearch();
+  const [isSignUp, setIsSignUp] = useState(Boolean(refFromSearch));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [referralCode, setReferralCode] = useState(
+    refFromSearch ? normalizeReferralCode(refFromSearch) : "",
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const afterAuth = async () => {
     if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")) {
-      window.location.assign(redirectTo);
+      // Preserve deep-link redirect without full page reload when possible.
+      router.history.push(redirectTo);
       return;
     }
-    await navigate({ to: "/account" });
+    await navigate({ to: "/dashboard" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,12 +72,22 @@ function LoginPage() {
 
     try {
       if (isSignUp) {
-        const result = await authClient.signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: typeof window !== "undefined" ? window.location.origin : undefined,
-        });
+        const code = normalizeReferralCode(referralCode);
+        const result = await authClient.signUp.email(
+          {
+            email,
+            password,
+            name,
+            callbackURL: typeof window !== "undefined" ? window.location.origin : undefined,
+          },
+          code
+            ? {
+                headers: {
+                  "x-referral-code": code,
+                },
+              }
+            : undefined,
+        );
         if (result.error) {
           setError(result.error.message || "Sign up failed");
           return;
@@ -75,97 +112,127 @@ function LoginPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {isSignUp ? "Create an account" : "Sign in"}
-        </h1>
-        <p className="text-sm text-neutral-500">
-          {isSignUp ? "Email and password via Better Auth" : "Welcome back"}
-        </p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
+      <main className="mx-auto flex max-w-md flex-col justify-center px-4 py-16 sm:py-24">
+        <Card className="border-border/70 shadow-xl shadow-primary/5">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl tracking-tight">
+              {isSignUp ? "Create an account" : "Welcome back"}
+            </CardTitle>
+            <CardDescription>
+              {isSignUp
+                ? "Email and password via Better Auth. Optional referral code on signup."
+                : "Sign in to open your portfolio dashboard"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="grid gap-4">
+              {isSignUp ? (
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+              ) : null}
 
-      <form onSubmit={handleSubmit} className="mt-8 grid gap-4">
-        {isSignUp ? (
-          <div className="grid gap-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700"
-              required
-              autoComplete="name"
-            />
-          </div>
-        ) : null}
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+              </div>
 
-        <div className="grid gap-2">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700"
-            required
-            autoComplete="email"
-          />
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                />
+              </div>
+
+              {isSignUp ? (
+                <div className="grid gap-2">
+                  <Label htmlFor="referral">Referral code (optional)</Label>
+                  <Input
+                    id="referral"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(normalizeReferralCode(e.target.value))}
+                    maxLength={8}
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="ABCD1234"
+                    className="font-mono tracking-wider uppercase"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    8 characters. Share links like{" "}
+                    <span className="font-mono">/login?ref=CODE</span>.
+                  </p>
+                </div>
+              ) : null}
+
+              {error ? (
+                <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {error}
+                </p>
+              ) : null}
+
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
+              </Button>
+            </form>
+
+            <button
+              type="button"
+              className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError("");
+              }}
+            >
+              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+            </button>
+
+            <p className="mt-6 text-center text-xs text-muted-foreground">
+              <Link to="/" preload="intent" className="underline-offset-4 hover:underline">
+                Back to home
+              </Link>
+              {" · "}
+              <Link
+                to="/demo/better-auth"
+                preload="intent"
+                className="underline-offset-4 hover:underline"
+              >
+                Auth demo
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="mt-6 text-center">
+          <ButtonLink to="/dashboard" variant="ghost" size="sm">
+            Continue to dashboard
+          </ButtonLink>
         </div>
-
-        <div className="grid gap-2">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700"
-            required
-            minLength={8}
-            autoComplete={isSignUp ? "new-password" : "current-password"}
-          />
-        </div>
-
-        {error ? (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-            {error}
-          </p>
-        ) : null}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-neutral-100 dark:text-neutral-900"
-        >
-          {loading ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
-        </button>
-      </form>
-
-      <button
-        type="button"
-        className="mt-4 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
-        onClick={() => {
-          setIsSignUp(!isSignUp);
-          setError("");
-        }}
-      >
-        {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
-      </button>
-
-      <p className="mt-8 text-center text-xs text-neutral-500">
-        Demo also available at{" "}
-        <Link to="/demo/better-auth" className="underline">
-          /demo/better-auth
-        </Link>
-      </p>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
-
-import { CalendarDays } from "lucide-react";
+import { CalendarDots } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef, useEffect } from "react";
 import type { FC } from "react";
@@ -228,7 +227,7 @@ export const CalendarWidget: FC<CalendarWidgetProps> = ({
                 className="flex h-40 flex-col items-center justify-center gap-3"
               >
                 <div className="rounded- bg-zinc-100 p-5 dark:bg-zinc-800">
-                  <CalendarDays className="size-8 text-zinc-500 dark:text-zinc-300" />
+                  <CalendarDots className="size-8 text-zinc-500 dark:text-zinc-300" />
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-zinc-500">No Events</p>
               </motion.div>

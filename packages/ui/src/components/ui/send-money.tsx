@@ -1,6 +1,5 @@
 "use client";
-
-import { Building2, CreditCard, Wallet, X } from "lucide-react";
+import { Buildings, CreditCard, Wallet, X } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState } from "react";
 import { MdOutlineAddCard } from "react-icons/md";
@@ -109,7 +108,7 @@ const BankTransferView = ({
 
   return (
     <motion.div layout>
-      <Header title="Bank Transfer" icon={Building2} onClose={onClose} id="bank" />
+      <Header title="Bank Transfer" icon={Buildings} onClose={onClose} id="bank" />
       <motion.div
         initial={{ opacity: 0, filter: "blur(4px)", y: 20 }}
         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -289,7 +288,7 @@ export const SendMoney: React.FC<SendMoneyProps> = ({
                     id: "bank",
                     title: "Bank Transfer",
                     sub: "Transfer to bank account",
-                    icon: Building2,
+                    icon: Buildings,
                   },
                   {
                     id: "card",

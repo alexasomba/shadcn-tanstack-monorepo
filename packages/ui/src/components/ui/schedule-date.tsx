@@ -1,8 +1,7 @@
 "use client";
-
+import { CaretLeft, CaretRight, Check, CaretDown } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Check, ChevronDown } from "lucide-react";
 import React, { useState } from "react";
 
 interface DateRange {
@@ -66,7 +65,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
               onClick={() => setViewDate(new Date(year, month - 1, 1))}
               className="p-1 text-neutral-400 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white"
             >
-              <ChevronLeft size={18} strokeWidth={2.5} />
+              <CaretLeft size={18} strokeWidth={2.5} />
             </button>
           ) : (
             <div className="w-7" />
@@ -80,7 +79,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
               onClick={() => setViewDate(new Date(year, month + 1, 1))}
               className="p-1 text-neutral-400 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white"
             >
-              <ChevronRight size={18} strokeWidth={2.5} />
+              <CaretRight size={18} strokeWidth={2.5} />
             </button>
           ) : (
             <div className="w-7" />
@@ -243,7 +242,7 @@ const DateInput = ({ label, date }: { label: string; date: Date | null }) => (
           ? date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
           : "Select Date"}
       </span>
-      <ChevronDown size={14} className="text-neutral-400 dark:text-neutral-500" />
+      <CaretDown size={14} className="text-neutral-400 dark:text-neutral-500" />
     </div>
   </div>
 );

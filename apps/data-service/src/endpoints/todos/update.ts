@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, todoToApi, updateTodo } from "data-ops";
 
 import type { AppContext } from "../../types";
@@ -29,8 +30,24 @@ export const updateTodoRoute = createRoute({
         },
       },
     },
+    400: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
     404: {
       description: "Not found",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+    500: {
+      description: "Database error",
       content: {
         "application/json": {
           schema: ErrorSchema,
@@ -44,17 +61,11 @@ export async function updateTodoHandler(c: AppContext) {
   const { id } = c.req.valid("param" as never) as { id: number };
   const { title } = c.req.valid("json" as never) as { title: string };
   const db = createDatabase(c.env.DATABASE);
-  const row = await updateTodo(db, id, title);
+  const result = await updateTodo(db, id, title);
 
-  if (!row) {
-    return c.json(
-      {
-        success: false as const,
-        error: { code: "NOT_FOUND", message: `Todo ${id} not found` },
-      },
-      404,
-    );
+  if (Result.isError(result)) {
+    return c.json(appErrorBody(result.error), appErrorStatus(result.error) as 400 | 404 | 500);
   }
 
-  return c.json(todoToApi(row), 200);
+  return c.json(todoToApi(result.value), 200);
 }

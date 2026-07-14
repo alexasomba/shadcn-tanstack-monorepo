@@ -1,6 +1,5 @@
 "use client";
-
-import { Pencil, X, Check } from "lucide-react";
+import { PencilSimple, X, Check } from "@phosphor-icons/react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import React, { useState, useEffect } from "react";
 import { BsArrowUpRightSquare } from "react-icons/bs";
@@ -233,7 +232,7 @@ export const InlineTableControl: React.FC<InlineTableControlProps> = ({
                         }}
                         className="flex justify-end text-neutral-400 transition-transform hover:text-black active:scale-125 dark:hover:text-white"
                       >
-                        <Pencil size={18} strokeWidth={2.5} />
+                        <PencilSimple size={18} strokeWidth={2.5} />
                       </button>
                     </motion.div>
                   )}

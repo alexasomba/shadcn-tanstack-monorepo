@@ -5,8 +5,6 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { getLocale } from "#/paraglide/runtime";
 
-import Footer from "../components/Footer";
-import Header from "../components/Header";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import StoreDevtools from "../lib/demo-store-devtools";
 
@@ -37,7 +35,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Admin — Starter console",
       },
     ],
     links: [
@@ -57,10 +55,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans [overflow-wrap:anywhere] antialiased selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
+      <body className="bg-background font-sans [overflow-wrap:anywhere] text-foreground antialiased selection:bg-[rgba(79,184,178,0.24)]">
         {children}
-        <Footer />
         <TanStackDevtools
           config={{
             position: "bottom-right",

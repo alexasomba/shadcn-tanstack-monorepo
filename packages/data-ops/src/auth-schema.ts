@@ -14,6 +14,10 @@ export const user = sqliteTable("user", {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  role: text("role"),
+  banned: integer("banned", { mode: "boolean" }).default(false),
+  banReason: text("ban_reason"),
+  banExpires: integer("ban_expires", { mode: "timestamp_ms" }),
 });
 
 export const session = sqliteTable(
@@ -34,6 +38,7 @@ export const session = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     activeOrganizationId: text("active_organization_id"),
+    impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
 );
@@ -142,11 +147,62 @@ export const invitation = sqliteTable(
   ],
 );
 
+export const referralCode = sqliteTable("referral_code", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  code: text("code").notNull().unique(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+});
+
+export const referrals = sqliteTable("referrals", {
+  id: text("id").primaryKey(),
+  referrerUserId: text("referrer_user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  referredUserId: text("referred_user_id")
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: "cascade" }),
+  referralCodeId: text("referral_code_id")
+    .notNull()
+    .references(() => referralCode.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+});
+
+export const notification = sqliteTable(
+  "notification",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id"),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    href: text("href"),
+    data: text("data", { mode: "json" }),
+    read: integer("read", { mode: "boolean" }).default(false).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("notification_user_created_idx").on(table.userId, table.createdAt)],
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
+  referralCode: many(referralCode),
+  referralss: many(referrals),
+  notifications: many(notification),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -186,6 +242,42 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
   }),
   user: one(user, {
     fields: [invitation.inviterId],
+    references: [user.id],
+  }),
+}));
+
+export const referralCodeRelations = relations(referralCode, ({ one, many }) => ({
+  user: one(user, {
+    fields: [referralCode.userId],
+    references: [user.id],
+  }),
+  referralss: many(referrals),
+}));
+
+export const referralsReferrerUserIdRelations = relations(referrals, ({ one }) => ({
+  user: one(user, {
+    fields: [referrals.referrerUserId],
+    references: [user.id],
+  }),
+}));
+
+export const referralsReferredUserIdRelations = relations(referrals, ({ one }) => ({
+  user: one(user, {
+    fields: [referrals.referredUserId],
+    references: [user.id],
+  }),
+}));
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referralCode: one(referralCode, {
+    fields: [referrals.referralCodeId],
+    references: [referralCode.id],
+  }),
+}));
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+  user: one(user, {
+    fields: [notification.userId],
     references: [user.id],
   }),
 }));

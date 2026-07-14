@@ -1,6 +1,4 @@
-import { Navigation03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { X } from "lucide-react";
+import { PaperPlaneTilt, X } from "@phosphor-icons/react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import React, { useState } from "react";
 import { FaRegThumbsUp, FaThumbsUp, FaRegThumbsDown, FaThumbsDown } from "react-icons/fa6";
@@ -148,7 +146,7 @@ export const FeedbackComponent: React.FC<FeedbackComponentProps> = ({ onSubmit }
                     transition={{ delay: 0.25 }}
                     className="flex items-center gap-2 rounded-xl bg-black px-6 py-3 font-bold text-white shadow-lg transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black"
                   >
-                    <HugeiconsIcon icon={Navigation03Icon} size={18} className="fill-current" />
+                    <PaperPlaneTilt size={18} weight="fill" className="fill-current" />
                     <span>{isSubmitting ? "Sending..." : "Send Now"}</span>
                   </motion.button>
                 </form>

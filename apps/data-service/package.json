@@ -19,6 +19,7 @@
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
     "@hono/zod-openapi": "catalog:",
+    "@workspace/result": "workspace:*",
     "better-auth": "catalog:",
     "data-ops": "workspace:*",
     "hono": "catalog:",

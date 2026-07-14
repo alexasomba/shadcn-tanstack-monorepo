@@ -1,3 +1,5 @@
+import { CaretRight, Folder, FolderOpen, House } from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,20 +14,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import type { LucideIcon } from "lucide-react";
-import { ChevronRightIcon, FolderIcon, FolderOpenIcon, HomeIcon } from "lucide-react";
 import { useState } from "react";
 
 type RootSegment = {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: Icon;
 };
 
 const rootSegment: RootSegment = {
   label: "Home",
   href: "#",
-  icon: HomeIcon,
+  icon: House,
 };
 
 const currentLabel = "Release Notes";
@@ -49,12 +49,12 @@ const Breadcrumb7 = () => {
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator className="text-muted-foreground/60">
-          <ChevronRightIcon className="size-3.5" />
+          <CaretRight className="size-3.5" />
         </BreadcrumbSeparator>
         <BreadcrumbItem className="flex items-center">
           <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-sm px-1 py-0.5 text-muted-foreground outline-none hover:text-foreground">
-              {open ? <FolderOpenIcon className="size-3.5" /> : <FolderIcon className="size-3.5" />}
+              {open ? <FolderOpen className="size-3.5" /> : <Folder className="size-3.5" />}
               <span className="sr-only">{open ? "Open section menu" : "Open section menu"}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -65,7 +65,7 @@ const Breadcrumb7 = () => {
           </DropdownMenu>
         </BreadcrumbItem>
         <BreadcrumbSeparator className="text-muted-foreground/60">
-          <ChevronRightIcon className="size-3.5" />
+          <CaretRight className="size-3.5" />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
           <BreadcrumbPage className="rounded-sm px-1 py-0.5 font-medium">

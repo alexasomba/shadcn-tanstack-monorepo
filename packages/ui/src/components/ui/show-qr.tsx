@@ -1,6 +1,5 @@
 "use client";
-
-import { X, Link } from "lucide-react";
+import { X, Link } from "@phosphor-icons/react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import type { Transition } from "motion/react";
 import { QRCodeSVG } from "qrcode.react";

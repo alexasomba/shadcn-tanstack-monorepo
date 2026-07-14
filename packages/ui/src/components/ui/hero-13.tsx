@@ -1,7 +1,6 @@
 "use client";
-
+import { Play, CaretDown } from "@phosphor-icons/react";
 import LogoIcon from "@workspace/ui/components/ui/logo-icon";
-import { Play, ChevronDown } from "lucide-react";
 import { motion, useMotionValue, useMotionTemplate } from "motion/react";
 import React from "react";
 
@@ -142,7 +141,7 @@ export default function Hero4({
               >
                 {link.label}
                 {link.hasDropdown && (
-                  <ChevronDown
+                  <CaretDown
                     size={14}
                     strokeWidth={2}
                     className="text-white/50 transition-colors group-hover/nav:text-white/80"

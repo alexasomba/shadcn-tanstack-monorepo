@@ -1,7 +1,6 @@
 "use client";
-
+import { CaretDown } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -124,7 +123,7 @@ export function ScrollIsland({ topics }: ScrollIslandProps) {
                   </motion.span>
 
                   <motion.div layout animate={{ rotate: isOpen ? 180 : 0 }}>
-                    <ChevronDown size={20} className="text-neutral-400 group-hover:text-white" />
+                    <CaretDown size={20} className="text-neutral-400 group-hover:text-white" />
                   </motion.div>
                 </div>
 

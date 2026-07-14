@@ -1,16 +1,16 @@
+import {
+  SealCheck,
+  Bookmark,
+  DotsThree,
+  Heart,
+  ChatCircle,
+  PaperPlaneTilt,
+} from "@phosphor-icons/react";
+import type { Icon } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
-import type { LucideIcon } from "lucide-react";
-import {
-  BadgeCheckIcon,
-  BookmarkIcon,
-  EllipsisIcon,
-  HeartIcon,
-  MessageCircleIcon,
-  SendIcon,
-} from "lucide-react";
 import { useState } from "react";
 
 type Profile = {
@@ -22,7 +22,7 @@ type Profile = {
 };
 
 type PostStat = {
-  icon: LucideIcon;
+  icon: Icon;
   label: string;
 };
 
@@ -54,9 +54,9 @@ const post: SocialPost = {
 };
 
 const stats: readonly PostStat[] = [
-  { icon: HeartIcon, label: "Like" },
-  { icon: MessageCircleIcon, label: "Comment" },
-  { icon: SendIcon, label: "Share" },
+  { icon: Heart, label: "Like" },
+  { icon: ChatCircle, label: "Comment" },
+  { icon: PaperPlaneTilt, label: "Share" },
 ] as const;
 
 const Card11 = () => {
@@ -73,7 +73,7 @@ const Card11 = () => {
           <div className="flex flex-col gap-0.5">
             <CardTitle className="flex items-center gap-1 text-sm">
               {profile.name}{" "}
-              <BadgeCheckIcon className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" />
+              <SealCheck className="size-4 fill-sky-600 stroke-white dark:fill-sky-400" />
             </CardTitle>
             <span className="text-xs text-muted-foreground">{post.location}</span>
           </div>
@@ -84,7 +84,7 @@ const Card11 = () => {
           aria-label="Toggle menu"
           className="size-8 rounded-full"
         >
-          <EllipsisIcon className="size-4" />
+          <DotsThree className="size-4" />
         </Button>
       </CardHeader>
       <CardContent className="space-y-3 px-0 text-sm">
@@ -120,7 +120,7 @@ const Card11 = () => {
               })}
             </div>
             <Button variant="ghost" size="icon" className="size-9 rounded-full">
-              <BookmarkIcon className="size-5" />
+              <Bookmark className="size-5" />
               <span className="sr-only">Save</span>
             </Button>
           </div>

@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, listTodos, todoToApi } from "data-ops";
 
 import type { AppContext } from "../../types";
-import { TodoSchema } from "./schemas";
+import { ErrorSchema, TodoSchema } from "./schemas";
 
 export const listTodosRoute = createRoute({
   method: "get",
@@ -18,11 +19,24 @@ export const listTodosRoute = createRoute({
         },
       },
     },
+    500: {
+      description: "Database error",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
   },
 });
 
 export async function listTodosHandler(c: AppContext) {
   const db = createDatabase(c.env.DATABASE);
-  const rows = await listTodos(db);
-  return c.json(rows.map(todoToApi), 200);
+  const result = await listTodos(db);
+
+  if (Result.isError(result)) {
+    return c.json(appErrorBody(result.error), appErrorStatus(result.error) as 500);
+  }
+
+  return c.json(result.value.map(todoToApi), 200);
 }

@@ -30,6 +30,9 @@ import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structure
 import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as ApiRemyChatRouteImport } from './routes/api.remy-chat'
+import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
+import { Route as ProtectedReferralsRouteImport } from './routes/_protected/referrals'
+import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
@@ -147,6 +150,21 @@ const ApiRemyChatRoute = ApiRemyChatRouteImport.update({
   path: '/api/remy-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedReferralsRoute = ProtectedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -213,6 +231,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/account': typeof ProtectedAccountRoute
+  '/dashboard': typeof ProtectedDashboardRoute
+  '/referrals': typeof ProtectedReferralsRoute
+  '/users': typeof ProtectedUsersRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -247,6 +268,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/account': typeof ProtectedAccountRoute
+  '/dashboard': typeof ProtectedDashboardRoute
+  '/referrals': typeof ProtectedReferralsRoute
+  '/users': typeof ProtectedUsersRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -283,6 +307,9 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
   '/_protected/account': typeof ProtectedAccountRoute
+  '/_protected/dashboard': typeof ProtectedDashboardRoute
+  '/_protected/referrals': typeof ProtectedReferralsRoute
+  '/_protected/users': typeof ProtectedUsersRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -319,6 +346,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/account'
+    | '/dashboard'
+    | '/referrals'
+    | '/users'
     | '/api/remy-chat'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -353,6 +383,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/account'
+    | '/dashboard'
+    | '/referrals'
+    | '/users'
     | '/api/remy-chat'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -388,6 +421,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/login'
     | '/_protected/account'
+    | '/_protected/dashboard'
+    | '/_protected/referrals'
+    | '/_protected/users'
     | '/api/remy-chat'
     | '/demo/ai-chat'
     | '/demo/ai-image'
@@ -602,6 +638,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiRemyChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/users': {
+      id: '/_protected/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof ProtectedUsersRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/referrals': {
+      id: '/_protected/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ProtectedReferralsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/dashboard': {
+      id: '/_protected/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ProtectedDashboardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/account': {
       id: '/_protected/account'
       path: '/account'
@@ -691,10 +748,16 @@ declare module '@tanstack/react-router' {
 
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRoute
+  ProtectedDashboardRoute: typeof ProtectedDashboardRoute
+  ProtectedReferralsRoute: typeof ProtectedReferralsRoute
+  ProtectedUsersRoute: typeof ProtectedUsersRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRoute,
+  ProtectedDashboardRoute: ProtectedDashboardRoute,
+  ProtectedReferralsRoute: ProtectedReferralsRoute,
+  ProtectedUsersRoute: ProtectedUsersRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -740,10 +803,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

@@ -1,10 +1,10 @@
 import { AIChatAgent } from "@cloudflare/ai-chat";
 import type { OnChatMessageOptions } from "@cloudflare/ai-chat";
+import { Result } from "@workspace/result";
 import { callable, routeAgentRequest } from "agents";
 import type { Schedule } from "agents";
 import { getSchedulePrompt, scheduleSchema } from "agents/schedule";
 import { convertToModelMessages, pruneMessages, stepCountIs, streamText, tool } from "ai";
-import { Result } from "better-result";
 import { createWorkersAI } from "workers-ai-provider";
 import { z } from "zod";
 

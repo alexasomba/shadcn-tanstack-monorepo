@@ -23,10 +23,13 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - **user-web / admin-web → data-service**: only via Cloudflare **service binding** `DATA_SERVICE` (`env.DATA_SERVICE.fetch`). Use `dataServiceClient` from `src/lib/data-client.ts`. No public HTTP between Workers.
 - Use `import { env } from "cloudflare:workers"` for bindings (current CF + TanStack Start API). Do **not** use `vinxi/http` `getEvent()` for env.
 - Use `createDatabase(env.DATABASE)` from `data-ops`. Shared queries live under `data-ops/queries/*`; Zod under `data-ops/zod-schema/*`.
-- **Auth**: `createAuth` + `createBaseAuthPlugins()` (includes **organization**) in `data-ops/auth`. Mailer: `createMailerFromEnv` (Resend or console). Apps append `tanstackStartCookies()` last. Client: `createBaseAuthClientPlugins()`. After plugin changes: `vpr auth:generate` → `vpr db:generate` → `vpr db:migrate:local`.
+- **Auth plugins** (server, shared D1): organization, **referral**, **admin**, **better-inbox**. Client split: **user-web** = org + referral + inbox; **admin-web** = org + admin + inbox. Referral product UX on user-web; admin has read-only `/referrals` stats. Inbox: `<InboxButton />` on both apps. Bootstrap admins: `role='admin'` or `BETTER_AUTH_ADMIN_USER_IDS`. After plugin changes: `vpr auth:generate` → `vpr db:generate` → `vpr db:migrate:local`.
 - **data-ops pack**: `pnpm --filter data-ops build` → `vp pack` (tsdown `dist/`); workspace still resolves `src/` for DX.
 - **data-service** endpoints: `@hono/zod-openapi` under `src/endpoints/<resource>/`. Prefer data-ops queries. **Queues/cron stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
 - **SEO discovery (user-web)**: `/sitemap.xml`, `/robots.txt`, `/llms.txt` server routes (`src/lib/discovery.ts`).
+- **UI**: `packages/ui/src/components` = shadcn **primitives**; `packages/ui/src/components/ui` = **Watermelon** marketing/dashboard compositions (use them). Apps compose both.
+- **Start auth boundary**: private `createServerFn` must use `requireAuthMiddleware` (RPC security). Route `beforeLoad` is UX only. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
+- **Result (`@workspace/result`)**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus` (early return for Hono typed responses). Prefer `@workspace/result` over direct `better-result` imports.
 
 ## Package Source Inspection
 
