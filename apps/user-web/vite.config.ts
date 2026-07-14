@@ -47,6 +47,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2000,
     rolldownOptions: {
+      external: ["vinxi/http"],
       output: {
         codeSplitting: {
           groups: [

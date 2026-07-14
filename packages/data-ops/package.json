@@ -80,6 +80,11 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@betternotify/core": "catalog:",
+    "@betternotify/discord": "catalog:",
+    "@betternotify/email": "catalog:",
+    "@betternotify/onesignal": "catalog:",
+    "@betternotify/push": "catalog:",
     "@marinedotsh/better-auth-referral": "catalog:",
     "@workspace/result": "workspace:*",
     "better-auth": "catalog:",

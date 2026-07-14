@@ -2,7 +2,9 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 
 import { getAuth } from "./auth.js";
+import { domainsApp } from "./endpoints/domains/router";
 import { healthHandler, healthRoute } from "./endpoints/health";
+import { notificationsApp } from "./endpoints/notifications/router";
 import { todosApp } from "./endpoints/todos/router";
 import { handleScheduled } from "./jobs/cron";
 import { handleJobsBatch } from "./jobs/queue";
@@ -61,12 +63,16 @@ app.use(
 
 app.use("*", async (c, next) => {
   try {
-    const auth = getAuth(c.env.DATABASE, {
-      baseURL: c.env.BETTER_AUTH_URL,
-      secret: c.env.BETTER_AUTH_SECRET,
-      RESEND_API_KEY: c.env.RESEND_API_KEY,
-      EMAIL_FROM: c.env.EMAIL_FROM,
-    });
+    const auth = getAuth(
+      c.env.DATABASE,
+      {
+        baseURL: c.env.BETTER_AUTH_URL,
+        secret: c.env.BETTER_AUTH_SECRET,
+        RESEND_API_KEY: c.env.RESEND_API_KEY,
+        EMAIL_FROM: c.env.EMAIL_FROM,
+      },
+      c.env,
+    );
     const session = await auth.api.getSession({ headers: c.req.raw.headers });
     c.set("user", session?.user ?? null);
     c.set("session", session?.session ?? null);
@@ -79,12 +85,16 @@ app.use("*", async (c, next) => {
 });
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
-  const auth = getAuth(c.env.DATABASE, {
-    baseURL: c.env.BETTER_AUTH_URL,
-    secret: c.env.BETTER_AUTH_SECRET,
-    RESEND_API_KEY: c.env.RESEND_API_KEY,
-    EMAIL_FROM: c.env.EMAIL_FROM,
-  });
+  const auth = getAuth(
+    c.env.DATABASE,
+    {
+      baseURL: c.env.BETTER_AUTH_URL,
+      secret: c.env.BETTER_AUTH_SECRET,
+      RESEND_API_KEY: c.env.RESEND_API_KEY,
+      EMAIL_FROM: c.env.EMAIL_FROM,
+    },
+    c.env,
+  );
   return auth.handler(c.req.raw);
 });
 
@@ -108,6 +118,8 @@ app.post("/internal/jobs/ping", async (c) => {
 
 app.openapi(healthRoute, healthHandler);
 app.route("/todos", todosApp);
+app.route("/notifications", notificationsApp);
+app.route("/domains", domainsApp);
 
 app.doc("/openapi.json", {
   openapi: "3.2.0",

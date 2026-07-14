@@ -1,4 +1,4 @@
-import type { DatabaseError} from "@workspace/result";
+import type { DatabaseError } from "@workspace/result";
 import { Result, databaseError } from "@workspace/result";
 import { desc, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";

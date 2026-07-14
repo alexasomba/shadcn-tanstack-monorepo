@@ -1,14 +1,6 @@
-import type {
-  DatabaseError,
-  NotFoundError,
-  ValidationError} from "@workspace/result";
-import {
-  Result,
-  databaseError,
-  notFound,
-  validation,
-  type AppError,
-} from "@workspace/result";
+import type { DatabaseError, NotFoundError, ValidationError } from "@workspace/result";
+import { Result, databaseError, notFound, validation } from "@workspace/result";
+import type { AppError } from "@workspace/result";
 import { desc, eq } from "drizzle-orm";
 
 import type { Database } from "../database/setup";

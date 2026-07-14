@@ -145,6 +145,12 @@ catalog:
   "workers-ai-provider": "^3.3.1"
   "wrangler": "^4.110.0"
   "zod": "^4.4.3"
+  "@betternotify/core": "^1.0.0-beta.10"
+  "@betternotify/email": "^1.0.0-beta.6"
+  "@betternotify/push": "^1.0.0-beta.5"
+  "@betternotify/discord": "^1.0.0-beta.6"
+  "@betternotify/onesignal": "^1.0.0-beta.5"
+  "@opencoredev/domain-sdk": ^0.1.0
 overrides:
   vite: "catalog:"
   # Keep a single Vitest copy aligned with the bundled `vp test` runner.

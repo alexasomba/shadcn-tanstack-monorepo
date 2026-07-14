@@ -1,5 +1,7 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+
+import { organization } from "./auth-schema";
 
 // Application Schema
 export const todos = sqliteTable("todos", {
@@ -27,3 +29,24 @@ export const outboxEvents = sqliteTable(
   },
   (table) => [index("outbox_events_type_idx").on(table.type)],
 );
+
+export const domains = sqliteTable(
+  "domains",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    hostname: text("hostname").notNull().unique(),
+    status: text("status").notNull().default("pending"),
+    createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+  },
+  (table) => [index("domains_organization_idx").on(table.organizationId)],
+);
+
+export const domainsRelations = relations(domains, ({ one }) => ({
+  organization: one(organization, {
+    fields: [domains.organizationId],
+    references: [organization.id],
+  }),
+}));

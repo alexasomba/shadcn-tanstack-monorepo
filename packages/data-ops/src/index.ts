@@ -63,3 +63,18 @@ export {
   type SendEmailInput,
 } from "./email/mailer";
 export { buildRobotsTxt, buildSitemapXml, buildLlmsTxt, type DiscoveryUrl } from "./seo/discovery";
+export { getNotifyClient, notificationCatalog, type NotificationCatalog } from "./notifications";
+export {
+  listDomains,
+  getDomainByHostname,
+  createDomain,
+  updateDomainStatus,
+  deleteDomain,
+  type DomainRow,
+} from "./queries/domains";
+export {
+  DomainSchema,
+  DomainCreateSchema,
+  type Domain,
+  type DomainCreate,
+} from "./zod-schema/domains";

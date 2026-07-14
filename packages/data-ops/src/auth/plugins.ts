@@ -2,7 +2,18 @@ import { betterAuthReferral } from "@marinedotsh/better-auth-referral";
 import type { BetterAuthPlugin } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { organization } from "better-auth/plugins/organization";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { inbox } from "better-inbox";
+
+export type AuthPluginsOptions = {
+  sendInvitationEmail?: (data: {
+    email: string;
+    organization: { name: string };
+    inviter: { user: { name: string } };
+    invitation: { id: string };
+  }) => Promise<void>;
+  sendOTP?: (data: { user: { email: string }; otp: string }) => Promise<void>;
+};
 
 function readEnv(name: string): string | undefined {
   try {
@@ -35,12 +46,25 @@ export function readAdminUserIds(): Array<string> {
  * | admin    | admin-web         |
  * | inbox    | both apps         |
  */
-export function createBaseAuthPlugins(): Array<BetterAuthPlugin> {
+export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<BetterAuthPlugin> {
   return [
     organization({
       allowUserToCreateOrganization: true,
       membershipLimit: 50,
       organizationLimit: 5,
+      ...(options.sendInvitationEmail ? { sendInvitationEmail: options.sendInvitationEmail } : {}),
+    }),
+    twoFactor({
+      issuer: "Data Service",
+      otpOptions: {
+        sendOTP: async ({ user, otp }) => {
+          if (options.sendOTP) {
+            await options.sendOTP({ user, otp });
+          } else {
+            console.log(`[auth:otp] to=${user.email} code=${otp}`);
+          }
+        },
+      },
     }),
     betterAuthReferral({
       maskReferredUserEmail: true,

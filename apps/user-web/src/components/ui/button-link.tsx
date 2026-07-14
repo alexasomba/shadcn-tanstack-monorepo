@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router';
-import type { LinkComponentProps } from '@tanstack/react-router';
+import { Link } from "@tanstack/react-router";
+import type { LinkComponentProps } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import type { ComponentProps } from "react";
 

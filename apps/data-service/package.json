@@ -14,10 +14,16 @@
     "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false",
     "build": "pnpm run cf-typegen",
     "deploy": "vp run build && wrangler deploy --minify",
-    "deploy:preview": "vp run build && wrangler versions upload"
+    "deploy:preview": "vp run build && wrangler versions upload",
+    "test": "vp test run"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@betternotify/core": "catalog:",
+    "@betternotify/discord": "catalog:",
+    "@betternotify/email": "catalog:",
+    "@betternotify/onesignal": "catalog:",
+    "@betternotify/push": "catalog:",
     "@hono/zod-openapi": "catalog:",
     "@workspace/result": "workspace:*",
     "better-auth": "catalog:",
@@ -27,6 +33,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "@types/better-sqlite3": "catalog:",
+    "better-sqlite3": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "catalog:"
   }
 }

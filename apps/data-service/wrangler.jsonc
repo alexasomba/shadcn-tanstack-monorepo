@@ -41,4 +41,12 @@
   "triggers": {
     "crons": ["*/15 * * * *"],
   },
+  "vars": {
+    "ONESIGNAL_APP_ID": "",
+    "ONESIGNAL_API_KEY": "",
+    "DISCORD_WEBHOOK_URL": "",
+    "CLOUDFLARE_API_TOKEN": "",
+    "CLOUDFLARE_ZONE_ID": "",
+    "CLOUDFLARE_CNAME_TARGET": "",
+  },
 }

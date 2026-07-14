@@ -50,6 +50,20 @@
       "when": 1784028022917,
       "tag": "0006_left_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1784034563122,
+      "tag": "0007_lush_dazzler",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1784037121759,
+      "tag": "0008_dapper_mandarin",
+      "breakpoints": true
     }
   ]
 }

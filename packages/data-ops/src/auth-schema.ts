@@ -14,6 +14,7 @@ export const user = sqliteTable("user", {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).default(false),
   role: text("role"),
   banned: integer("banned", { mode: "boolean" }).default(false),
   banReason: text("ban_reason"),
@@ -147,6 +148,25 @@ export const invitation = sqliteTable(
   ],
 );
 
+export const twoFactor = sqliteTable(
+  "two_factor",
+  {
+    id: text("id").primaryKey(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    verified: integer("verified", { mode: "boolean" }).default(true),
+    failedVerificationCount: integer("failed_verification_count").default(0),
+    lockedUntil: integer("locked_until", { mode: "timestamp_ms" }),
+  },
+  (table) => [
+    index("twoFactor_secret_idx").on(table.secret),
+    index("twoFactor_userId_idx").on(table.userId),
+  ],
+);
+
 export const referralCode = sqliteTable("referral_code", {
   id: text("id").primaryKey(),
   userId: text("user_id")
@@ -176,30 +196,27 @@ export const referrals = sqliteTable("referrals", {
     .notNull(),
 });
 
-export const notification = sqliteTable(
-  "notification",
-  {
-    id: text("id").primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    organizationId: text("organization_id"),
-    type: text("type").notNull(),
-    title: text("title").notNull(),
-    body: text("body"),
-    href: text("href"),
-    data: text("data", { mode: "json" }),
-    read: integer("read", { mode: "boolean" }).default(false).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (table) => [index("notification_user_created_idx").on(table.userId, table.createdAt)],
-);
+export const notification = sqliteTable("notification", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id"),
+  type: text("type").notNull(),
+  title: text("title").notNull(),
+  body: text("body"),
+  href: text("href"),
+  data: text("data", { mode: "json" }),
+  read: integer("read", { mode: "boolean" }).default(false).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+});
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
+  twoFactors: many(twoFactor),
   referralCode: many(referralCode),
   referralss: many(referrals),
   notifications: many(notification),
@@ -242,6 +259,13 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
   }),
   user: one(user, {
     fields: [invitation.inviterId],
+    references: [user.id],
+  }),
+}));
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
     references: [user.id],
   }),
 }));

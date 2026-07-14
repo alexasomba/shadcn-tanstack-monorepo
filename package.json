@@ -12,6 +12,9 @@
     "worktree:list": "node scripts/worktree.mjs list",
     "cache:clean": "vp cache clean"
   },
+  "dependencies": {
+    "@opencoredev/domain-sdk": "catalog:"
+  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "catalog:",
     "@tanstack/eslint-plugin-query": "catalog:",

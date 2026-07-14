@@ -7,10 +7,11 @@ import type { Database } from "../database/setup";
 import { createMailerFromEnv } from "../email/mailer";
 import type { Mailer } from "../email/mailer";
 import { createBaseAuthPlugins } from "./plugins";
+import type { AuthPluginsOptions } from "./plugins";
 
 const DEV_SECRET = "dev-only-better-auth-secret-min-32-chars!";
 
-export type CreateAuthEnv = {
+export type CreateAuthEnv = AuthPluginsOptions & {
   /** Base URL of the auth API host (e.g. http://127.0.0.1:8300). */
   baseURL?: string;
   /** Encryption secret — min 32 chars. Prefer BETTER_AUTH_SECRET env. */
@@ -30,6 +31,9 @@ export type CreateAuthEnv = {
   mailer?: Mailer;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
+  sendVerificationEmail?: (args: { user: { email: string }; url: string }) => Promise<void>;
+  sendResetPassword?: (args: { user: { email: string }; url: string }) => Promise<void>;
+  advanced?: BetterAuthOptions["advanced"];
 };
 
 function readEnv(name: string): string | undefined {
@@ -97,7 +101,7 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
   const secret = resolveSecret(env.secret, isProduction);
   const baseURL = env.baseURL ?? readEnv("BETTER_AUTH_URL");
   const trustedOrigins = env.trustedOrigins ?? defaultTrustedOrigins();
-  const plugins = [...createBaseAuthPlugins(), ...(env.plugins ?? [])];
+  const plugins = [...createBaseAuthPlugins(env), ...(env.plugins ?? [])];
   const mailer =
     env.mailer ??
     createMailerFromEnv({
@@ -115,10 +119,13 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
     }),
     emailAndPassword: {
       enabled: true,
-      minPasswordLength: 8,
+      minPasswordLength: 12,
       maxPasswordLength: 256,
       revokeSessionsOnPasswordReset: true,
       sendResetPassword: ({ user, url }: { user: { email: string }; url: string }) => {
+        if (env.sendResetPassword) {
+          return env.sendResetPassword({ user, url });
+        }
         return mailer.send({
           to: user.email,
           subject: "Reset your password",
@@ -130,6 +137,9 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
     emailVerification: {
       sendOnSignUp: false,
       sendVerificationEmail: ({ user, url }: { user: { email: string }; url: string }) => {
+        if (env.sendVerificationEmail) {
+          return env.sendVerificationEmail({ user, url });
+        }
         return mailer.send({
           to: user.email,
           subject: "Verify your email",
@@ -167,6 +177,7 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
         sameSite: "lax" as const,
         httpOnly: true,
       },
+      ...env.advanced,
     },
     plugins,
   } satisfies BetterAuthOptions;

@@ -11,6 +11,12 @@ export type Bindings = {
   BETTER_AUTH_URL?: string;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
+  ONESIGNAL_APP_ID?: string;
+  ONESIGNAL_API_KEY?: string;
+  DISCORD_WEBHOOK_URL?: string;
+  CLOUDFLARE_API_TOKEN?: string;
+  CLOUDFLARE_ZONE_ID?: string;
+  CLOUDFLARE_CNAME_TARGET?: string;
   /** Producer + consumer for background jobs (stub). */
   JOBS_QUEUE?: Queue;
 };

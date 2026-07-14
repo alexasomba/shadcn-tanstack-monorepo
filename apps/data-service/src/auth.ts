@@ -1,5 +1,7 @@
-import { createAuth, createDatabase } from "data-ops";
+import { createAuth, createDatabase, getNotifyClient } from "data-ops";
 import type { Auth, AuthSession, AuthUser } from "data-ops";
+
+import type { Bindings } from "./types";
 
 function readEnv(name: string): string | undefined {
   try {
@@ -22,14 +24,65 @@ export type GetAuthOptions = {
  * Runtime Better Auth instance for the data-service Worker.
  * Prefer binding secrets via wrangler (`BETTER_AUTH_SECRET` / `BETTER_AUTH_URL`).
  */
-export function getAuth(d1: D1Database, options: GetAuthOptions = {}) {
+export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?: Bindings) {
   const db = createDatabase(d1);
+  const notify = bindings ? getNotifyClient(bindings) : undefined;
+
   return createAuth(db, {
     appName: "Data Service",
     baseURL: options.baseURL ?? readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8302",
     secret: options.secret ?? readEnv("BETTER_AUTH_SECRET"),
     RESEND_API_KEY: options.RESEND_API_KEY ?? readEnv("RESEND_API_KEY"),
     EMAIL_FROM: options.EMAIL_FROM ?? readEnv("EMAIL_FROM"),
+
+    sendVerificationEmail: async ({ user, url }) => {
+      if (notify) {
+        await notify.verifyEmail.send({
+          to: user.email,
+          input: { name: "User", url },
+        });
+      } else {
+        console.log(`[auth:verifyEmail] to=${user.email} url=${url}`);
+      }
+    },
+
+    sendResetPassword: async ({ user, url }) => {
+      if (notify) {
+        await notify.resetPassword.send({
+          to: user.email,
+          input: { name: "User", url },
+        });
+      } else {
+        console.log(`[auth:resetPassword] to=${user.email} url=${url}`);
+      }
+    },
+
+    sendInvitationEmail: async ({ email, organization, inviter, invitation }) => {
+      if (notify) {
+        const acceptUrl = `${options.baseURL ?? readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8302"}/accept-invite?id=${invitation.id}`;
+        await notify.orgInvitation.send({
+          to: email,
+          input: {
+            inviterName: inviter.user.name || "Admin",
+            organizationName: organization.name,
+            url: acceptUrl,
+          },
+        });
+      } else {
+        console.log(`[auth:orgInvitation] to=${email} org=${organization.name}`);
+      }
+    },
+
+    sendOTP: async ({ user, otp }) => {
+      if (notify) {
+        await notify.twoFactorOtp.send({
+          to: user.email,
+          input: { otp },
+        });
+      } else {
+        console.log(`[auth:twoFactorOtp] to=${user.email} code=${otp}`);
+      }
+    },
   });
 }
 
