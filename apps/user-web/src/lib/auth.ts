@@ -1,8 +1,6 @@
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { env } from "cloudflare:workers";
+import { env, waitUntil } from "cloudflare:workers";
 import { createAuth, createDatabase, getNotifyClient } from "data-ops";
-// @ts-ignore: TS2307 - Vinxi/http types are not fully resolved in this workspace
-import { getEvent } from "vinxi/http";
 
 function readEnv(name: string): string | undefined {
   try {
@@ -31,12 +29,8 @@ export function getAuth(d1: D1Database) {
       backgroundTasks: {
         handler: (promise: Promise<unknown>) => {
           try {
-            const event = getEvent();
-            const ctx = event?.context?.cloudflare?.context;
-            if (ctx && typeof ctx.waitUntil === "function") {
-              ctx.waitUntil(promise);
-              return;
-            }
+            waitUntil(promise);
+            return;
           } catch {
             // Ignore
           }
