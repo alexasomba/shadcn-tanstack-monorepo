@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
+    "@better-auth/passkey": "catalog:",
     "@cloudflare/tanstack-ai": "catalog:",
     "@cloudflare/vite-plugin": "catalog:",
     "@faker-js/faker": "catalog:",

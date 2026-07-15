@@ -1035,6 +1035,210 @@ function getSuccessfulOrders<
   );
 }
 
+interface PartyLike {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string | null;
+  userId?: string | null;
+  phone?: string | null;
+}
+
+interface CustomerLike {
+  id: string;
+  email: string;
+  partyId?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string | null;
+  userId?: string | null;
+  phone?: string | null;
+  isGuest?: boolean;
+  lastPurchaseAt?: Date | null;
+  orders?: Array<{
+    status?: string | null;
+    total?: number | null;
+    createdAt?: Date | null;
+  }>;
+}
+
+interface StoredContactLike {
+  id: string;
+  email: string;
+  partyId?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  userId?: string | null;
+  phone?: string | null;
+  companyId?: string | null;
+  company?: string | null;
+  companyRecord?: { name: string } | null;
+  status?: string | null;
+  marketingStatus?: string | null;
+  prefix?: string | null;
+  lastContactedAt?: Date | null;
+  externalId?: string | null;
+  externalSource?: string | null;
+}
+
+function computeOrderStats(customer: CustomerLike | null) {
+  const orders = customer ? getSuccessfulOrders(customer) : [];
+  const count = orders.length;
+  const spend = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+  return { orders, count, spend };
+}
+
+function processParties(
+  canonicalParties: Array<PartyLike>,
+  customerByPartyId: Map<string, CustomerLike>,
+  customerByEmail: Map<string, CustomerLike>,
+  contactByPartyId: Map<string, StoredContactLike>,
+  contactByEmail: Map<string, StoredContactLike>,
+  seenKeys: Set<string>,
+  results: Array<unknown>,
+) {
+  canonicalParties.forEach((party) => {
+    const customer =
+      customerByPartyId.get(party.id) || customerByEmail.get(party.email.toLowerCase()) || null;
+    const storedContact =
+      contactByPartyId.get(party.id) || contactByEmail.get(party.email.toLowerCase()) || null;
+    const {
+      orders: ordersForCustomer,
+      count: orderCount,
+      spend: totalSpend,
+    } = computeOrderStats(customer);
+    const key = customer?.id || storedContact?.id || party.id;
+    seenKeys.add(key);
+
+    results.push({
+      firstName: storedContact?.firstName || customer?.firstName || party.firstName || null,
+      lastName: storedContact?.lastName || customer?.lastName || party.lastName || null,
+      id: storedContact?.id || party.id,
+      partyId: party.id,
+      customerId: customer?.id || null,
+      userId: party.userId || storedContact?.userId || customer?.userId || null,
+      name: party.name || customer?.name || storedContact?.email || party.email,
+      email: party.email,
+      phone: party.phone || storedContact?.phone || customer?.phone || null,
+      companyId: storedContact?.companyId || null,
+      companyName: storedContact?.companyRecord?.name || storedContact?.company || null,
+      lifecycle: deriveLifecycle(orderCount, totalSpend),
+      marketingStatus: storedContact?.marketingStatus || "subscribed",
+      orderCount,
+      totalSpend,
+      firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
+      lastPurchaseAt: customer?.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
+      isGuest: customer?.isGuest ?? false,
+      prefix: storedContact?.prefix || null,
+      lastContactedAt: storedContact?.lastContactedAt || null,
+      externalId: storedContact?.externalId || null,
+      externalSource: storedContact?.externalSource || null,
+    });
+  });
+}
+
+function processCustomers(
+  allCustomers: Array<CustomerLike>,
+  contactByEmail: Map<string, StoredContactLike>,
+  seenKeys: Set<string>,
+  results: Array<unknown>,
+) {
+  for (const customer of allCustomers) {
+    const key = customer.id;
+    if (seenKeys.has(key)) continue;
+    const storedContact = contactByEmail.get(customer.email.toLowerCase()) || null;
+    const {
+      orders: ordersForCustomer,
+      count: orderCount,
+      spend: totalSpend,
+    } = computeOrderStats(customer);
+
+    results.push({
+      id: storedContact?.id || customer.id,
+      partyId: customer.partyId || null,
+      customerId: customer.id,
+      userId: storedContact?.userId || customer.userId || null,
+      name: customer.name || customer.email,
+      email: customer.email,
+      phone: storedContact?.phone || customer.phone,
+      companyId: storedContact?.companyId || null,
+      companyName: storedContact?.companyRecord?.name || storedContact?.company || null,
+      lifecycle: deriveLifecycle(orderCount, totalSpend),
+      marketingStatus: storedContact?.marketingStatus || "subscribed",
+      orderCount,
+      totalSpend,
+      firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
+      lastPurchaseAt: customer.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
+      isGuest: customer.isGuest,
+      prefix: storedContact?.prefix || null,
+      lastContactedAt: storedContact?.lastContactedAt || null,
+      externalId: storedContact?.externalId || null,
+      externalSource: storedContact?.externalSource || null,
+    });
+    seenKeys.add(key);
+  }
+}
+
+function processStoredContacts(
+  storedContacts: Array<StoredContactLike>,
+  canonicalParties: Array<PartyLike>,
+  customerByPartyId: Map<string, CustomerLike>,
+  customerByEmail: Map<string, CustomerLike>,
+  seenKeys: Set<string>,
+  results: Array<unknown>,
+) {
+  for (const storedContact of storedContacts) {
+    const key = storedContact.partyId || storedContact.id;
+    if (seenKeys.has(key)) continue;
+    const party = storedContact.partyId
+      ? canonicalParties.find((entry) => entry.id === storedContact.partyId) || null
+      : null;
+    const customer = party
+      ? customerByPartyId.get(party.id) ||
+        customerByEmail.get(storedContact.email.toLowerCase()) ||
+        null
+      : customerByEmail.get(storedContact.email.toLowerCase()) || null;
+    const {
+      orders: ordersForCustomer,
+      count: orderCount,
+      spend: totalSpend,
+    } = computeOrderStats(customer);
+
+    results.push({
+      id: storedContact.id,
+      partyId: storedContact.partyId || null,
+      customerId: customer?.id || null,
+      userId: storedContact.userId || party?.userId || null,
+      name:
+        [storedContact.firstName, storedContact.lastName].filter(Boolean).join(" ") ||
+        party?.name ||
+        storedContact.email,
+      email: storedContact.email,
+      phone: storedContact.phone || party?.phone || null,
+      companyId: storedContact.companyId || null,
+      companyName: storedContact.companyRecord?.name || storedContact.company || null,
+      lifecycle:
+        orderCount > 0
+          ? deriveLifecycle(orderCount, totalSpend)
+          : storedContact.status === "customer"
+            ? "Customer"
+            : "Lead",
+      marketingStatus: storedContact.marketingStatus || "subscribed",
+      orderCount,
+      totalSpend,
+      firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
+      lastPurchaseAt: customer?.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
+      isGuest: false,
+      prefix: storedContact.prefix || null,
+      lastContactedAt: storedContact.lastContactedAt || null,
+      externalId: storedContact.externalId || null,
+      externalSource: storedContact.externalSource || null,
+    });
+    seenKeys.add(key);
+  }
+}
+
 export async function listCrmContacts(
   db: Database,
 ): Promise<Result<Array<UnifiedCrmContact>, DatabaseError>> {
@@ -1079,132 +1283,26 @@ export async function listCrmContacts(
       const seenKeys = new Set<string>();
       const results: Array<unknown> = [];
 
-      canonicalParties.forEach((party) => {
-        const customer =
-          customerByPartyId.get(party.id) || customerByEmail.get(party.email.toLowerCase()) || null;
-        const storedContact =
-          contactByPartyId.get(party.id) || contactByEmail.get(party.email.toLowerCase()) || null;
-        const ordersForCustomer = customer ? getSuccessfulOrders(customer) : [];
-        const orderCount = ordersForCustomer.length;
-        const totalSpend = ordersForCustomer.reduce(
-          (sum, order) => sum + Number(order.total || 0),
-          0,
-        );
-        const key = customer?.id || storedContact?.id || party.id;
-        seenKeys.add(key);
+      processParties(
+        canonicalParties,
+        customerByPartyId,
+        customerByEmail,
+        contactByPartyId,
+        contactByEmail,
+        seenKeys,
+        results,
+      );
 
-        results.push({
-          firstName: storedContact?.firstName || customer?.firstName || party.firstName || null,
-          lastName: storedContact?.lastName || customer?.lastName || party.lastName || null,
-          id: storedContact?.id || party.id,
-          partyId: party.id,
-          customerId: customer?.id || null,
-          userId: party.userId || storedContact?.userId || customer?.userId || null,
-          name: party.name || customer?.name || storedContact?.email || party.email,
-          email: party.email,
-          phone: party.phone || storedContact?.phone || customer?.phone || null,
-          companyId: storedContact?.companyId || null,
-          companyName: storedContact?.companyRecord?.name || storedContact?.company || null,
-          lifecycle: deriveLifecycle(orderCount, totalSpend),
-          marketingStatus: storedContact?.marketingStatus || "subscribed",
-          orderCount,
-          totalSpend,
-          firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
-          lastPurchaseAt: customer?.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
-          isGuest: customer?.isGuest ?? false,
-          prefix: storedContact?.prefix || null,
-          lastContactedAt: storedContact?.lastContactedAt || null,
-          externalId: storedContact?.externalId || null,
-          externalSource: storedContact?.externalSource || null,
-        });
-      });
+      processCustomers(allCustomers, contactByEmail, seenKeys, results);
 
-      for (const customer of allCustomers) {
-        const key = customer.id;
-        if (seenKeys.has(key)) continue;
-        const storedContact = contactByEmail.get(customer.email.toLowerCase()) || null;
-        const ordersForCustomer = getSuccessfulOrders(customer);
-        const orderCount = ordersForCustomer.length;
-        const totalSpend = ordersForCustomer.reduce(
-          (sum, order) => sum + Number(order.total || 0),
-          0,
-        );
-
-        results.push({
-          id: storedContact?.id || customer.id,
-          partyId: customer.partyId || null,
-          customerId: customer.id,
-          userId: storedContact?.userId || customer.userId || null,
-          name: customer.name || customer.email,
-          email: customer.email,
-          phone: storedContact?.phone || customer.phone,
-          companyId: storedContact?.companyId || null,
-          companyName: storedContact?.companyRecord?.name || storedContact?.company || null,
-          lifecycle: deriveLifecycle(orderCount, totalSpend),
-          marketingStatus: storedContact?.marketingStatus || "subscribed",
-          orderCount,
-          totalSpend,
-          firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
-          lastPurchaseAt: customer.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
-          isGuest: customer.isGuest,
-          prefix: storedContact?.prefix || null,
-          lastContactedAt: storedContact?.lastContactedAt || null,
-          externalId: storedContact?.externalId || null,
-          externalSource: storedContact?.externalSource || null,
-        });
-        seenKeys.add(key);
-      }
-
-      for (const storedContact of storedContacts) {
-        const key = storedContact.partyId || storedContact.id;
-        if (seenKeys.has(key)) continue;
-        const party = storedContact.partyId
-          ? canonicalParties.find((entry) => entry.id === storedContact.partyId) || null
-          : null;
-        const customer = party
-          ? customerByPartyId.get(party.id) ||
-            customerByEmail.get(storedContact.email.toLowerCase()) ||
-            null
-          : customerByEmail.get(storedContact.email.toLowerCase()) || null;
-        const ordersForCustomer = customer ? getSuccessfulOrders(customer) : [];
-        const orderCount = ordersForCustomer.length;
-        const totalSpend = ordersForCustomer.reduce(
-          (sum, order) => sum + Number(order.total || 0),
-          0,
-        );
-
-        results.push({
-          id: storedContact.id,
-          partyId: storedContact.partyId || null,
-          customerId: customer?.id || null,
-          userId: storedContact.userId || party?.userId || null,
-          name:
-            [storedContact.firstName, storedContact.lastName].filter(Boolean).join(" ") ||
-            party?.name ||
-            storedContact.email,
-          email: storedContact.email,
-          phone: storedContact.phone || party?.phone || null,
-          companyId: storedContact.companyId || null,
-          companyName: storedContact.companyRecord?.name || storedContact.company || null,
-          lifecycle:
-            orderCount > 0
-              ? deriveLifecycle(orderCount, totalSpend)
-              : storedContact.status === "customer"
-                ? "Customer"
-                : "Lead",
-          marketingStatus: storedContact.marketingStatus || "subscribed",
-          orderCount,
-          totalSpend,
-          firstPurchaseAt: ordersForCustomer.at(-1)?.createdAt ?? null,
-          lastPurchaseAt: customer?.lastPurchaseAt ?? ordersForCustomer.at(0)?.createdAt ?? null,
-          isGuest: false,
-          prefix: storedContact.prefix || null,
-          lastContactedAt: storedContact.lastContactedAt || null,
-          externalId: storedContact.externalId || null,
-          externalSource: storedContact.externalSource || null,
-        });
-        seenKeys.add(key);
-      }
+      processStoredContacts(
+        storedContacts,
+        canonicalParties,
+        customerByPartyId,
+        customerByEmail,
+        seenKeys,
+        results,
+      );
 
       return results as Array<UnifiedCrmContact>;
     },
@@ -1820,6 +1918,42 @@ export async function saveCrmCompanyDeal(
   });
 }
 
+async function resolveAssociatedIds(
+  db: Database,
+  objectKey: string,
+  recordId: string,
+): Promise<{ contactId: string | null; companyId: string | null; dealId: string | null }> {
+  if (objectKey === "contacts") {
+    return { contactId: recordId, companyId: null, dealId: null };
+  }
+  if (objectKey === "companies") {
+    return { contactId: null, companyId: recordId, dealId: null };
+  }
+  if (objectKey === "deals") {
+    return { contactId: null, companyId: null, dealId: recordId };
+  }
+
+  const record = (await findObjectRecord(db, objectKey as CrmObjectKey, recordId)) as
+    | (Record<string, unknown> & { contactId?: string | null; customerId?: string | null })
+    | null;
+
+  if (record) {
+    if ("contactId" in record && record.contactId) {
+      return { contactId: record.contactId, companyId: null, dealId: null };
+    }
+    if ("customerId" in record && record.customerId) {
+      const contact = await ensureCrmContactForCustomer(db, record.customerId).then((res) =>
+        res.unwrap(),
+      );
+      if (contact) {
+        return { contactId: contact.id, companyId: null, dealId: null };
+      }
+    }
+  }
+
+  return { contactId: null, companyId: null, dealId: null };
+}
+
 export async function saveRecordNote(
   db: Database,
   data: {
@@ -1831,6 +1965,7 @@ export async function saveRecordNote(
 ): Promise<Result<unknown, DatabaseError>> {
   return Result.tryPromise({
     try: async () => {
+      const assoc = await resolveAssociatedIds(db, data.objectKey, data.recordId);
       const values: {
         id: string;
         body: string;
@@ -1844,40 +1979,12 @@ export async function saveRecordNote(
         id: crypto.randomUUID(),
         body: data.body,
         authorUserId: data.authorUserId || null,
-        contactId: null,
-        companyId: null,
-        dealId: null,
+        contactId: assoc.contactId,
+        companyId: assoc.companyId,
+        dealId: assoc.dealId,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-
-      if (data.objectKey === "contacts") {
-        values.contactId = data.recordId;
-      } else if (data.objectKey === "companies") {
-        values.companyId = data.recordId;
-      } else if (data.objectKey === "deals") {
-        values.dealId = data.recordId;
-      } else {
-        const record = (await findObjectRecord(
-          db,
-          data.objectKey as CrmObjectKey,
-          data.recordId,
-        )) as
-          | (Record<string, unknown> & { contactId?: string | null; customerId?: string | null })
-          | null;
-        if (record) {
-          if ("contactId" in record && record.contactId) {
-            values.contactId = record.contactId;
-          } else if ("customerId" in record && record.customerId) {
-            const contact = await ensureCrmContactForCustomer(db, record.customerId).then((res) =>
-              res.unwrap(),
-            );
-            if (contact) {
-              values.contactId = contact.id;
-            }
-          }
-        }
-      }
 
       const [inserted] = await db.insert(crmNotes).values(values).returning();
       return inserted;

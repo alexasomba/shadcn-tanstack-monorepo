@@ -15,6 +15,14 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 <!--VITE PLUS END-->
 
+## Package Source Inspection
+
+No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
+
+- Search: `rg "query" $(opensrc path <package>)`
+- Read: `cat $(opensrc path <package>)/path/to/file`
+- Other registries: `find $(opensrc path pypi:requests) -name "*.py"`
+
 ## Cloudflare D1 + data-service architecture
 
 - **Shared D1** binding is `DATABASE` on database `app-db`. Schema/migrations only in `packages/data-ops`.
@@ -30,14 +38,6 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - **UI**: `packages/ui/src/components` = shadcn **primitives**; `packages/ui/src/components/ui` = **Watermelon** marketing/dashboard compositions (use them). Apps compose both.
 - **Start auth boundary**: private `createServerFn` must use `requireAuthMiddleware` (RPC security). Route `beforeLoad` is UX only. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
 - **Result (`@workspace/result`)**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus` (early return for Hono typed responses). Prefer `@workspace/result` over direct `better-result` imports.
-
-## Package Source Inspection
-
-No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
-
-- Search: `rg "query" $(opensrc path <package>)`
-- Read: `cat $(opensrc path <package>)/path/to/file`
-- Other registries: `find $(opensrc path pypi:requests) -name "*.py"`
 
 ## Testing & TDD
 

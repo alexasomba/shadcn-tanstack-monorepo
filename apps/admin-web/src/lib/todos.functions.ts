@@ -9,9 +9,14 @@ import { getDatabase } from "./cloudflare-env";
 /** Authenticated todo list — Result boundary in data-ops, unwrap at Start edge. */
 export const getTodos = createServerFn({ method: "GET" })
   .middleware([requireAuthMiddleware])
-  .handler(async () => {
+  .handler(async ({ context }) => {
+    const orgId = (context.session as { activeOrganizationId?: string | null } | undefined)
+      ?.activeOrganizationId;
+    if (!orgId) {
+      throw new Error("Active organization is required");
+    }
     const db = createDatabase(getDatabase());
-    return unwrapResult(await listTodos(db));
+    return unwrapResult(await listTodos(db, orgId));
   });
 
 /** Authenticated todo create. */
@@ -22,8 +27,13 @@ export const createTodo = createServerFn({ method: "POST" })
       title: z.string().min(1, "Title is required"),
     }),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const orgId = (context.session as { activeOrganizationId?: string | null } | undefined)
+      ?.activeOrganizationId;
+    if (!orgId) {
+      throw new Error("Active organization is required");
+    }
     const db = createDatabase(getDatabase());
-    unwrapResult(await insertTodo(db, data.title));
+    unwrapResult(await insertTodo(db, data.title, orgId));
     return { success: true as const };
   });

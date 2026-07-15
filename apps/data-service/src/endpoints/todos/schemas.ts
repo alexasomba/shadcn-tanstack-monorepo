@@ -4,11 +4,14 @@ import { z } from "zod";
 
 extendZodWithOpenApi(z);
 
-export const TodoSchema = DbTodoSchema.openapi("Todo");
+export const TodoSchema = z
+  .object(DbTodoSchema.shape)
+  .omit({ organizationId: true })
+  .openapi("Todo");
 
-export const TodoCreateSchema = DbTodoCreateSchema.openapi("TodoCreate");
+export const TodoCreateSchema = z.object(DbTodoCreateSchema.shape).openapi("TodoCreate");
 
-export const TodoUpdateSchema = DbTodoCreateSchema.openapi("TodoUpdate");
+export const TodoUpdateSchema = z.object(DbTodoCreateSchema.shape).openapi("TodoUpdate");
 
 export const TodoIdParamSchema = z.object({
   id: z.coerce

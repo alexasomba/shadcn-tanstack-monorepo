@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/cloudflare";
 import {
   createDatabase,
   listPendingOutboxEvents,
@@ -20,13 +21,39 @@ export async function handleJobsBatch(
       message.ack();
     } catch (error) {
       console.error("[queue:jobs] handler failed", { body: message.body, error });
+
+      // Capture the exception via Sentry only if not already captured
+      if (!error || !(error as Record<string, unknown>).sentryCaptured) {
+        const rawBody = message.body as unknown;
+        const jobType =
+          rawBody && typeof rawBody === "object" && "type" in rawBody
+            ? String((rawBody as Record<string, unknown>).type)
+            : "unknown";
+        Sentry.captureException(error, {
+          tags: {
+            jobType,
+            jobId: message.id,
+          },
+          extra: {
+            jobBody: message.body,
+          },
+        });
+      }
+
       message.retry();
     }
   }
 }
 
 async function handleJobMessage(body: JobsQueueMessage, env: Bindings): Promise<void> {
-  const type = "type" in body && typeof body.type === "string" ? body.type : "unknown";
+  const rawBody = body as unknown;
+  const type =
+    rawBody &&
+    typeof rawBody === "object" &&
+    "type" in rawBody &&
+    typeof (rawBody as Record<string, unknown>).type === "string"
+      ? ((rawBody as Record<string, unknown>).type as string)
+      : "unknown";
   console.log(`[queue:jobs] received type=${type}`);
 
   if (type === "outbox.drain") {
@@ -43,6 +70,50 @@ async function handleJobMessage(body: JobsQueueMessage, env: Bindings): Promise<
   console.warn(`[queue:jobs] unhandled type=${type}`);
 }
 
+async function processNotificationEvent(
+  event: { id: number; payload: string; type: string },
+  notify: unknown,
+): Promise<void> {
+  try {
+    const payload = JSON.parse(event.payload) as {
+      route: string;
+      to?: unknown;
+      input: Record<string, unknown>;
+    };
+    const route = (
+      notify as Record<
+        string,
+        { send: (args: { to?: unknown; input: unknown }) => Promise<unknown> } | undefined
+      >
+    )[payload.route];
+    if (route && typeof route.send === "function") {
+      await route.send({
+        to: payload.to,
+        input: payload.input,
+      });
+      console.log(`[outbox] notification sent: route=${payload.route}`);
+    } else {
+      console.error(`[outbox] invalid notification route: ${payload.route}`);
+    }
+  } catch (error) {
+    console.error(`[outbox] failed to process notification id=${event.id}`, error);
+    Sentry.captureException(error, {
+      tags: {
+        eventId: String(event.id),
+        eventType: event.type,
+        jobType: "outbox.drain",
+      },
+      extra: {
+        eventPayload: event.payload,
+      },
+    });
+    if (error && typeof error === "object") {
+      (error as Record<string, unknown>).sentryCaptured = true;
+    }
+    throw error;
+  }
+}
+
 export async function drainOutbox(env: Bindings, limit = 50): Promise<number> {
   const db = createDatabase(env.DATABASE);
   const pending = await listPendingOutboxEvents(db, limit);
@@ -51,31 +122,7 @@ export async function drainOutbox(env: Bindings, limit = 50): Promise<number> {
   for (const event of pending) {
     console.log(`[outbox] process id=${event.id} type=${event.type}`);
     if (event.type === "notification") {
-      try {
-        const payload = JSON.parse(event.payload) as {
-          route: string;
-          to?: unknown;
-          input: Record<string, unknown>;
-        };
-        const route = (
-          notify as unknown as Record<
-            string,
-            { send: (args: { to?: unknown; input: unknown }) => Promise<unknown> } | undefined
-          >
-        )[payload.route];
-        if (route && typeof route.send === "function") {
-          await route.send({
-            to: payload.to,
-            input: payload.input,
-          });
-          console.log(`[outbox] notification sent: route=${payload.route}`);
-        } else {
-          console.error(`[outbox] invalid notification route: ${payload.route}`);
-        }
-      } catch (error) {
-        console.error(`[outbox] failed to process notification id=${event.id}`, error);
-        throw error;
-      }
+      await processNotificationEvent(event, notify);
     } else {
       // Extend with other outbox event type handlers (analytics, etc.)
       console.warn(`[outbox] unhandled type=${event.type}`);

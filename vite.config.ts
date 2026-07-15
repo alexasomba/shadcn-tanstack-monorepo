@@ -211,6 +211,7 @@ export default defineConfig({
           "jsx-a11y/prefer-tag-over-role": "off",
           "typescript/array-type": "off",
           "typescript/require-await": "off",
+          "sonarjs/cognitive-complexity": "off",
         },
         env: {
           browser: true,
@@ -294,6 +295,17 @@ export default defineConfig({
         env: {
           node: true,
           vitest: true,
+        },
+      },
+      {
+        files: ["apps/e2e-tests/**/*.{js,mjs,cjs,ts,tsx}"],
+        rules: {
+          "typescript/no-explicit-any": "off",
+          "no-instanceof/no-instanceof": "off",
+          "typescript/no-redundant-type-constituents": "off",
+          "typescript/no-unnecessary-condition": "off",
+          "typescript/require-await": "off",
+          "sonarjs/cognitive-complexity": "off",
         },
       },
     ],

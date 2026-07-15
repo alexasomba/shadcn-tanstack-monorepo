@@ -25,6 +25,7 @@
     "@betternotify/onesignal": "catalog:",
     "@betternotify/push": "catalog:",
     "@hono/zod-openapi": "catalog:",
+    "@sentry/cloudflare": "^10.65.0",
     "@workspace/result": "workspace:*",
     "better-auth": "catalog:",
     "data-ops": "workspace:*",

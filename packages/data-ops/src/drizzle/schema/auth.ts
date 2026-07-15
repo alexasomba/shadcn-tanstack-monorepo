@@ -1,25 +1,37 @@
 import { defineRelationsPart, sql } from "drizzle-orm";
 import { sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 
-export const user = sqliteTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
-  image: text("image"),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }).default(false),
-  role: text("role"),
-  banned: integer("banned", { mode: "boolean" }).default(false),
-  banReason: text("ban_reason"),
-  banExpires: integer("ban_expires", { mode: "timestamp_ms" }),
-});
+export const user = sqliteTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+    image: text("image"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    twoFactorEnabled: integer("two_factor_enabled", {
+      mode: "boolean",
+    }).default(false),
+    role: text("role"),
+    banned: integer("banned", { mode: "boolean" }).default(false),
+    banReason: text("ban_reason"),
+    banExpires: integer("ban_expires", { mode: "timestamp_ms" }),
+    username: text("username").unique(),
+    displayUsername: text("display_username"),
+    phoneNumber: text("phone_number").unique(),
+    phoneNumberVerified: integer("phone_number_verified", { mode: "boolean" }),
+    lastLoginMethod: text("last_login_method"),
+    paystackCustomerCode: text("paystack_customer_code"),
+  },
+  (table) => [index("user_paystackCustomerCode_idx").on(table.paystackCustomerCode)],
+);
 
 export const session = sqliteTable(
   "session",
@@ -211,6 +223,147 @@ export const notification = sqliteTable("notification", {
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
 });
 
+export const passkey = sqliteTable(
+  "passkey",
+  {
+    id: text("id").primaryKey(),
+    name: text("name"),
+    publicKey: text("public_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    credentialID: text("credential_id").notNull(),
+    counter: integer("counter").notNull(),
+    deviceType: text("device_type").notNull(),
+    backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
+    transports: text("transports"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }),
+    aaguid: text("aaguid"),
+  },
+  (table) => [
+    index("passkey_userId_idx").on(table.userId),
+    index("passkey_credentialID_idx").on(table.credentialID),
+  ],
+);
+
+export const subscription = sqliteTable(
+  "subscription",
+  {
+    id: text("id").primaryKey(),
+    plan: text("plan").notNull(),
+    referenceId: text("reference_id").notNull(),
+    paystackCustomerCode: text("paystack_customer_code"),
+    paystackSubscriptionCode: text("paystack_subscription_code").unique(),
+    paystackTransactionReference: text("paystack_transaction_reference"),
+    paystackAuthorizationCode: text("paystack_authorization_code"),
+    paystackEmailToken: text("paystack_email_token"),
+    status: text("status").default("incomplete"),
+    periodStart: integer("period_start", { mode: "timestamp_ms" }),
+    periodEnd: integer("period_end", { mode: "timestamp_ms" }),
+    trialStart: integer("trial_start", { mode: "timestamp_ms" }),
+    trialEnd: integer("trial_end", { mode: "timestamp_ms" }),
+    cancelAtPeriodEnd: integer("cancel_at_period_end", {
+      mode: "boolean",
+    }).default(false),
+    groupId: text("group_id"),
+    seats: integer("seats"),
+    pendingPlan: text("pending_plan"),
+  },
+  (table) => [
+    index("subscription_plan_idx").on(table.plan),
+    index("subscription_referenceId_idx").on(table.referenceId),
+    index("subscription_paystackCustomerCode_idx").on(table.paystackCustomerCode),
+    index("subscription_paystackTransactionReference_idx").on(table.paystackTransactionReference),
+  ],
+);
+
+export const paystackTransaction = sqliteTable(
+  "paystack_transaction",
+  {
+    id: text("id").primaryKey(),
+    reference: text("reference").notNull().unique(),
+    paystackId: text("paystack_id"),
+    referenceId: text("reference_id").notNull(),
+    userId: text("user_id").notNull(),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    status: text("status").notNull(),
+    plan: text("plan"),
+    product: text("product"),
+    metadata: text("metadata"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [
+    index("paystackTransaction_referenceId_idx").on(table.referenceId),
+    index("paystackTransaction_userId_idx").on(table.userId),
+  ],
+);
+
+export const paystackProduct = sqliteTable("paystack_product", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  price: integer("price").notNull(),
+  currency: text("currency").notNull(),
+  quantity: integer("quantity").default(0),
+  unlimited: integer("unlimited", { mode: "boolean" }).default(true),
+  paystackId: text("paystack_id").unique(),
+  slug: text("slug").notNull().unique(),
+  metadata: text("metadata"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+});
+
+export const paystackPlan = sqliteTable("paystack_plan", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull(),
+  interval: text("interval").notNull(),
+  planCode: text("plan_code").notNull().unique(),
+  paystackId: text("paystack_id").notNull().unique(),
+  metadata: text("metadata"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+});
+
+export const apikey = sqliteTable(
+  "apikey",
+  {
+    id: text("id").primaryKey(),
+    configId: text("config_id").default("default").notNull(),
+    name: text("name"),
+    start: text("start"),
+    referenceId: text("reference_id").notNull(),
+    prefix: text("prefix"),
+    key: text("key").notNull(),
+    refillInterval: integer("refill_interval"),
+    refillAmount: integer("refill_amount"),
+    lastRefillAt: integer("last_refill_at", { mode: "timestamp_ms" }),
+    enabled: integer("enabled", { mode: "boolean" }).default(true),
+    rateLimitEnabled: integer("rate_limit_enabled", {
+      mode: "boolean",
+    }).default(true),
+    rateLimitTimeWindow: integer("rate_limit_time_window").default(86400000),
+    rateLimitMax: integer("rate_limit_max").default(10),
+    requestCount: integer("request_count").default(0),
+    remaining: integer("remaining"),
+    lastRequest: integer("last_request", { mode: "timestamp_ms" }),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+    permissions: text("permissions"),
+    metadata: text("metadata"),
+  },
+  (table) => [
+    index("apikey_configId_idx").on(table.configId),
+    index("apikey_referenceId_idx").on(table.referenceId),
+    index("apikey_key_idx").on(table.key),
+  ],
+);
+
 export const authRelations = defineRelationsPart(
   {
     user,
@@ -224,6 +377,12 @@ export const authRelations = defineRelationsPart(
     referralCode,
     referrals,
     notification,
+    passkey,
+    subscription,
+    paystackTransaction,
+    paystackProduct,
+    paystackPlan,
+    apikey,
   },
   (r) => ({
     user: {
@@ -258,6 +417,10 @@ export const authRelations = defineRelationsPart(
       notifications: r.many.notification({
         from: r.user.id,
         to: r.notification.userId,
+      }),
+      passkeys: r.many.passkey({
+        from: r.user.id,
+        to: r.passkey.userId,
       }),
     },
     session: {
@@ -335,6 +498,12 @@ export const authRelations = defineRelationsPart(
     notification: {
       user: r.one.user({
         from: r.notification.userId,
+        to: r.user.id,
+      }),
+    },
+    passkey: {
+      user: r.one.user({
+        from: r.passkey.userId,
         to: r.user.id,
       }),
     },

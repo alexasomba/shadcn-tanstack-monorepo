@@ -1,6 +1,16 @@
+import { paystack } from "@alexasomba/better-auth-paystack";
+import { apiKey } from "@better-auth/api-key";
+import { passkey } from "@better-auth/passkey";
 import { betterAuthReferral } from "@marinedotsh/better-auth-referral";
 import type { BetterAuthPlugin } from "better-auth";
-import { admin } from "better-auth/plugins";
+import {
+  admin,
+  username,
+  phoneNumber,
+  emailOTP,
+  lastLoginMethod,
+  testUtils,
+} from "better-auth/plugins";
 import { organization } from "better-auth/plugins/organization";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { inbox } from "better-inbox";
@@ -13,6 +23,18 @@ export type AuthPluginsOptions = {
     invitation: { id: string };
   }) => Promise<void>;
   sendOTP?: (data: { user: { email: string }; otp: string }) => Promise<void>;
+  sendPhoneOTP?: (data: { phoneNumber: string; code: string }) => Promise<void>;
+  sendVerificationOTP?: (data: {
+    email: string;
+    otp: string;
+    type: "sign-in" | "email-verification" | "forget-password" | "change-email";
+  }) => Promise<void>;
+  onOrgCreate?: (org: { id: string; name: string; [key: string]: unknown }) => Promise<void> | void;
+  onOrgJoin?: (member: {
+    organizationId: string;
+    userId: string;
+    [key: string]: unknown;
+  }) => Promise<void> | void;
 };
 
 function readEnv(name: string): string | undefined {
@@ -53,6 +75,18 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
       membershipLimit: 50,
       organizationLimit: 5,
       ...(options.sendInvitationEmail ? { sendInvitationEmail: options.sendInvitationEmail } : {}),
+      organizationHooks: {
+        afterCreateOrganization: async ({ organization: createdOrg }) => {
+          if (options.onOrgCreate) {
+            await options.onOrgCreate(createdOrg);
+          }
+        },
+        afterAddMember: async ({ member }) => {
+          if (options.onOrgJoin) {
+            await options.onOrgJoin(member);
+          }
+        },
+      },
     }),
     twoFactor({
       issuer: "Data Service",
@@ -79,5 +113,39 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
         "You have been banned from this application. Please contact support if you believe this is an error.",
     }),
     inbox(),
+    username(),
+    phoneNumber({
+      sendOTP: async ({ phoneNumber: phone, code }) => {
+        if (options.sendPhoneOTP) {
+          await options.sendPhoneOTP({ phoneNumber: phone, code });
+        } else {
+          console.log(`[auth:phone-otp] to=${phone} code=${code}`);
+        }
+      },
+    }),
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        if (options.sendVerificationOTP) {
+          await options.sendVerificationOTP({ email, otp, type });
+        } else {
+          console.log(`[auth:email-otp] to=${email} code=${otp} type=${type}`);
+        }
+      },
+    }),
+    passkey(),
+    lastLoginMethod({
+      storeInDatabase: true,
+    }),
+    ...(readEnv("NODE_ENV") === "test" || readEnv("VITEST") === "true"
+      ? [testUtils({ captureOTP: true })]
+      : []),
+    paystack({
+      secretKey: readEnv("PAYSTACK_SECRET_KEY") ?? "",
+      subscription: {
+        enabled: true,
+        plans: [],
+      },
+    }),
+    apiKey(),
   ];
 }

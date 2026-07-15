@@ -1,5 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
+import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody } from "@workspace/result";
 import { createDatabase, listDomains } from "data-ops";
 
@@ -56,6 +57,7 @@ export const listDomainsHandler: RouteHandler<typeof listDomainsRoute, AppEnv> =
   const dbResult = await listDomains(db, organizationId);
 
   if (Result.isError(dbResult)) {
+    Sentry.captureException(dbResult.error);
     return c.json(appErrorBody(dbResult.error), 500);
   }
 

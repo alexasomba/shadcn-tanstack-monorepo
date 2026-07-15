@@ -1,5 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
+import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, createDomain, deleteDomain, updateDomainStatus } from "data-ops";
 
@@ -77,6 +78,9 @@ export const createDomainHandler: RouteHandler<typeof createDomainRoute, AppEnv>
   // 1. Create in local database first (validates duplicates and constraints)
   const dbResult = await createDomain(db, organizationId, hostname);
   if (Result.isError(dbResult)) {
+    if (dbResult.error._tag === "DatabaseError") {
+      Sentry.captureException(dbResult.error);
+    }
     console.error(
       JSON.stringify({
         message: "Failed to create custom domain in local database",

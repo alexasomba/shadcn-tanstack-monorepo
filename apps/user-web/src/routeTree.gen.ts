@@ -43,6 +43,7 @@ import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.test
 import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
@@ -219,6 +220,11 @@ const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
   path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDebugSentryTestRoute = ApiDebugSentryTestRouteImport.update({
+  id: '/api/debug/sentry-test',
+  path: '/api/debug/sentry-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/speakers': typeof SpeakersIndexRoute
   '/talks': typeof TalksIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/talks/'
     | '/api/auth/$'
+    | '/api/debug/sentry-test'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -448,6 +458,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/talks'
     | '/api/auth/$'
+    | '/api/debug/sentry-test'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/talks/'
     | '/api/auth/$'
+    | '/api/debug/sentry-test'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TalksIndexRoute: typeof TalksIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiDebugSentryTestRoute: typeof ApiDebugSentryTestRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
@@ -783,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/debug/sentry-test': {
+      id: '/api/debug/sentry-test'
+      path: '/api/debug/sentry-test'
+      fullPath: '/api/debug/sentry-test'
+      preLoaderRoute: typeof ApiDebugSentryTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -871,6 +891,7 @@ const rootRouteChildren: RootRouteChildren = {
   SpeakersIndexRoute: SpeakersIndexRoute,
   TalksIndexRoute: TalksIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiDebugSentryTestRoute: ApiDebugSentryTestRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,

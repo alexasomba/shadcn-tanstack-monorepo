@@ -5,13 +5,20 @@ import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { organization } from "./auth";
 
 // Application Schema
-export const todos = sqliteTable("todos", {
-  id: integer({ mode: "number" }).primaryKey({
-    autoIncrement: true,
-  }),
-  title: text().notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-});
+export const todos = sqliteTable(
+  "todos",
+  {
+    id: integer({ mode: "number" }).primaryKey({
+      autoIncrement: true,
+    }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    title: text().notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+  },
+  (table) => [index("todos_organization_idx").on(table.organizationId)],
+);
 
 /**
  * Outbox stub for async side-effects (email, webhooks, queues).

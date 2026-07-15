@@ -1,6 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
+import * as Sentry from "@sentry/cloudflare";
+import { Result, appErrorBody } from "@workspace/result";
 import { createDatabase, createTodo, todoToApi } from "data-ops";
 
 import type { AppEnv } from "../../types";
@@ -38,6 +39,14 @@ export const createTodoRoute = createRoute({
         },
       },
     },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
     500: {
       description: "Database error",
       content: {
@@ -50,12 +59,28 @@ export const createTodoRoute = createRoute({
 });
 
 export const createTodoHandler: RouteHandler<typeof createTodoRoute, AppEnv> = async (c) => {
+  const session = c.get("session") as unknown as { activeOrganizationId?: string | null } | null;
+  if (!session || !session.activeOrganizationId) {
+    return c.json(
+      {
+        success: false as const,
+        error: { code: "UNAUTHORIZED", message: "Active organization required" },
+      },
+      401,
+    );
+  }
+  const organizationId = session.activeOrganizationId;
+
   const { title } = c.req.valid("json");
   const db = createDatabase(c.env.DATABASE);
-  const result = await createTodo(db, title);
+  const result = await createTodo(db, title, organizationId);
 
   if (Result.isError(result)) {
-    return c.json(appErrorBody(result.error), appErrorStatus(result.error) as 400 | 500);
+    if (result.error._tag === "DatabaseError") {
+      Sentry.captureException(result.error);
+      return c.json(appErrorBody(result.error), 500);
+    }
+    return c.json(appErrorBody(result.error), 400);
   }
 
   return c.json(todoToApi(result.value), 201);

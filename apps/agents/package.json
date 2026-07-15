@@ -25,6 +25,7 @@
     "@cloudflare/ai-chat": "catalog:",
     "@cloudflare/kumo": "catalog:",
     "@phosphor-icons/react": "catalog:",
+    "@sentry/cloudflare": "^10.65.0",
     "@streamdown/code": "catalog:",
     "@workspace/result": "workspace:*",
     "agents": "catalog:",

@@ -19,6 +19,15 @@ export type Bindings = {
   CLOUDFLARE_CNAME_TARGET?: string;
   /** Producer + consumer for background jobs (stub). */
   JOBS_QUEUE?: Queue;
+  R2_BUCKET?: R2Bucket;
+  R2_ACCOUNT_ID?: string;
+  R2_ACCESS_KEY_ID?: string;
+  R2_SECRET_ACCESS_KEY?: string;
+  R2_BUCKET_NAME?: string;
+  USER_ONBOARDING_WORKFLOW?: Workflow;
+  ORG_ONBOARDING_WORKFLOW?: Workflow;
+  SENTRY_DSN?: string;
+  VITE_SENTRY_DSN?: string;
 };
 
 export type Variables = {

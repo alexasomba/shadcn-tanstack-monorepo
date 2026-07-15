@@ -35,6 +35,32 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
     RESEND_API_KEY: options.RESEND_API_KEY ?? readEnv("RESEND_API_KEY"),
     EMAIL_FROM: options.EMAIL_FROM ?? readEnv("EMAIL_FROM"),
 
+    onUserSignup: async (user) => {
+      if (bindings?.USER_ONBOARDING_WORKFLOW) {
+        try {
+          await bindings.USER_ONBOARDING_WORKFLOW.create({
+            id: `wf-user-${user.id}-${Date.now()}`,
+            params: { userId: user.id },
+          });
+        } catch (err) {
+          console.error("Failed to automatically trigger UserOnboardingWorkflow:", err);
+        }
+      }
+    },
+
+    onOrgCreate: async (org) => {
+      if (bindings?.ORG_ONBOARDING_WORKFLOW) {
+        try {
+          await bindings.ORG_ONBOARDING_WORKFLOW.create({
+            id: `wf-org-${org.id}-${Date.now()}`,
+            params: { orgId: org.id },
+          });
+        } catch (err) {
+          console.error("Failed to automatically trigger OrgOnboardingWorkflow:", err);
+        }
+      }
+    },
+
     sendVerificationEmail: async ({ user, url }) => {
       if (notify) {
         await notify.verifyEmail.send({

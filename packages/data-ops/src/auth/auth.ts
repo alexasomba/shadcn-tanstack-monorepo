@@ -37,5 +37,23 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  socialProviders: {
+    ...(readEnv("GOOGLE_CLIENT_ID") && readEnv("GOOGLE_CLIENT_SECRET")
+      ? {
+          google: {
+            clientId: readEnv("GOOGLE_CLIENT_ID") ?? "",
+            clientSecret: readEnv("GOOGLE_CLIENT_SECRET") ?? "",
+          },
+        }
+      : {}),
+    ...(readEnv("MICROSOFT_CLIENT_ID") && readEnv("MICROSOFT_CLIENT_SECRET")
+      ? {
+          microsoft: {
+            clientId: readEnv("MICROSOFT_CLIENT_ID") ?? "",
+            clientSecret: readEnv("MICROSOFT_CLIENT_SECRET") ?? "",
+          },
+        }
+      : {}),
+  },
   plugins: createBaseAuthPlugins(),
 });

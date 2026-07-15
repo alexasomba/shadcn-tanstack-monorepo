@@ -42,7 +42,8 @@ const localDbPath = getLocalD1Path();
 const config: Config = {
   out: "./src/drizzle/migrations",
   schema: [
-    "./src/drizzle/schema/schema.ts",
+    "./src/drizzle/schema/core.ts",
+    "./src/drizzle/schema/relations.ts",
     "./src/drizzle/schema/auth.ts",
     "./src/drizzle/schema/ecommerce.ts",
     "./src/drizzle/schema/crm.ts",

@@ -3,6 +3,9 @@
 Robust starter kit for multi-app Cloudflare Workers monorepos: **TanStack Start** frontends,
 **Hono data-service**, **Drizzle + D1**, and **strict Worker service bindings**.
 
+SaaS kit roadmap (platform done; product shell next): **[PROJECT.md](./PROJECT.md)**.  
+Next milestone (M8 app shell tasks): **[docs/milestones/M8-app-shell-tasks.md](./docs/milestones/M8-app-shell-tasks.md)**.
+
 ## Apps & ports
 
 | App              | Package         | Dev port | Role                                        |

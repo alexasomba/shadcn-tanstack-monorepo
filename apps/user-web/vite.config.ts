@@ -1,3 +1,5 @@
+import path from "path";
+
 import { cloudflare } from "@cloudflare/vite-plugin";
 import contentCollections from "@content-collections/vite";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
@@ -14,7 +16,12 @@ process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";
  * `lazyPlugins` skips plugin factories during vp check/lint/fmt metadata loads.
  */
 export default defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      "drizzle-seed": path.resolve(__dirname, "src/mocks/drizzle-seed-mock.ts"),
+    },
+  },
   server: {
     host: "127.0.0.1",
     port: 8300,
@@ -47,6 +54,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2000,
     rolldownOptions: {
+      external: ["cloudflare:workers"],
       output: {
         codeSplitting: {
           groups: [

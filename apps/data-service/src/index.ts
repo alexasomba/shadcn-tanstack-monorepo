@@ -1,13 +1,19 @@
+import type { ExportedHandler } from "@cloudflare/workers-types";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import * as Sentry from "@sentry/cloudflare";
 import { cors } from "hono/cors";
 
 import { getAuth } from "./auth.js";
+import { databaseApp } from "./endpoints/database/router";
 import { domainsApp } from "./endpoints/domains/router";
 import { healthHandler, healthRoute } from "./endpoints/health";
 import { notificationsApp } from "./endpoints/notifications/router";
+import { r2App } from "./endpoints/r2/router";
 import { todosApp } from "./endpoints/todos/router";
+import { workflowsApp } from "./endpoints/workflows/router";
 import { handleScheduled } from "./jobs/cron";
 import { handleJobsBatch } from "./jobs/queue";
+import { requireApiKey } from "./middleware/api-key.js";
 import type { AppEnv, Bindings, JobsQueueMessage } from "./types";
 
 const app = new OpenAPIHono<AppEnv>({
@@ -31,6 +37,7 @@ const app = new OpenAPIHono<AppEnv>({
 
 app.onError((err, c) => {
   console.error("[data-service] unhandled error:", err);
+  Sentry.captureException(err);
   return c.json(
     {
       success: false,
@@ -84,6 +91,10 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+app.use("/todos/*", requireApiKey);
+app.use("/notifications/*", requireApiKey);
+app.use("/domains/*", requireApiKey);
+
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   const auth = getAuth(
     c.env.DATABASE,
@@ -120,6 +131,15 @@ app.openapi(healthRoute, healthHandler);
 app.route("/todos", todosApp);
 app.route("/notifications", notificationsApp);
 app.route("/domains", domainsApp);
+app.route("/database", databaseApp);
+app.route("/r2", r2App);
+app.route("/workflows", workflowsApp);
+
+app.get("/api/debug/sentry-test", () => {
+  const error = new Error("Sentry test exception");
+  Sentry.captureException(error);
+  throw error;
+});
 
 app.doc("/openapi.json", {
   openapi: "3.2.0",
@@ -140,7 +160,7 @@ app.doc("/doc", {
 });
 
 const worker = {
-  fetch: app.fetch.bind(app),
+  fetch: (request: Request, env: Bindings, ctx?: ExecutionContext) => app.fetch(request, env, ctx),
   async queue(batch: MessageBatch<JobsQueueMessage>, env: Bindings) {
     await handleJobsBatch(batch, env);
   },
@@ -149,5 +169,17 @@ const worker = {
   },
 };
 
-export default worker;
+const isTest =
+  typeof process !== "undefined" && (process.env.VITEST || process.env.NODE_ENV === "test");
+
+export default (isTest
+  ? worker
+  : Sentry.withSentry(
+      (env: Bindings) => ({
+        dsn: env.SENTRY_DSN || env.VITE_SENTRY_DSN || "https://mock-dsn@sentry.io/123",
+        tracesSampleRate: 1.0,
+      }),
+      worker as unknown as ExportedHandler<Bindings>,
+    )) as typeof worker;
+
 export type AppType = typeof app;

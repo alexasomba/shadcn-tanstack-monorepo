@@ -32,4 +32,22 @@
       "service": "data-service",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "app-bucket",
+    },
+  ],
+  "workflows": [
+    {
+      "name": "user-onboarding-workflow",
+      "binding": "USER_ONBOARDING_WORKFLOW",
+      "class_name": "UserOnboardingWorkflow",
+    },
+    {
+      "name": "org-onboarding-workflow",
+      "binding": "ORG_ONBOARDING_WORKFLOW",
+      "class_name": "OrgOnboardingWorkflow",
+    },
+  ],
 }

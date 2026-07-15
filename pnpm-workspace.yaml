@@ -103,6 +103,7 @@ catalog:
   "ai": "^7.0.28"
   "babel-plugin-react-compiler": "^1.0.0"
   "better-auth": "^1.7.0-rc.1"
+  "@better-auth/passkey": "^1.7.0-rc.1"
   "auth": "^1.7.0-rc.1"
   "@better-auth/drizzle-adapter": "^1.7.0-rc.1"
   "better-sqlite3": "^12.11.1"
@@ -158,6 +159,8 @@ overrides:
   vitest: "catalog:"
   typescript: "6.0.3"
   kysely: "0.28.17"
+  drizzle-orm: "catalog:"
+  drizzle-kit: "catalog:"
 
 peerDependencyRules:
   allowAny:

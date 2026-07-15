@@ -1,5 +1,6 @@
 import { AIChatAgent } from "@cloudflare/ai-chat";
 import type { OnChatMessageOptions } from "@cloudflare/ai-chat";
+import { withSentry } from "@sentry/cloudflare";
 import { Result } from "@workspace/result";
 import { callable, routeAgentRequest } from "agents";
 import type { Schedule } from "agents";
@@ -198,8 +199,18 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
   }
 }
 
-export default {
-  async fetch(request: Request, env: Env) {
-    return (await routeAgentRequest(request, env)) || new Response("Not found", { status: 404 });
-  },
-} satisfies ExportedHandler<Env>;
+export default withSentry(
+  (env: Env) => ({
+    dsn: env.SENTRY_DSN || env.VITE_SENTRY_DSN || "https://mock-dsn@sentry.io/123",
+    tracesSampleRate: 1.0,
+  }),
+  {
+    async fetch(request: Request, env: Env) {
+      const url = new URL(request.url);
+      if (url.pathname === "/api/debug/sentry-test") {
+        throw new Error("Sentry test exception");
+      }
+      return (await routeAgentRequest(request, env)) || new Response("Not found", { status: 404 });
+    },
+  } satisfies ExportedHandler<Env>,
+);

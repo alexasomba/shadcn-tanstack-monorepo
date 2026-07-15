@@ -25,6 +25,51 @@ export function getAuth(d1: D1Database) {
     baseURL: readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8301",
     secret: readEnv("BETTER_AUTH_SECRET"),
     plugins: [tanstackStartCookies()],
+    onUserSignup: async (user) => {
+      const envObj = env as unknown as Record<string, unknown>;
+      const userWorkflow = envObj.USER_ONBOARDING_WORKFLOW as
+        | {
+            create: (options: {
+              id: string;
+              params: { userId: string };
+            }) => Promise<{ id: string }>;
+          }
+        | undefined;
+      if (userWorkflow) {
+        try {
+          await userWorkflow.create({
+            id: `wf-user-${user.id}-${Date.now()}`,
+            params: { userId: user.id },
+          });
+        } catch (err) {
+          console.error(
+            "Failed to automatically trigger UserOnboardingWorkflow from admin-web:",
+            err,
+          );
+        }
+      }
+    },
+    onOrgCreate: async (org) => {
+      const envObj = env as unknown as Record<string, unknown>;
+      const orgWorkflow = envObj.ORG_ONBOARDING_WORKFLOW as
+        | {
+            create: (options: { id: string; params: { orgId: string } }) => Promise<{ id: string }>;
+          }
+        | undefined;
+      if (orgWorkflow) {
+        try {
+          await orgWorkflow.create({
+            id: `wf-org-${org.id}-${Date.now()}`,
+            params: { orgId: org.id },
+          });
+        } catch (err) {
+          console.error(
+            "Failed to automatically trigger OrgOnboardingWorkflow from admin-web:",
+            err,
+          );
+        }
+      }
+    },
     advanced: {
       backgroundTasks: {
         handler: (promise: Promise<unknown>) => {

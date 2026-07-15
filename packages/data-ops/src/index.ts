@@ -12,6 +12,7 @@ export {
   type DrizzleDb,
   type SQLiteDb,
 } from "./database/setup";
+export { seedDatabase } from "./database/seed";
 export {
   createAuth,
   type Auth,
@@ -85,3 +86,5 @@ export {
 export * from "./zod/schema/crm-platform";
 export * from "./queries/crm-workspace";
 export * from "./queries/admin-audit";
+export * from "./r2";
+export * from "./workflows/onboarding";

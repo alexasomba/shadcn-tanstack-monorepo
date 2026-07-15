@@ -33,7 +33,22 @@ export type CreateAuthEnv = AuthPluginsOptions & {
   EMAIL_FROM?: string;
   sendVerificationEmail?: (args: { user: { email: string }; url: string }) => Promise<void>;
   sendResetPassword?: (args: { user: { email: string }; url: string }) => Promise<void>;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  MICROSOFT_CLIENT_ID?: string;
+  MICROSOFT_CLIENT_SECRET?: string;
   advanced?: BetterAuthOptions["advanced"];
+  onUserSignup?: (user: {
+    id: string;
+    email: string;
+    [key: string]: unknown;
+  }) => Promise<void> | void;
+  onOrgCreate?: (org: { id: string; name: string; [key: string]: unknown }) => Promise<void> | void;
+  onOrgJoin?: (member: {
+    organizationId: string;
+    userId: string;
+    [key: string]: unknown;
+  }) => Promise<void> | void;
 };
 
 function readEnv(name: string): string | undefined {
@@ -109,6 +124,11 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
       EMAIL_FROM: env.EMAIL_FROM ?? readEnv("EMAIL_FROM"),
     });
 
+  const googleClientId = env.GOOGLE_CLIENT_ID ?? readEnv("GOOGLE_CLIENT_ID");
+  const googleClientSecret = env.GOOGLE_CLIENT_SECRET ?? readEnv("GOOGLE_CLIENT_SECRET");
+  const microsoftClientId = env.MICROSOFT_CLIENT_ID ?? readEnv("MICROSOFT_CLIENT_ID");
+  const microsoftClientSecret = env.MICROSOFT_CLIENT_SECRET ?? readEnv("MICROSOFT_CLIENT_SECRET");
+
   const options = {
     appName: env.appName ?? "App",
     ...(baseURL ? { baseURL } : {}),
@@ -148,6 +168,24 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
         });
       },
     },
+    socialProviders: {
+      ...(googleClientId && googleClientSecret
+        ? {
+            google: {
+              clientId: googleClientId,
+              clientSecret: googleClientSecret,
+            },
+          }
+        : {}),
+      ...(microsoftClientId && microsoftClientSecret
+        ? {
+            microsoft: {
+              clientId: microsoftClientId,
+              clientSecret: microsoftClientSecret,
+            },
+          }
+        : {}),
+    },
     session: {
       expiresIn: 60 * 60 * 24 * 7,
       updateAge: 60 * 60 * 24,
@@ -179,6 +217,17 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
       },
       ...env.advanced,
     },
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user: unknown) => {
+            if (env.onUserSignup) {
+              await env.onUserSignup(user as { id: string; email: string });
+            }
+          },
+        },
+      },
+    } as unknown as BetterAuthOptions["databaseHooks"],
     plugins,
   } satisfies BetterAuthOptions;
 

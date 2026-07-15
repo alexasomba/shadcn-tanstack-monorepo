@@ -9,7 +9,7 @@ import { getAuth } from "./auth";
 import worker from "./index";
 
 // Mock the auth module to bypass Better Auth's token parsing and hashing
-vi.mock("./auth", async (importOriginal) => {
+vi.mock("./auth.js", async (importOriginal) => {
   const original = await importOriginal<any>();
   return {
     ...original,
@@ -19,26 +19,15 @@ vi.mock("./auth", async (importOriginal) => {
         ...originalAuth,
         api: {
           ...originalAuth.api,
-          getSession: vi.fn().mockImplementation(async ({ headers }) => {
-            const authHeader =
-              typeof (headers as any)?.get === "function"
-                ? (headers as any).get("Authorization")
-                : (headers as any)?.Authorization;
-
-            if (authHeader === "Bearer test-session-token") {
+          getSession: vi.fn().mockResolvedValue(null),
+          verifyApiKey: vi.fn().mockImplementation(async ({ body }) => {
+            if (body && body.key === "test-api-key") {
               return {
-                user: {
-                  id: "user-123",
-                  name: "Test User",
-                  email: "test@example.com",
-                  role: "user",
-                },
-                session: {
-                  id: "session-123",
-                  userId: "user-123",
-                  activeOrganizationId: "org-123",
-                  expiresAt: new Date(Date.now() + 3600 * 1000),
-                  token: "test-session-token",
+                key: {
+                  id: "key-123",
+                  referenceId: "org-123", // Matches organizationId for domains
+                  prefix: "test",
+                  key: "test-api-key",
                 },
               };
             }
@@ -165,7 +154,7 @@ describe("Custom Domain Management API", () => {
 
     const testHeaders = new Headers({
       "Content-Type": "application/json",
-      Authorization: "Bearer test-session-token",
+      Authorization: "Bearer test-api-key",
     });
 
     // 1. Create a domain
