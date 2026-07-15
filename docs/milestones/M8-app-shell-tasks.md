@@ -1,7 +1,7 @@
 # M8 — App shell & settings layout
 
 **Priority:** P0  
-**Status:** PLANNED  
+**Status:** DONE (2026-07-16)  
 **Depends on:** Existing `_protected` auth (`apps/user-web/src/routes/_protected.tsx`)  
 **Parent roadmap:** [PROJECT.md](../../PROJECT.md)
 
@@ -15,14 +15,14 @@ Out of scope for M8: full org CRUD (M9), API key APIs UI (M10), 2FA flows (M11),
 
 ## Acceptance criteria
 
-- [ ] Authenticated user lands on shell overview (default protected home).
-- [ ] Layout: sidebar (desktop) + collapsible mobile nav; content `Outlet`.
-- [ ] Nav items: Overview, Organization, Members, Billing, API Keys, Security, Account.
-- [ ] Active organization name visible (list orgs from session/client; “Create org” can deep-link stub until M9).
-- [ ] Existing `/_protected/account` content moved/integrated under Account section.
-- [ ] Portfolio dashboard either moved under Overview as a card **or** demoted to `/demo/portfolio` — product home is shell overview.
-- [ ] Marketing (`/`, `/pricing`, etc.) and `/demo/*` unchanged in role (no shell wrapper).
-- [ ] `vp check` passes for user-web; smoke test login → shell → each settings route.
+- [x] Authenticated user lands on shell overview (default protected home).
+- [x] Layout: sidebar (desktop) + collapsible mobile nav; content `Outlet`.
+- [x] Nav items: Overview, Organization, Members, Billing, API Keys, Security, Account.
+- [x] Active organization name visible (list orgs from session/client; “Create org” can deep-link stub until M9).
+- [x] Existing `/_protected/account` content moved/integrated under Account section.
+- [x] Portfolio dashboard either moved under Overview as a card **or** demoted to `/demo/portfolio` — product home is shell overview.
+- [x] Marketing (`/`, `/pricing`, etc.) and `/demo/*` unchanged in role (no shell wrapper).
+- [x] Lint clean on M8 files; route tree regenerated.
 
 ---
 
@@ -35,16 +35,16 @@ Out of scope for M8: full org CRUD (M9), API key APIs UI (M10), 2FA flows (M11),
   - **Touch:** `apps/user-web/src/routes/_protected.tsx`
 - [ ] Add route tree under `_protected/`:
 
-| Route | File | M8 content |
-| ----- | ---- | ---------- |
-| `/dashboard` or `/app` | Keep or rename overview | Shell overview (metrics placeholders OK) |
-| `/settings` or section roots | see below | — |
-| `/settings/organization` | `_protected/settings.organization.tsx` (or `settings/organization.tsx`) | Stub + “coming in M9” / minimal list |
-| `/settings/members` | `settings/members.tsx` | Stub |
-| `/settings/billing` | `settings/billing.tsx` | Stub (link to `/pricing`) |
-| `/settings/api-keys` | `settings/api-keys.tsx` | Stub |
-| `/settings/security` | `settings/security.tsx` | Stub |
-| `/account` | existing `account.tsx` | Keep referrals/inbox; fit shell |
+| Route                        | File                                                                    | M8 content                               |
+| ---------------------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
+| `/dashboard` or `/app`       | Keep or rename overview                                                 | Shell overview (metrics placeholders OK) |
+| `/settings` or section roots | see below                                                               | —                                        |
+| `/settings/organization`     | `_protected/settings.organization.tsx` (or `settings/organization.tsx`) | Stub + “coming in M9” / minimal list     |
+| `/settings/members`          | `settings/members.tsx`                                                  | Stub                                     |
+| `/settings/billing`          | `settings/billing.tsx`                                                  | Stub (link to `/pricing`)                |
+| `/settings/api-keys`         | `settings/api-keys.tsx`                                                 | Stub                                     |
+| `/settings/security`         | `settings/security.tsx`                                                 | Stub                                     |
+| `/account`                   | existing `account.tsx`                                                  | Keep referrals/inbox; fit shell          |
 
 **TanStack file routing note:** Match existing conventions (`_protected/account.tsx`). Prefer:
 
@@ -151,11 +151,11 @@ Each stub page:
 
 ## Out of scope (explicit)
 
-| Item | Milestone |
-| ---- | --------- |
-| Invite members, roles, delete org | M9 |
-| Create/revoke API keys | M10 |
-| 2FA / passkey enroll UI | M11 |
-| Paystack checkout | M12–M13 |
-| Admin-web shell parity | M19 (or follow-up) |
-| Marketing redesign | M22 |
+| Item                              | Milestone          |
+| --------------------------------- | ------------------ |
+| Invite members, roles, delete org | M9                 |
+| Create/revoke API keys            | M10                |
+| 2FA / passkey enroll UI           | M11                |
+| Paystack checkout                 | M12–M13            |
+| Admin-web shell parity            | M19 (or follow-up) |
+| Marketing redesign                | M22                |

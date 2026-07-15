@@ -55,7 +55,7 @@ export default defineConfig({
         },
       ],
       "zod/prefer-enum-over-literal-union": "warn",
-      "sonarjs/cognitive-complexity": ["warn", 15],
+      "sonarjs/cognitive-complexity": ["error", 15],
       // "zod-openapi/require-meta": "off",
     },
     options: { typeAware: true, typeCheck: true },

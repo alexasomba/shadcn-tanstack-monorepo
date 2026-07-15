@@ -1,61 +1,115 @@
+import {
+  ArrowRightIcon,
+  BuildingsIcon,
+  CreditCardIcon,
+  KeyIcon,
+  ShieldCheckIcon,
+} from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
-import { PortfolioDashboard } from "@workspace/ui/components/ui/portfolio-dashboard";
-
-import { AuthInboxButton } from "#/components/auth/AuthInboxButton";
-import { authClient } from "#/lib/auth-client";
-import { getPortfolio } from "#/lib/portfolio.functions";
+import { ButtonLink } from "@workspace/ui/components/button-link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 
 export const Route = createFileRoute("/_protected/dashboard")({
-  loader: () => getPortfolio(),
   component: UserDashboardPage,
   head: () => ({
-    meta: [{ title: "Portfolio dashboard — Starter" }],
+    meta: [{ title: "Overview — App" }],
   }),
 });
 
+const quickLinks = [
+  {
+    to: "/settings/organization" as const,
+    title: "Organization",
+    description: "Create and switch tenants (M9).",
+    icon: BuildingsIcon,
+  },
+  {
+    to: "/settings/billing" as const,
+    title: "Billing",
+    description: "Plans and Paystack checkout (M12–M13).",
+    icon: CreditCardIcon,
+  },
+  {
+    to: "/settings/api-keys" as const,
+    title: "API Keys",
+    description: "Developer keys for data-service (M10).",
+    icon: KeyIcon,
+  },
+  {
+    to: "/settings/security" as const,
+    title: "Security",
+    description: "2FA and passkeys (M11).",
+    icon: ShieldCheckIcon,
+  },
+];
+
 function UserDashboardPage() {
   const { user } = Route.useRouteContext();
-  const { ownerName, ownerUserId: _ownerUserId, ...portfolio } = Route.useLoaderData();
 
   return (
-    <div className="relative min-h-screen bg-[#0a0a0a]">
-      <div className="absolute top-4 left-4 z-50 flex flex-wrap items-center gap-2">
-        <Link
-          to="/"
-          preload="intent"
-          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white no-underline backdrop-blur transition hover:bg-white/10"
-        >
-          ← Marketing
-        </Link>
-        <Link
-          to="/account"
-          preload="intent"
-          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 no-underline backdrop-blur transition hover:bg-white/10"
-        >
-          {ownerName || user.name || user.email}
-        </Link>
-        <div className="rounded-full border border-white/10 bg-white/5 backdrop-blur [&_button]:text-white [&_button:hover]:bg-white/10">
-          <AuthInboxButton />
-        </div>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-auto rounded-full border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 hover:text-white"
-          onClick={() => {
-            void authClient.signOut({
-              fetchOptions: {
-                onSuccess: () => {
-                  window.location.href = "/login";
-                },
-              },
-            });
-          }}
-        >
-          Sign out
-        </Button>
+    <div className="mx-auto max-w-4xl space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Welcome{user.name ? `, ${user.name}` : ""}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Product home for the SaaS kit. Settings sections are stubbed until later milestones.
+        </p>
       </div>
-      <PortfolioDashboard data={portfolio} />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {quickLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              preload="intent"
+              className="group rounded-xl border border-border/70 bg-card p-4 no-underline shadow-none transition hover:border-primary/40 hover:shadow-sm"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-foreground">
+                  <Icon className="size-4" weight="duotone" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1 font-medium text-foreground">
+                    {item.title}
+                    <ArrowRightIcon className="size-3.5 opacity-0 transition group-hover:opacity-100" />
+                  </div>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{item.description}</p>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      <Card className="border-border/70 shadow-none">
+        <CardHeader>
+          <CardTitle className="text-base">Demos</CardTitle>
+          <CardDescription>
+            Showcase compositions live under <code className="text-xs">/demo/*</code> — not the
+            product shell.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <ButtonLink to="/demo/portfolio" variant="outline" size="sm">
+            Portfolio dashboard
+          </ButtonLink>
+          <ButtonLink to="/" variant="outline" size="sm">
+            Marketing site
+          </ButtonLink>
+          <ButtonLink to="/pricing" variant="outline" size="sm">
+            Pricing
+          </ButtonLink>
+        </CardContent>
+      </Card>
     </div>
   );
 }

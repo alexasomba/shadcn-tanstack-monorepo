@@ -27,6 +27,7 @@ import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
+import { Route as DemoPortfolioRouteImport } from './routes/demo/portfolio'
 import { Route as DemoI18nRouteImport } from './routes/demo.i18n'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as DemoDbChatApiRouteImport } from './routes/demo/db-chat-api'
@@ -45,6 +46,11 @@ import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedSettingsSecurityRouteImport } from './routes/_protected/settings.security'
+import { Route as ProtectedSettingsOrganizationRouteImport } from './routes/_protected/settings.organization'
+import { Route as ProtectedSettingsMembersRouteImport } from './routes/_protected/settings.members'
+import { Route as ProtectedSettingsBillingRouteImport } from './routes/_protected/settings.billing'
+import { Route as ProtectedSettingsApiKeysRouteImport } from './routes/_protected/settings.api-keys'
 import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
 import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
@@ -140,6 +146,11 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
   path: '/demo/store',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoPortfolioRoute = DemoPortfolioRouteImport.update({
+  id: '/demo/portfolio',
+  path: '/demo/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoI18nRoute = DemoI18nRouteImport.update({
   id: '/demo/i18n',
   path: '/demo/i18n',
@@ -230,6 +241,36 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedSettingsSecurityRoute =
+  ProtectedSettingsSecurityRouteImport.update({
+    id: '/settings/security',
+    path: '/settings/security',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsOrganizationRoute =
+  ProtectedSettingsOrganizationRouteImport.update({
+    id: '/settings/organization',
+    path: '/settings/organization',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsMembersRoute =
+  ProtectedSettingsMembersRouteImport.update({
+    id: '/settings/members',
+    path: '/settings/members',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsBillingRoute =
+  ProtectedSettingsBillingRouteImport.update({
+    id: '/settings/billing',
+    path: '/settings/billing',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedSettingsApiKeysRoute =
+  ProtectedSettingsApiKeysRouteImport.update({
+    id: '/settings/api-keys',
+    path: '/settings/api-keys',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
   id: '/demo/api/ai/tts',
   path: '/demo/api/ai/tts',
@@ -277,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/portfolio': typeof DemoPortfolioRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -285,6 +327,11 @@ export interface FileRoutesByFullPath {
   '/schedule/': typeof ScheduleIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
+  '/settings/api-keys': typeof ProtectedSettingsApiKeysRoute
+  '/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/settings/members': typeof ProtectedSettingsMembersRoute
+  '/settings/organization': typeof ProtectedSettingsOrganizationRoute
+  '/settings/security': typeof ProtectedSettingsSecurityRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -319,6 +366,7 @@ export interface FileRoutesByTo {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/portfolio': typeof DemoPortfolioRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -327,6 +375,11 @@ export interface FileRoutesByTo {
   '/schedule': typeof ScheduleIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/talks': typeof TalksIndexRoute
+  '/settings/api-keys': typeof ProtectedSettingsApiKeysRoute
+  '/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/settings/members': typeof ProtectedSettingsMembersRoute
+  '/settings/organization': typeof ProtectedSettingsOrganizationRoute
+  '/settings/security': typeof ProtectedSettingsSecurityRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -363,6 +416,7 @@ export interface FileRoutesById {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/portfolio': typeof DemoPortfolioRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -371,6 +425,11 @@ export interface FileRoutesById {
   '/schedule/': typeof ScheduleIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
+  '/_protected/settings/api-keys': typeof ProtectedSettingsApiKeysRoute
+  '/_protected/settings/billing': typeof ProtectedSettingsBillingRoute
+  '/_protected/settings/members': typeof ProtectedSettingsMembersRoute
+  '/_protected/settings/organization': typeof ProtectedSettingsOrganizationRoute
+  '/_protected/settings/security': typeof ProtectedSettingsSecurityRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -407,6 +466,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/portfolio'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -415,6 +475,11 @@ export interface FileRouteTypes {
     | '/schedule/'
     | '/speakers/'
     | '/talks/'
+    | '/settings/api-keys'
+    | '/settings/billing'
+    | '/settings/members'
+    | '/settings/organization'
+    | '/settings/security'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -449,6 +514,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/portfolio'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -457,6 +523,11 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/speakers'
     | '/talks'
+    | '/settings/api-keys'
+    | '/settings/billing'
+    | '/settings/members'
+    | '/settings/organization'
+    | '/settings/security'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -492,6 +563,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/portfolio'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -500,6 +572,11 @@ export interface FileRouteTypes {
     | '/schedule/'
     | '/speakers/'
     | '/talks/'
+    | '/_protected/settings/api-keys'
+    | '/_protected/settings/billing'
+    | '/_protected/settings/members'
+    | '/_protected/settings/organization'
+    | '/_protected/settings/security'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -534,6 +611,7 @@ export interface RootRouteChildren {
   DemoDbChatApiRoute: typeof DemoDbChatApiRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoI18nRoute: typeof DemoI18nRoute
+  DemoPortfolioRoute: typeof DemoPortfolioRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
@@ -684,6 +762,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/portfolio': {
+      id: '/demo/portfolio'
+      path: '/demo/portfolio'
+      fullPath: '/demo/portfolio'
+      preLoaderRoute: typeof DemoPortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/i18n': {
       id: '/demo/i18n'
       path: '/demo/i18n'
@@ -810,6 +895,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/settings/security': {
+      id: '/_protected/settings/security'
+      path: '/settings/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof ProtectedSettingsSecurityRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/organization': {
+      id: '/_protected/settings/organization'
+      path: '/settings/organization'
+      fullPath: '/settings/organization'
+      preLoaderRoute: typeof ProtectedSettingsOrganizationRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/members': {
+      id: '/_protected/settings/members'
+      path: '/settings/members'
+      fullPath: '/settings/members'
+      preLoaderRoute: typeof ProtectedSettingsMembersRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/billing': {
+      id: '/_protected/settings/billing'
+      path: '/settings/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof ProtectedSettingsBillingRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/settings/api-keys': {
+      id: '/_protected/settings/api-keys'
+      path: '/settings/api-keys'
+      fullPath: '/settings/api-keys'
+      preLoaderRoute: typeof ProtectedSettingsApiKeysRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/demo/api/ai/tts': {
       id: '/demo/api/ai/tts'
       path: '/demo/api/ai/tts'
@@ -851,11 +971,21 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
+  ProtectedSettingsApiKeysRoute: typeof ProtectedSettingsApiKeysRoute
+  ProtectedSettingsBillingRoute: typeof ProtectedSettingsBillingRoute
+  ProtectedSettingsMembersRoute: typeof ProtectedSettingsMembersRoute
+  ProtectedSettingsOrganizationRoute: typeof ProtectedSettingsOrganizationRoute
+  ProtectedSettingsSecurityRoute: typeof ProtectedSettingsSecurityRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
+  ProtectedSettingsApiKeysRoute: ProtectedSettingsApiKeysRoute,
+  ProtectedSettingsBillingRoute: ProtectedSettingsBillingRoute,
+  ProtectedSettingsMembersRoute: ProtectedSettingsMembersRoute,
+  ProtectedSettingsOrganizationRoute: ProtectedSettingsOrganizationRoute,
+  ProtectedSettingsSecurityRoute: ProtectedSettingsSecurityRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -882,6 +1012,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoDbChatApiRoute: DemoDbChatApiRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoI18nRoute: DemoI18nRoute,
+  DemoPortfolioRoute: DemoPortfolioRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
