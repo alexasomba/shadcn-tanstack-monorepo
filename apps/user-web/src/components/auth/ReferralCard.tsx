@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -6,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { authClient } from "#/lib/auth-client";
 
@@ -36,49 +37,41 @@ type ReferralRecord = {
  * Codes + invite links for end users; admin-web has a separate read-only overview.
  */
 export function ReferralCard() {
-  const [dashboard, setDashboard] = useState<ReferralDashboard | null>(null);
-  const [referrals, setReferrals] = useState<Array<ReferralRecord>>([]);
-  const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [copyError, setCopyError] = useState("");
 
-  useEffect(() => {
-    let cancelled = false;
+  const {
+    data,
+    error: queryError,
+    isLoading,
+  } = useQuery<{
+    dashboard: ReferralDashboard;
+    referrals: ReferralRecord[];
+  }>({
+    queryKey: ["referrals-dashboard"],
+    queryFn: async () => {
+      const [dash, list] = await Promise.all([
+        authClient.referrals(),
+        authClient.referrals.listReferrals({
+          query: { limit: 10, offset: 0 },
+        }),
+      ]);
 
-    void (async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const [dash, list] = await Promise.all([
-          authClient.referrals(),
-          authClient.referrals.listReferrals({
-            query: { limit: 10, offset: 0 },
-          }),
-        ]);
-        if (cancelled) return;
-        if (dash.error) {
-          setError(dash.error.message || "Could not load referral dashboard");
-          return;
-        }
-        setDashboard(dash.data);
-
-        if (!list.error && list.data) {
-          const data = list.data as { referrals?: Array<ReferralRecord> };
-          setReferrals(data.referrals ?? []);
-        }
-      } catch {
-        if (!cancelled) {
-          setError("Could not load referral dashboard");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (dash.error) {
+        throw new Error(dash.error.message || "Could not load referral dashboard");
       }
-    })();
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      const listData = list.data as { referrals?: Array<ReferralRecord> } | undefined;
+      return {
+        dashboard: dash.data,
+        referrals: listData?.referrals ?? [],
+      };
+    },
+  });
+
+  const dashboard = data?.dashboard;
+  const referrals = data?.referrals ?? [];
+  const error = queryError ? queryError.message : copyError;
 
   const shareUrl =
     typeof window !== "undefined" && dashboard?.code
@@ -91,8 +84,9 @@ export function ReferralCard() {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
+      setCopyError("");
     } catch {
-      setError("Could not copy link");
+      setCopyError("Could not copy link");
     }
   };
 
@@ -103,7 +97,7 @@ export function ReferralCard() {
         <CardDescription>Share your invite code. Track who signed up with it.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {loading ? <p className="text-sm text-muted-foreground">Loading referral code…</p> : null}
+        {isLoading ? <p className="text-sm text-muted-foreground">Loading referral code…</p> : null}
 
         {error ? (
           <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>

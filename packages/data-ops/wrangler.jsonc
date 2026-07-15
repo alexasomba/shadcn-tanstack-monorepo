@@ -10,7 +10,8 @@
       "binding": "DATABASE",
       "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-      "migrations_dir": "src/drizzle",
+      "migrations_dir": "src/drizzle/migrations",
+      "migrations_pattern": "src/drizzle/migrations/*/migration.sql",
     },
   ],
 }

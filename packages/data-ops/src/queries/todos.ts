@@ -1,22 +1,18 @@
-import type { DatabaseError, NotFoundError, ValidationError } from "@workspace/result";
 import { Result, databaseError, notFound, validation } from "@workspace/result";
-import type { AppError } from "@workspace/result";
-import { desc, eq } from "drizzle-orm";
+import type { DatabaseError, NotFoundError, ValidationError, AppError } from "@workspace/result";
+import { eq } from "drizzle-orm";
 
 import type { Database } from "../database/setup";
-import { todos } from "../schema";
+import { todos } from "../drizzle/schema/core";
+import type { DbTodo } from "../drizzle/schema/core";
 
-export type TodoRow = {
-  id: number;
-  title: string;
-  createdAt: Date | null;
-};
+export type TodoRow = DbTodo;
 
 export async function listTodos(db: Database): Promise<Result<Array<TodoRow>, DatabaseError>> {
   return Result.tryPromise({
     try: () =>
       db.query.todos.findMany({
-        orderBy: [desc(todos.createdAt)],
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
     catch: (cause) => databaseError("listTodos", cause),
   });
@@ -29,7 +25,7 @@ export async function getTodoById(
   const found = await Result.tryPromise({
     try: () =>
       db.query.todos.findFirst({
-        where: eq(todos.id, id),
+        where: { id },
       }),
     catch: (cause) => databaseError("getTodoById", cause),
   });
@@ -54,11 +50,7 @@ export async function createTodo(
     catch: (cause) => databaseError("createTodo", cause),
   });
 
-  return inserted.andThen((row) =>
-    row
-      ? Result.ok(row)
-      : Result.err(databaseError("createTodo", undefined, "Insert returned no row")),
-  );
+  return inserted;
 }
 
 export async function updateTodo(
@@ -71,13 +63,14 @@ export async function updateTodo(
     return Result.err(validation("Title is required", "title"));
   }
 
-  const updated = await Result.tryPromise({
+  const updated: Result<TodoRow | undefined, DatabaseError> = await Result.tryPromise({
     try: async () => {
-      const [row] = await db
+      const rows = await db
         .update(todos)
         .set({ title: trimmed })
         .where(eq(todos.id, id))
         .returning();
+      const row: TodoRow | undefined = rows[0];
       return row;
     },
     catch: (cause) => databaseError("updateTodo", cause),

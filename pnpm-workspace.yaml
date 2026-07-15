@@ -27,7 +27,7 @@ catalog:
   "@babel/plugin-proposal-decorators": "^8.0.2"
   "@base-ui/react": "^1.6.0"
   "better-result": "^2.9.2"
-  "@marinedotsh/better-auth-referral": "^0.1.0"
+  "@marinedotsh/better-auth-referral": "^0.2.0"
   "better-inbox": "^0.1.1"
   "@dnd-kit/core": "^6.3.1"
   "@dnd-kit/modifiers": "^9.0.0"
@@ -100,33 +100,34 @@ catalog:
   "@types/react-dom": "^19.2.3"
   "@vitejs/plugin-react": "^6.0.3"
   "agents": "^0.17.4"
-  "ai": "^7.0.26"
+  "ai": "^7.0.28"
   "babel-plugin-react-compiler": "^1.0.0"
-  "better-auth": "^1.6.23"
-  "@better-auth/drizzle-adapter": "^1.6.23"
+  "better-auth": "^1.7.0-rc.1"
+  "auth": "^1.7.0-rc.1"
+  "@better-auth/drizzle-adapter": "^1.7.0-rc.1"
   "better-sqlite3": "^12.11.1"
   "class-variance-authority": "^0.7.1"
   "clsx": "^2.1.1"
   "dotenv": "^17.4.2"
   "dotenv-cli": "^11.0.0"
-  "drizzle-kit": "^0.31.10"
-  "drizzle-orm": "^0.45.2"
+  "drizzle-kit": "^1.0.0-rc.4"
+  "drizzle-orm": "^1.0.0-rc.4"
   "eslint": "^9.39.5"
   "eslint-plugin-drizzle": "^0.2.3"
   "eslint-plugin-import": "^2.32.0"
   "eslint-plugin-no-instanceof": "^1.0.1"
   "eslint-plugin-react": "^7.37.5"
-  "eslint-plugin-sonarjs": "^4.1.0"
+  "eslint-plugin-sonarjs": "^4.2.0"
   "eslint-plugin-zod": "^4.7.1"
   "eslint-plugin-zod-openapi": "^2.0.0"
 
   "highlight.js": "^11.11.1"
   "hono": "^4.12.30"
-  "@hono/zod-openapi": "^1.4.0"
+  "@hono/zod-openapi": "^1.5.1"
   "jsdom": "^29.1.1"
   "marked": "^18.0.6"
-  "oxfmt": "^0.58.0"
-  "oxlint": "^1.73.0"
+  "oxfmt": "^0.59.0"
+  "oxlint": "^1.74.0"
   "qrcode.react": "^4.2.0"
   "react": "^19.2.7"
   "react-dom": "^19.2.7"
@@ -150,12 +151,13 @@ catalog:
   "@betternotify/push": "^1.0.0-beta.5"
   "@betternotify/discord": "^1.0.0-beta.6"
   "@betternotify/onesignal": "^1.0.0-beta.5"
-  "@opencoredev/domain-sdk": ^0.1.0
+  "@opencoredev/domain-sdk": ^0.2.0
 overrides:
   vite: "catalog:"
   # Keep a single Vitest copy aligned with the bundled `vp test` runner.
   vitest: "catalog:"
   typescript: "6.0.3"
+  kysely: "0.28.17"
 
 peerDependencyRules:
   allowAny:
@@ -167,12 +169,12 @@ minimumReleaseAgeExclude:
   - miniflare@4.20260708.0 || 4.20260708.1
   - wrangler@4.109.0 || 4.110.0
   - "@inlang/paraglide-js@2.21.0 || 2.22.0"
-  - "@ai-sdk/gateway@4.0.15 || 4.0.19"
-  - "@ai-sdk/provider-utils@5.0.7 || 5.0.9"
+  - "@ai-sdk/gateway@4.0.15 || 4.0.19 || 4.0.20"
+  - "@ai-sdk/provider-utils@5.0.7 || 5.0.9 || 5.0.10"
   - "@ai-sdk/provider@4.0.3"
   - "@tanstack/form-core@1.33.1"
   - "@tanstack/react-form@1.33.1"
-  - ai@7.0.19 || 7.0.26
+  - ai@7.0.19 || 7.0.26 || 7.0.28
   - "@typescript-eslint/eslint-plugin@8.64.0"
   - "@typescript-eslint/parser@8.64.0"
   - "@typescript-eslint/project-service@8.64.0"
@@ -203,5 +205,9 @@ minimumReleaseAgeExclude:
   - "@tanstack/start-storage-context@1.167.17"
   - "@turbo/gen@2.10.5"
   - agents@0.17.4
+  - "@hono/zod-openapi@1.5.0 || 1.5.1"
+  - "@marinedotsh/better-auth-referral@0.2.0"
+  - eslint-plugin-sonarjs@4.2.0
+  - "@hono/zod-validator@0.9.0"
 patchedDependencies:
   eslint-plugin-sonarjs: patches/eslint-plugin-sonarjs.patch

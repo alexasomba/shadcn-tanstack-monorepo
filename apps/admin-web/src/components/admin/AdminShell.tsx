@@ -5,15 +5,16 @@ import {
   SquaresFourIcon,
   SignOutIcon,
   UsersIcon,
+  Briefcase as BriefcaseIcon,
 } from "@phosphor-icons/react";
 import { Link, Outlet } from "@tanstack/react-router";
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { AuthInboxButton } from "#/components/auth/AuthInboxButton";
-import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 import { adminDemoNav, adminNav } from "#/lib/nav";
 
@@ -57,6 +58,8 @@ export default function AdminShell({
             >
               {link.to === "/dashboard" ? (
                 <ChartBarIcon className="size-4" />
+              ) : link.to === "/crm" ? (
+                <BriefcaseIcon className="size-4" />
               ) : link.to === "/users" ? (
                 <UsersIcon className="size-4" />
               ) : link.to === "/referrals" ? (

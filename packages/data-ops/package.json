@@ -18,14 +18,14 @@
       "default": "./src/index.ts"
     },
     "./schema": {
-      "types": "./src/schema.ts",
-      "import": "./src/schema.ts",
-      "default": "./src/schema.ts"
+      "types": "./src/drizzle/schema/schema.ts",
+      "import": "./src/drizzle/schema/schema.ts",
+      "default": "./src/drizzle/schema/schema.ts"
     },
     "./auth-schema": {
-      "types": "./src/auth-schema.ts",
-      "import": "./src/auth-schema.ts",
-      "default": "./src/auth-schema.ts"
+      "types": "./src/drizzle/schema/auth.ts",
+      "import": "./src/drizzle/schema/auth.ts",
+      "default": "./src/drizzle/schema/auth.ts"
     },
     "./database/setup": {
       "types": "./src/database/setup.ts",
@@ -48,9 +48,9 @@
       "default": "./src/queries/*.ts"
     },
     "./zod-schema/*": {
-      "types": "./src/zod-schema/*.ts",
-      "import": "./src/zod-schema/*.ts",
-      "default": "./src/zod-schema/*.ts"
+      "types": "./src/zod/schema/*.ts",
+      "import": "./src/zod/schema/*.ts",
+      "default": "./src/zod/schema/*.ts"
     },
     "./email/*": {
       "types": "./src/email/*.ts",
@@ -68,9 +68,9 @@
     "build": "vp pack && tsc --noEmit",
     "pack": "vp pack",
     "typecheck": "tsc --noEmit",
-    "auth:generate": "npx @better-auth/cli@latest generate --config ./src/auth/auth.ts --output ./src/auth-schema.ts --yes",
-    "auth:info": "npx @better-auth/cli@latest info --config ./src/auth/auth.ts",
-    "auth:secret": "npx @better-auth/cli@latest secret",
+    "auth:generate": "auth generate --config ./src/auth/auth.ts --output ./src/drizzle/schema/auth.ts --yes",
+    "auth:info": "auth info --config ./src/auth/auth.ts",
+    "auth:secret": "auth secret",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:studio": "drizzle-kit studio --config drizzle.config.ts",
     "db:migrate:local": "wrangler d1 migrations apply app-db --cwd ../../apps/user-web --config wrangler.jsonc --local",
@@ -96,7 +96,9 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "auth": "catalog:",
     "drizzle-kit": "catalog:",
+    "drizzle-seed": "^0.3.1",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",

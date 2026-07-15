@@ -1,12 +1,12 @@
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Faq1 } from "@workspace/ui/components/ui/faq-1";
 import Pricing2 from "@workspace/ui/components/ui/pricing-2";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";
-import { ButtonLink } from "#/components/ui/button-link";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,

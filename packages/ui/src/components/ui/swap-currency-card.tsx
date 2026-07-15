@@ -29,10 +29,6 @@ interface FlagIconProps {
 const FlagIcon: FC<FlagIconProps> = ({ countryCode, emoji }) => {
   const [imgError, setImgError] = useState(false);
 
-  useEffect(() => {
-    requestAnimationFrame(() => setImgError(false));
-  }, [countryCode]);
-
   if (!countryCode) return <span className="text-lg sm:text-xl">{emoji}</span>;
 
   const src =
@@ -86,7 +82,11 @@ const Dropdown: FC<DropdownProps> = ({ selected, onSelect, currencies }) => {
         onClick={() => setIsOpen((v) => !v)}
         className="flex items-center gap-1.5 rounded-full border border-[#E5E5E9] bg-[#fefefe] px-2.5 py-1.5 transition-all active:scale-95 sm:gap-2 sm:px-3 sm:py-2 dark:border-zinc-700 dark:bg-zinc-800"
       >
-        <FlagIcon countryCode={selected.countryCode} emoji={selected.flag} />
+        <FlagIcon
+          key={selected.countryCode}
+          countryCode={selected.countryCode}
+          emoji={selected.flag}
+        />
         <span className="text-xs font-semibold text-gray-700 sm:text-sm dark:text-zinc-200">
           {selected.code}
         </span>
@@ -116,7 +116,11 @@ const Dropdown: FC<DropdownProps> = ({ selected, onSelect, currencies }) => {
                 className="flex w-full items-center justify-between px-3 py-2 transition-colors hover:bg-gray-50 sm:px-4 sm:py-2.5 dark:hover:bg-zinc-700/50"
               >
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <FlagIcon countryCode={currency.countryCode} emoji={currency.flag} />
+                  <FlagIcon
+                    key={currency.countryCode}
+                    countryCode={currency.countryCode}
+                    emoji={currency.flag}
+                  />
                   <span className="text-xs font-medium text-gray-700 sm:text-sm dark:text-zinc-200">
                     {currency.code}
                   </span>
@@ -219,8 +223,8 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
 
   const [fromCurrency, setFromCurrency] = useState(fromDefault);
   const [toCurrency, setToCurrency] = useState(toDefault);
-  const [fromAmount, setFromAmount] = useState(defaultAmount);
-  const [toAmount, setToAmount] = useState("");
+  const [amount, setAmount] = useState(defaultAmount);
+  const [independentField, setIndependentField] = useState<"from" | "to">("from");
 
   const convert = useCallback((amount: string, from: Currency, to: Currency): string => {
     const val = parseFloat(amount);
@@ -229,23 +233,23 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
     return (usd * to.rate).toFixed(2);
   }, []);
 
-  useEffect(() => {
-    requestAnimationFrame(() => setToAmount(convert(fromAmount, fromCurrency, toCurrency)));
-  }, [convert, fromAmount, fromCurrency, toCurrency]);
+  const fromAmount =
+    independentField === "from" ? amount : convert(amount, toCurrency, fromCurrency);
+  const toAmount = independentField === "to" ? amount : convert(amount, fromCurrency, toCurrency);
 
   const handleFromChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val === "" || /^\d*\.?\d*$/.test(val)) {
-      setFromAmount(val);
-      setToAmount(convert(val, fromCurrency, toCurrency));
+      setAmount(val);
+      setIndependentField("from");
     }
   };
 
   const handleToChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val === "" || /^\d*\.?\d*$/.test(val)) {
-      setToAmount(val);
-      setFromAmount(convert(val, toCurrency, fromCurrency));
+      setAmount(val);
+      setIndependentField("to");
     }
   };
 
@@ -279,8 +283,9 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
             selected={fromCurrency}
             currencies={currencies}
             onSelect={(c) => {
+              setAmount(fromAmount);
+              setIndependentField("from");
               setFromCurrency(c);
-              setToAmount(convert(fromAmount, c, toCurrency));
             }}
           />
         </div>
@@ -301,8 +306,9 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
             selected={toCurrency}
             currencies={currencies}
             onSelect={(c) => {
+              setAmount(fromAmount);
+              setIndependentField("from");
               setToCurrency(c);
-              setToAmount(convert(fromAmount, fromCurrency, c));
             }}
           />
         </div>

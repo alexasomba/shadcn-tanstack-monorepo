@@ -5,6 +5,7 @@ import {
   UserSwitchIcon,
   ShieldCheckIcon,
 } from "@phosphor-icons/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
@@ -24,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { authClient } from "#/lib/auth-client";
 
@@ -48,64 +49,58 @@ type AdminUser = {
 const PAGE_SIZE = 20;
 
 function UsersAdminPage() {
-  const [users, setUsers] = useState<Array<AdminUser>>([]);
-  const [total, setTotal] = useState(0);
+  const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const loadUsers = useCallback(
-    async (nextOffset = 0, searchValue = search) => {
-      setLoading(true);
-      setError("");
-      try {
-        const result = await authClient.admin.listUsers({
-          query: {
-            limit: PAGE_SIZE,
-            offset: nextOffset,
-            ...(searchValue.trim()
-              ? {
-                  searchValue: searchValue.trim(),
-                  searchField: "email" as const,
-                  searchOperator: "contains" as const,
-                }
-              : {}),
-            sortBy: "createdAt",
-            sortDirection: "desc" as const,
-          },
-        });
+  const {
+    data,
+    isLoading,
+    error: queryError,
+  } = useQuery<{
+    users: AdminUser[];
+    total: number;
+  }>({
+    queryKey: ["admin-users", { offset, search }],
+    queryFn: async () => {
+      const result = await authClient.admin.listUsers({
+        query: {
+          limit: PAGE_SIZE,
+          offset,
+          ...(search.trim()
+            ? {
+                searchValue: search.trim(),
+                searchField: "email" as const,
+                searchOperator: "contains" as const,
+              }
+            : {}),
+          sortBy: "createdAt",
+          sortDirection: "desc" as const,
+        },
+      });
 
-        if (result.error) {
-          setError(result.error.message || "Failed to list users");
-          setUsers([]);
-          setTotal(0);
-          return;
-        }
-
-        const data = result.data as {
-          users?: Array<AdminUser>;
-          total?: number;
-        } | null;
-
-        setUsers(data?.users ?? []);
-        setTotal(data?.total ?? 0);
-        setOffset(nextOffset);
-      } catch {
-        setError("Failed to list users");
-      } finally {
-        setLoading(false);
+      if (result.error) {
+        throw new Error(result.error.message || "Failed to list users");
       }
-    },
-    [search],
-  );
 
-  useEffect(() => {
-    void loadUsers(0);
-    // initial load only
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      const listData = result.data as {
+        users?: Array<AdminUser>;
+        total?: number;
+      } | null;
+
+      return {
+        users: listData?.users ?? [],
+        total: listData?.total ?? 0,
+      };
+    },
+  });
+
+  const users = data?.users ?? [];
+  const total = data?.total ?? 0;
+  const displayError = queryError ? queryError.message : error;
 
   const runAction = async (
     userId: string,
@@ -119,7 +114,7 @@ function UsersAdminPage() {
         setError(result.error.message || "Action failed");
         return;
       }
-      await loadUsers(offset);
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     } catch {
       setError("Action failed");
     } finally {
@@ -151,26 +146,27 @@ function UsersAdminPage() {
             className="flex flex-col gap-2 sm:flex-row"
             onSubmit={(e) => {
               e.preventDefault();
-              void loadUsers(0);
+              setSearch(searchInput);
+              setOffset(0);
             }}
           >
             <div className="relative flex-1">
               <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by email…"
                 className="pl-9"
               />
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={isLoading}>
               Search
             </Button>
           </form>
 
-          {error ? (
+          {displayError ? (
             <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {error}
+              {displayError}
             </p>
           ) : null}
 
@@ -185,7 +181,7 @@ function UsersAdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-muted-foreground">
                       Loading…
@@ -298,16 +294,16 @@ function UsersAdminPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={loading || offset <= 0}
-              onClick={() => void loadUsers(Math.max(0, offset - PAGE_SIZE))}
+              disabled={isLoading || offset <= 0}
+              onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             >
               Previous
             </Button>
             <Button
               variant="outline"
               size="sm"
-              disabled={loading || offset + PAGE_SIZE >= total}
-              onClick={() => void loadUsers(offset + PAGE_SIZE)}
+              disabled={isLoading || offset + PAGE_SIZE >= total}
+              onClick={() => setOffset(offset + PAGE_SIZE)}
             >
               Next
             </Button>

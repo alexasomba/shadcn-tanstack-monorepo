@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 
-import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/_protected/account")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_protected/account")({
 function AccountPage() {
   const { user, session } = Route.useRouteContext();
   const impersonatedBy =
-    session && typeof session === "object" && "impersonatedBy" in session
+    typeof session === "object" && "impersonatedBy" in session
       ? (session as { impersonatedBy?: string | null }).impersonatedBy
       : null;
 
@@ -36,9 +36,9 @@ function AccountPage() {
           <div className="rounded-2xl border border-border/70 bg-muted/30 p-4">
             <p className="font-medium">{user.name}</p>
             <p className="text-sm text-muted-foreground">{user.email}</p>
-            {"role" in user && user.role ? (
+            {"role" in user && typeof user.role === "string" ? (
               <p className="mt-2 text-xs text-muted-foreground">
-                Role: <span className="font-mono text-foreground">{String(user.role)}</span>
+                Role: <span className="font-mono text-foreground">{user.role}</span>
               </p>
             ) : null}
           </div>

@@ -3,8 +3,8 @@ import { Result, databaseError } from "@workspace/result";
 import { desc, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 
-import { referralCode, referrals, user } from "../auth-schema";
 import type { Database } from "../database/setup";
+import { referralCode, referrals, user } from "../drizzle/schema/auth";
 
 export type ReferralLeaderboardRow = {
   referrerUserId: string;
@@ -91,7 +91,7 @@ export async function countReferrals(db: Database): Promise<Result<number, Datab
       const [row] = await db
         .select({ count: sql<number>`count(*)`.mapWith(Number) })
         .from(referrals);
-      return row?.count ?? 0;
+      return row.count;
     },
     catch: (cause) => databaseError("countReferrals", cause),
   });

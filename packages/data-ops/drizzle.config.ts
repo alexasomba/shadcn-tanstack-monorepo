@@ -40,8 +40,13 @@ function getLocalD1Path() {
 const localDbPath = getLocalD1Path();
 
 const config: Config = {
-  out: "./src/drizzle",
-  schema: ["./src/schema.ts", "./src/auth-schema.ts"],
+  out: "./src/drizzle/migrations",
+  schema: [
+    "./src/drizzle/schema/schema.ts",
+    "./src/drizzle/schema/auth.ts",
+    "./src/drizzle/schema/ecommerce.ts",
+    "./src/drizzle/schema/crm.ts",
+  ],
   dialect: "sqlite",
   // Prefer the local miniflare SQLite file when present; otherwise d1-http.
   ...(localDbPath

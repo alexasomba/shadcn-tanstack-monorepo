@@ -3,15 +3,10 @@ import { Result, databaseError, notFound, validation } from "@workspace/result";
 import { eq } from "drizzle-orm";
 
 import type { Database } from "../database/setup";
-import { domains } from "../schema";
+import { domains } from "../drizzle/schema/core";
+import type { DbDomain } from "../drizzle/schema/core";
 
-export type DomainRow = {
-  id: string;
-  organizationId: string;
-  hostname: string;
-  status: string;
-  createdAt: Date | null;
-};
+export type DomainRow = DbDomain;
 
 export async function listDomains(
   db: Database,
@@ -20,7 +15,7 @@ export async function listDomains(
   return Result.tryPromise({
     try: () =>
       db.query.domains.findMany({
-        where: eq(domains.organizationId, organizationId),
+        where: { organizationId },
       }),
     catch: (cause) => databaseError("listDomains", cause),
   });
@@ -33,7 +28,7 @@ export async function getDomainByHostname(
   const found = await Result.tryPromise({
     try: () =>
       db.query.domains.findFirst({
-        where: eq(domains.hostname, hostname),
+        where: { hostname },
       }),
     catch: (cause) => databaseError("getDomainByHostname", cause),
   });

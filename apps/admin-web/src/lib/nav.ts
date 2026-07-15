@@ -3,6 +3,7 @@ import { linkOptions } from "@tanstack/react-router";
 /** Type-safe admin console nav. */
 export const adminNav = linkOptions([
   { to: "/dashboard", label: "Overview", activeOptions: { exact: true } },
+  { to: "/crm", label: "CRM" },
   { to: "/users", label: "Users" },
   { to: "/referrals", label: "Referrals" },
   { to: "/account", label: "Account" },

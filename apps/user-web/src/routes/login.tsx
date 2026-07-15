@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
   Card,
   CardContent,
@@ -14,7 +15,6 @@ import { z } from "zod";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";
-import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 import { getSession } from "#/lib/auth.functions";
 

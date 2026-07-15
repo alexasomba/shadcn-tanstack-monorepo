@@ -1,8 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, getTodoById, todoToApi } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { ErrorSchema, TodoIdParamSchema, TodoSchema } from "./schemas";
 
 export const readTodoRoute = createRoute({
@@ -41,8 +42,8 @@ export const readTodoRoute = createRoute({
   },
 });
 
-export async function readTodoHandler(c: AppContext) {
-  const { id } = c.req.valid("param" as never) as { id: number };
+export const readTodoHandler: RouteHandler<typeof readTodoRoute, AppEnv> = async (c) => {
+  const { id } = c.req.valid("param");
   const db = createDatabase(c.env.DATABASE);
   const result = await getTodoById(db, id);
 
@@ -51,4 +52,4 @@ export async function readTodoHandler(c: AppContext) {
   }
 
   return c.json(todoToApi(result.value), 200);
-}
+};

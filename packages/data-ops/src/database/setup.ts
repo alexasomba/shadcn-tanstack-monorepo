@@ -2,14 +2,33 @@ import { drizzle } from "drizzle-orm/d1";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import * as authSchema from "../auth-schema";
-import * as schema from "../schema";
+import * as authSchema from "../drizzle/schema/auth";
+import * as schema from "../drizzle/schema/core";
+import * as crmSchema from "../drizzle/schema/crm";
+import * as ecommerceSchema from "../drizzle/schema/ecommerce";
+import { relations } from "../drizzle/schema/relations";
 
-const fullSchema = { ...schema, ...authSchema };
+const { authRelations, ...authTables } = authSchema;
 
-export type DrizzleDb = DrizzleD1Database<typeof fullSchema>;
+const fullSchema = {
+  ...schema,
+  ...authTables,
+  ...ecommerceSchema,
+  ...crmSchema,
+  relations,
+  authRelations,
+};
+
+const relationsMerged = { ...relations, ...authRelations };
+
+export type DrizzleDb = DrizzleD1Database<typeof fullSchema, typeof relationsMerged>;
 export type Database = DrizzleDb;
-export type SQLiteDb = BaseSQLiteDatabase<"async" | "sync", unknown, typeof fullSchema>;
+export type SQLiteDb = BaseSQLiteDatabase<
+  "async" | "sync",
+  unknown,
+  typeof fullSchema,
+  typeof relationsMerged
+>;
 
 const dbCache = new WeakMap<object, DrizzleDb>();
 
@@ -21,12 +40,18 @@ const dbCache = new WeakMap<object, DrizzleDb>();
 export function createDatabase(d1: D1Database): DrizzleDb {
   const d1Obj = d1 as unknown;
   if (!d1Obj || typeof d1Obj !== "object") {
-    return drizzle(d1, { schema: fullSchema });
+    return drizzle(d1, {
+      schema: fullSchema,
+      relations: { ...relations, ...authRelations },
+    });
   }
 
   let db = dbCache.get(d1);
   if (!db) {
-    db = drizzle(d1, { schema: fullSchema });
+    db = drizzle(d1, {
+      schema: fullSchema,
+      relations: { ...relations, ...authRelations },
+    });
     dbCache.set(d1, db);
   }
   return db;

@@ -2,10 +2,10 @@
  * Better Auth instance for CLI tooling only (`vpr auth:generate` / `vpr auth:info`).
  * Runtime Workers use `createAuth(db, env)` from `./create-auth`.
  */
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { betterAuth } from "better-auth";
 
-import * as authSchema from "../auth-schema";
+import * as authSchema from "../drizzle/schema/auth";
 import { createBaseAuthPlugins } from "./plugins";
 
 function readEnv(name: string): string | undefined {

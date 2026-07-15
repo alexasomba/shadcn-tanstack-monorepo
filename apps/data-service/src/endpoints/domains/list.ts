@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
+import type { RouteHandler } from "@hono/zod-openapi";
+import { Result, appErrorBody } from "@workspace/result";
 import { createDatabase, listDomains } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { DbDomainSchema, ErrorSchema } from "./schemas";
 
 export const listDomainsRoute = createRoute({
@@ -38,12 +39,12 @@ export const listDomainsRoute = createRoute({
   },
 });
 
-export async function listDomainsHandler(c: AppContext) {
+export const listDomainsHandler: RouteHandler<typeof listDomainsRoute, AppEnv> = async (c) => {
   const session = c.get("session") as unknown as { activeOrganizationId?: string | null } | null;
   if (!session || !session.activeOrganizationId) {
     return c.json(
       {
-        success: false,
+        success: false as const,
         error: { code: "UNAUTHORIZED", message: "Active organization required" },
       },
       401,
@@ -55,7 +56,7 @@ export async function listDomainsHandler(c: AppContext) {
   const dbResult = await listDomains(db, organizationId);
 
   if (Result.isError(dbResult)) {
-    return c.json(appErrorBody(dbResult.error), appErrorStatus(dbResult.error) as 500);
+    return c.json(appErrorBody(dbResult.error), 500);
   }
 
   return c.json(
@@ -68,4 +69,4 @@ export async function listDomainsHandler(c: AppContext) {
     })),
     200,
   );
-}
+};

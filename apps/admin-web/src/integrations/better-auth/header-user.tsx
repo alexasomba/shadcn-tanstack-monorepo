@@ -1,6 +1,6 @@
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 
-import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 
 export default function BetterAuthHeader() {
@@ -14,7 +14,7 @@ export default function BetterAuthHeader() {
     return (
       <div className="flex items-center gap-2">
         <ButtonLink to="/account" variant="outline" size="sm" className="rounded-full">
-          {session.user.name?.split(" ")[0] || "Account"}
+          {session.user.name.split(" ")[0] || "Account"}
         </ButtonLink>
         <Button
           size="sm"

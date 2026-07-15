@@ -1,10 +1,11 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, createDomain, deleteDomain, updateDomainStatus } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
-import { DomainCreateSchema, DomainDetailsSchema, ErrorSchema } from "./schemas";
+import { DomainCreateSchema, DomainDetailsSchema, ErrorSchema, domainToApi } from "./schemas";
 
 export const createDomainRoute = createRoute({
   method: "post",
@@ -57,12 +58,12 @@ export const createDomainRoute = createRoute({
   },
 });
 
-export async function createDomainHandler(c: AppContext) {
+export const createDomainHandler: RouteHandler<typeof createDomainRoute, AppEnv> = async (c) => {
   const session = c.get("session") as unknown as { activeOrganizationId?: string | null } | null;
   if (!session || !session.activeOrganizationId) {
     return c.json(
       {
-        success: false,
+        success: false as const,
         error: { code: "UNAUTHORIZED", message: "Active organization required" },
       },
       401,
@@ -70,7 +71,7 @@ export async function createDomainHandler(c: AppContext) {
   }
   const organizationId = session.activeOrganizationId;
 
-  const { hostname } = c.req.valid("json" as never) as { hostname: string };
+  const { hostname } = c.req.valid("json");
   const db = createDatabase(c.env.DATABASE);
 
   // 1. Create in local database first (validates duplicates and constraints)
@@ -113,7 +114,7 @@ export async function createDomainHandler(c: AppContext) {
     await deleteDomain(db, hostname);
     return c.json(
       {
-        success: false,
+        success: false as const,
         error: {
           code: "PROVIDER_ERROR",
           message: errMessage,
@@ -140,19 +141,5 @@ export async function createDomainHandler(c: AppContext) {
     }),
   );
 
-  return c.json(
-    {
-      id: domain.id,
-      hostname: domain.hostname,
-      provider: domain.provider,
-      status: domain.status,
-      records: domain.records,
-      verification: domain.verification,
-      certificate: domain.certificate,
-      issues: domain.issues,
-      createdAt: domain.createdAt ? domain.createdAt.toISOString() : new Date().toISOString(),
-      updatedAt: domain.updatedAt ? domain.updatedAt.toISOString() : new Date().toISOString(),
-    },
-    201,
-  );
-}
+  return c.json(domainToApi(domain), 201);
+};

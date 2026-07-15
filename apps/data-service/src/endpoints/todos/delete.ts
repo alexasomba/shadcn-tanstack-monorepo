@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, deleteTodo } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { ErrorSchema, TodoIdParamSchema } from "./schemas";
 
 export const deleteTodoRoute = createRoute({
@@ -41,8 +42,8 @@ export const deleteTodoRoute = createRoute({
   },
 });
 
-export async function deleteTodoHandler(c: AppContext) {
-  const { id } = c.req.valid("param" as never) as { id: number };
+export const deleteTodoHandler: RouteHandler<typeof deleteTodoRoute, AppEnv> = async (c) => {
+  const { id } = c.req.valid("param");
   const db = createDatabase(c.env.DATABASE);
   const result = await deleteTodo(db, id);
 
@@ -51,4 +52,4 @@ export async function deleteTodoHandler(c: AppContext) {
   }
 
   return c.json({ success: true as const }, 200);
-}
+};

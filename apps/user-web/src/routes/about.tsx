@@ -1,12 +1,12 @@
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import Features3 from "@workspace/ui/components/ui/feature-3";
 import Stats3 from "@workspace/ui/components/ui/stats-3";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";
-import { ButtonLink } from "#/components/ui/button-link";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,

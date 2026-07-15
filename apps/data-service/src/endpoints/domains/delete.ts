@@ -1,8 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, deleteDomain, getDomainByHostname } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
 import { DomainHostnameParamSchema, ErrorSchema, SuccessResponseSchema } from "./schemas";
 
@@ -58,7 +59,7 @@ export const deleteDomainRoute = createRoute({
   },
 });
 
-export async function deleteDomainHandler(c: AppContext) {
+export const deleteDomainHandler: RouteHandler<typeof deleteDomainRoute, AppEnv> = async (c) => {
   const session = c.get("session") as unknown as { activeOrganizationId?: string | null } | null;
   if (!session || !session.activeOrganizationId) {
     return c.json(
@@ -71,7 +72,7 @@ export async function deleteDomainHandler(c: AppContext) {
   }
   const organizationId = session.activeOrganizationId;
 
-  const { hostname } = c.req.valid("param" as never) as { hostname: string };
+  const { hostname } = c.req.valid("param");
   const db = createDatabase(c.env.DATABASE);
 
   // 1. Fetch domain from DB to verify ownership
@@ -151,4 +152,4 @@ export async function deleteDomainHandler(c: AppContext) {
   );
 
   return c.json({ success: true }, 200);
-}
+};

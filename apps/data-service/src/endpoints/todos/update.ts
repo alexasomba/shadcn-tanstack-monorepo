@@ -1,8 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, todoToApi, updateTodo } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { ErrorSchema, TodoIdParamSchema, TodoSchema, TodoUpdateSchema } from "./schemas";
 
 export const updateTodoRoute = createRoute({
@@ -57,9 +58,9 @@ export const updateTodoRoute = createRoute({
   },
 });
 
-export async function updateTodoHandler(c: AppContext) {
-  const { id } = c.req.valid("param" as never) as { id: number };
-  const { title } = c.req.valid("json" as never) as { title: string };
+export const updateTodoHandler: RouteHandler<typeof updateTodoRoute, AppEnv> = async (c) => {
+  const { id } = c.req.valid("param");
+  const { title } = c.req.valid("json");
   const db = createDatabase(c.env.DATABASE);
   const result = await updateTodo(db, id, title);
 
@@ -68,4 +69,4 @@ export async function updateTodoHandler(c: AppContext) {
   }
 
   return c.json(todoToApi(result.value), 200);
-}
+};

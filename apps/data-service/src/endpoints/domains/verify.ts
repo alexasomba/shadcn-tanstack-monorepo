@@ -1,10 +1,16 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, getDomainByHostname, updateDomainStatus } from "data-ops";
 
-import type { AppContext } from "../../types";
+import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
-import { DomainDetailsSchema, DomainHostnameParamSchema, ErrorSchema } from "./schemas";
+import {
+  DomainDetailsSchema,
+  DomainHostnameParamSchema,
+  ErrorSchema,
+  domainToApi,
+} from "./schemas";
 
 export const verifyDomainRoute = createRoute({
   method: "post",
@@ -58,12 +64,12 @@ export const verifyDomainRoute = createRoute({
   },
 });
 
-export async function verifyDomainHandler(c: AppContext) {
+export const verifyDomainHandler: RouteHandler<typeof verifyDomainRoute, AppEnv> = async (c) => {
   const session = c.get("session") as unknown as { activeOrganizationId?: string | null } | null;
   if (!session || !session.activeOrganizationId) {
     return c.json(
       {
-        success: false,
+        success: false as const,
         error: { code: "UNAUTHORIZED", message: "Active organization required" },
       },
       401,
@@ -71,7 +77,7 @@ export async function verifyDomainHandler(c: AppContext) {
   }
   const organizationId = session.activeOrganizationId;
 
-  const { hostname } = c.req.valid("param" as never) as { hostname: string };
+  const { hostname } = c.req.valid("param");
   const db = createDatabase(c.env.DATABASE);
 
   // 1. Fetch domain from DB to verify ownership
@@ -84,7 +90,7 @@ export async function verifyDomainHandler(c: AppContext) {
   if (domainRow.organizationId !== organizationId) {
     return c.json(
       {
-        success: false,
+        success: false as const,
         error: { code: "FORBIDDEN", message: "Domain does not belong to active organization" },
       },
       403,
@@ -120,7 +126,7 @@ export async function verifyDomainHandler(c: AppContext) {
 
       return c.json(
         {
-          success: false,
+          success: false as const,
           error: {
             code: "PROVIDER_ERROR",
             message: errMessage,
@@ -147,21 +153,5 @@ export async function verifyDomainHandler(c: AppContext) {
     }),
   );
 
-  return c.json(
-    {
-      id: domain.id,
-      hostname: domain.hostname,
-      provider: domain.provider,
-      status: domain.status,
-      records: domain.records,
-      verification: domain.verification,
-      certificate: domain.certificate,
-      issues: domain.issues,
-      createdAt: domain.createdAt
-        ? domain.createdAt.toISOString()
-        : domainRow.createdAt?.toISOString(),
-      updatedAt: domain.updatedAt ? domain.updatedAt.toISOString() : new Date().toISOString(),
-    },
-    200,
-  );
-}
+  return c.json(domainToApi(domain, domainRow.createdAt), 200);
+};

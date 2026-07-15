@@ -1,24 +1,14 @@
-import { z } from "@hono/zod-openapi";
+import { extendZodWithOpenApi } from "@hono/zod-openapi";
+import { TodoSchema as DbTodoSchema, TodoCreateSchema as DbTodoCreateSchema } from "data-ops";
+import { z } from "zod";
 
-export const TodoSchema = z
-  .object({
-    id: z.number().int().openapi({ example: 1 }),
-    title: z.string().openapi({ example: "Buy milk" }),
-    createdAt: z.string().datetime().openapi({ example: "2026-07-10T15:50:00.000Z" }),
-  })
-  .openapi("Todo");
+extendZodWithOpenApi(z);
 
-export const TodoCreateSchema = z
-  .object({
-    title: z.string().min(1).openapi({ example: "Buy milk" }),
-  })
-  .openapi("TodoCreate");
+export const TodoSchema = DbTodoSchema.openapi("Todo");
 
-export const TodoUpdateSchema = z
-  .object({
-    title: z.string().min(1).openapi({ example: "Buy oat milk" }),
-  })
-  .openapi("TodoUpdate");
+export const TodoCreateSchema = DbTodoCreateSchema.openapi("TodoCreate");
+
+export const TodoUpdateSchema = DbTodoCreateSchema.openapi("TodoUpdate");
 
 export const TodoIdParamSchema = z.object({
   id: z.coerce

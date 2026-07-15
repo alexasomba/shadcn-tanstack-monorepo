@@ -64,6 +64,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "recharts": "catalog:",
+    "sonner": "catalog:",
     "streamdown": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",

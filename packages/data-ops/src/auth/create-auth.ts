@@ -1,9 +1,9 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { betterAuth } from "better-auth";
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 
-import * as authSchema from "../auth-schema";
 import type { Database } from "../database/setup";
+import * as authSchema from "../drizzle/schema/auth";
 import { createMailerFromEnv } from "../email/mailer";
 import type { Mailer } from "../email/mailer";
 import { createBaseAuthPlugins } from "./plugins";

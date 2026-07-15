@@ -35,16 +35,21 @@ import { Route as ProtectedReferralsRouteImport } from './routes/_protected/refe
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as ProtectedCrmIndexRouteImport } from './routes/_protected/crm.index'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
 import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedCrmObjectKeyRouteImport } from './routes/_protected/crm.$objectKey'
 import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
 import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
 import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
 import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
+import { Route as ProtectedCrmDealsIdRouteImport } from './routes/_protected/crm.deals.$id'
+import { Route as ProtectedCrmContactsIdRouteImport } from './routes/_protected/crm.contacts.$id'
+import { Route as ProtectedCrmCompaniesCompanyIdRouteImport } from './routes/_protected/crm.companies.$companyId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -175,6 +180,11 @@ const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
   path: '/demo/guitars/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedCrmIndexRoute = ProtectedCrmIndexRouteImport.update({
+  id: '/crm/',
+  path: '/crm/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
   id: '/demo/sentry/testing',
   path: '/demo/sentry/testing',
@@ -199,6 +209,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedCrmObjectKeyRoute = ProtectedCrmObjectKeyRouteImport.update({
+  id: '/crm/$objectKey',
+  path: '/crm/$objectKey',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
   id: '/demo/api/ai/tts',
@@ -225,6 +240,22 @@ const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
   path: '/demo/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedCrmDealsIdRoute = ProtectedCrmDealsIdRouteImport.update({
+  id: '/crm/deals/$id',
+  path: '/crm/deals/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCrmContactsIdRoute = ProtectedCrmContactsIdRouteImport.update({
+  id: '/crm/contacts/$id',
+  path: '/crm/contacts/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCrmCompaniesCompanyIdRoute =
+  ProtectedCrmCompaniesCompanyIdRouteImport.update({
+    id: '/crm/companies/$companyId',
+    path: '/crm/companies/$companyId',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -251,12 +282,17 @@ export interface FileRoutesByFullPath {
   '/schedule/': typeof ScheduleIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
+  '/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/crm/': typeof ProtectedCrmIndexRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/crm/companies/$companyId': typeof ProtectedCrmCompaniesCompanyIdRoute
+  '/crm/contacts/$id': typeof ProtectedCrmContactsIdRoute
+  '/crm/deals/$id': typeof ProtectedCrmDealsIdRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -288,12 +324,17 @@ export interface FileRoutesByTo {
   '/schedule': typeof ScheduleIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/talks': typeof TalksIndexRoute
+  '/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/crm': typeof ProtectedCrmIndexRoute
   '/demo/guitars': typeof DemoGuitarsIndexRoute
+  '/crm/companies/$companyId': typeof ProtectedCrmCompaniesCompanyIdRoute
+  '/crm/contacts/$id': typeof ProtectedCrmContactsIdRoute
+  '/crm/deals/$id': typeof ProtectedCrmDealsIdRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -327,12 +368,17 @@ export interface FileRoutesById {
   '/schedule/': typeof ScheduleIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
+  '/_protected/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/_protected/crm/': typeof ProtectedCrmIndexRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/_protected/crm/companies/$companyId': typeof ProtectedCrmCompaniesCompanyIdRoute
+  '/_protected/crm/contacts/$id': typeof ProtectedCrmContactsIdRoute
+  '/_protected/crm/deals/$id': typeof ProtectedCrmDealsIdRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -366,12 +412,17 @@ export interface FileRouteTypes {
     | '/schedule/'
     | '/speakers/'
     | '/talks/'
+    | '/crm/$objectKey'
     | '/api/auth/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
     | '/demo/sentry/testing'
+    | '/crm/'
     | '/demo/guitars/'
+    | '/crm/companies/$companyId'
+    | '/crm/contacts/$id'
+    | '/crm/deals/$id'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -403,12 +454,17 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/speakers'
     | '/talks'
+    | '/crm/$objectKey'
     | '/api/auth/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
     | '/demo/sentry/testing'
+    | '/crm'
     | '/demo/guitars'
+    | '/crm/companies/$companyId'
+    | '/crm/contacts/$id'
+    | '/crm/deals/$id'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -441,12 +497,17 @@ export interface FileRouteTypes {
     | '/schedule/'
     | '/speakers/'
     | '/talks/'
+    | '/_protected/crm/$objectKey'
     | '/api/auth/$'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
     | '/demo/sentry/testing'
+    | '/_protected/crm/'
     | '/demo/guitars/'
+    | '/_protected/crm/companies/$companyId'
+    | '/_protected/crm/contacts/$id'
+    | '/_protected/crm/deals/$id'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -673,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoGuitarsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/crm/': {
+      id: '/_protected/crm/'
+      path: '/crm'
+      fullPath: '/crm/'
+      preLoaderRoute: typeof ProtectedCrmIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/demo/sentry/testing': {
       id: '/demo/sentry/testing'
       path: '/demo/sentry/testing'
@@ -707,6 +775,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/crm/$objectKey': {
+      id: '/_protected/crm/$objectKey'
+      path: '/crm/$objectKey'
+      fullPath: '/crm/$objectKey'
+      preLoaderRoute: typeof ProtectedCrmObjectKeyRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/demo/api/ai/tts': {
       id: '/demo/api/ai/tts'
@@ -743,6 +818,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/crm/deals/$id': {
+      id: '/_protected/crm/deals/$id'
+      path: '/crm/deals/$id'
+      fullPath: '/crm/deals/$id'
+      preLoaderRoute: typeof ProtectedCrmDealsIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/crm/contacts/$id': {
+      id: '/_protected/crm/contacts/$id'
+      path: '/crm/contacts/$id'
+      fullPath: '/crm/contacts/$id'
+      preLoaderRoute: typeof ProtectedCrmContactsIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/crm/companies/$companyId': {
+      id: '/_protected/crm/companies/$companyId'
+      path: '/crm/companies/$companyId'
+      fullPath: '/crm/companies/$companyId'
+      preLoaderRoute: typeof ProtectedCrmCompaniesCompanyIdRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
 
@@ -751,6 +847,11 @@ interface ProtectedRouteChildren {
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedReferralsRoute: typeof ProtectedReferralsRoute
   ProtectedUsersRoute: typeof ProtectedUsersRoute
+  ProtectedCrmObjectKeyRoute: typeof ProtectedCrmObjectKeyRoute
+  ProtectedCrmIndexRoute: typeof ProtectedCrmIndexRoute
+  ProtectedCrmCompaniesCompanyIdRoute: typeof ProtectedCrmCompaniesCompanyIdRoute
+  ProtectedCrmContactsIdRoute: typeof ProtectedCrmContactsIdRoute
+  ProtectedCrmDealsIdRoute: typeof ProtectedCrmDealsIdRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
@@ -758,6 +859,11 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedReferralsRoute: ProtectedReferralsRoute,
   ProtectedUsersRoute: ProtectedUsersRoute,
+  ProtectedCrmObjectKeyRoute: ProtectedCrmObjectKeyRoute,
+  ProtectedCrmIndexRoute: ProtectedCrmIndexRoute,
+  ProtectedCrmCompaniesCompanyIdRoute: ProtectedCrmCompaniesCompanyIdRoute,
+  ProtectedCrmContactsIdRoute: ProtectedCrmContactsIdRoute,
+  ProtectedCrmDealsIdRoute: ProtectedCrmDealsIdRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(

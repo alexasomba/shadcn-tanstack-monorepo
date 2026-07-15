@@ -1,15 +1,10 @@
-import { asc, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { Database } from "../database/setup";
-import { outboxEvents } from "../schema";
+import { outboxEvents } from "../drizzle/schema/core";
+import type { DbOutboxEvent } from "../drizzle/schema/core";
 
-export type OutboxEventRow = {
-  id: number;
-  type: string;
-  payload: string;
-  createdAt: Date | null;
-  processedAt: Date | null;
-};
+export type OutboxEventRow = DbOutboxEvent;
 
 export async function enqueueOutboxEvent(
   db: Database,
@@ -32,8 +27,8 @@ export async function listPendingOutboxEvents(
   limit = 50,
 ): Promise<Array<OutboxEventRow>> {
   return db.query.outboxEvents.findMany({
-    where: isNull(outboxEvents.processedAt),
-    orderBy: [asc(outboxEvents.createdAt)],
+    where: { processedAt: { isNull: true } },
+    orderBy: (t, { asc }) => [asc(t.createdAt)],
     limit,
   });
 }

@@ -125,17 +125,23 @@ function createMockD1(dbPath = ":memory:"): D1Database {
 /** Helper to bootstrap test database schemas from SQL migrations */
 async function setupTestDb() {
   const d1 = createMockD1();
-  const migrationsDir = path.resolve(__dirname, "../../../packages/data-ops/src/drizzle");
+  const migrationsDir = path.resolve(
+    __dirname,
+    "../../../packages/data-ops/src/drizzle/migrations",
+  );
 
-  // Apply all sql files sequentially
-  const files = fs
+  // Apply all sql files sequentially from nested directories
+  const dirs = fs
     .readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
+    .filter((d) => fs.statSync(path.join(migrationsDir, d)).isDirectory())
     .sort();
 
-  for (const file of files) {
-    const sql = fs.readFileSync(path.join(migrationsDir, file), "utf8");
-    await d1.exec(sql);
+  for (const dir of dirs) {
+    const migrationFile = path.join(migrationsDir, dir, "migration.sql");
+    if (fs.existsSync(migrationFile)) {
+      const sql = fs.readFileSync(migrationFile, "utf8");
+      await d1.exec(sql);
+    }
   }
   return d1;
 }

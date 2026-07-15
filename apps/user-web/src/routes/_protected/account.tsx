@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
   Card,
   CardContent,
@@ -13,7 +14,6 @@ import { AuthInboxButton } from "#/components/auth/AuthInboxButton";
 import { ReferralCard } from "#/components/auth/ReferralCard";
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";
-import { ButtonLink } from "#/components/ui/button-link";
 import { authClient } from "#/lib/auth-client";
 
 export const Route = createFileRoute("/_protected/account")({

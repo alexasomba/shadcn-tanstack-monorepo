@@ -1,5 +1,7 @@
-export * from "./schema";
-export * from "./auth-schema";
+export * from "./drizzle/schema/core";
+export * from "./drizzle/schema/auth";
+export * from "./drizzle/schema/ecommerce";
+export * from "./drizzle/schema/crm";
 export * from "drizzle-orm";
 export {
   createDatabase,
@@ -54,7 +56,7 @@ export {
   type Todo,
   type TodoCreate,
   type TodoUpdate,
-} from "./zod-schema/todos";
+} from "./zod/schema/todos";
 export {
   createConsoleMailer,
   createResendMailer,
@@ -77,4 +79,9 @@ export {
   DomainCreateSchema,
   type Domain,
   type DomainCreate,
-} from "./zod-schema/domains";
+} from "./zod/schema/domains";
+
+// --- CRM Platform Schemas & Queries ---
+export * from "./zod/schema/crm-platform";
+export * from "./queries/crm-workspace";
+export * from "./queries/admin-audit";

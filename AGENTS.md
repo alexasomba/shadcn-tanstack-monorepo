@@ -44,3 +44,10 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - **Flow**: Red-Green-Refactor before implementation.
 - **Coverage**: Acceptance + failure paths on public interfaces; Cloudflare integration via Miniflare or `wrangler dev`.
 - **Skills**: `tdd`.
+
+## Drizzle ORM & Hono OpenAPI Type Safety
+
+- **OpenAPI Schema Composition**: Do not directly cast Drizzle-Zod schemas for route schemas. Instead, compose them cleanly using `.shape`: `z.object(DbSchemaFromOps.shape).openapi("Name")`. This preserves OpenAPI metadata and prevents complex internal type mismatches.
+- **DRY Types**: Avoid duplicating schema structures into TypeScript interfaces. Always use `z.infer<typeof Schema>` to keep types and validations in sync.
+- **Strict Response Signatures**: Avoid status code unions in RouteHandler return types. Use explicit conditional blocks and return manual error responses with `success: false as const` to satisfy the strict `z.literal(false)` constraint of `ErrorSchema`.
+- **Centralized Database Types**: Define and export inferred database types centrally in `schema.ts` using `InferSelectModel`/`InferInsertModel`. Query helper files and other packages must import and reuse these models (e.g. `DbTodo`, `DbDomain`, `DbOutboxEvent`) rather than repeating legacy `typeof table.$inferSelect` casts.

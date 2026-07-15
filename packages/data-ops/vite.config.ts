@@ -8,8 +8,8 @@ export default defineConfig({
   pack: {
     entry: [
       "src/index.ts",
-      "src/schema.ts",
-      "src/auth-schema.ts",
+      "src/drizzle/schema/schema.ts",
+      "src/drizzle/schema/auth.ts",
       "src/database/setup.ts",
       "src/auth/create-auth.ts",
       "src/auth/plugins.ts",
@@ -20,7 +20,9 @@ export default defineConfig({
       "src/queries/todos.ts",
       "src/queries/referrals.ts",
       "src/queries/outbox.ts",
-      "src/zod-schema/todos.ts",
+      "src/zod/schema/todos.ts",
+      "src/zod/schema/domains.ts",
+      "src/zod/schema/crm-platform.ts",
       "src/seo/discovery.ts",
     ],
     dts: true,
