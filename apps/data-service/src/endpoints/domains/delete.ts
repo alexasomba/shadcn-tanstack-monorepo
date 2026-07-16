@@ -1,9 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, deleteDomain, getDomainByHostname } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
 import { DomainHostnameParamSchema, ErrorSchema, SuccessResponseSchema } from "./schemas";
@@ -79,9 +79,7 @@ export const deleteDomainHandler: RouteHandler<typeof deleteDomainRoute, AppEnv>
   // 1. Fetch domain from DB to verify ownership
   const dbResult = await getDomainByHostname(db, hostname);
   if (Result.isError(dbResult)) {
-    if (dbResult.error._tag === "DatabaseError") {
-      Sentry.captureException(dbResult.error);
-    }
+    captureResultError(dbResult.error, { operation: "domains.delete" });
     return c.json(appErrorBody(dbResult.error), appErrorStatus(dbResult.error) as 404 | 500);
   }
 
@@ -133,9 +131,7 @@ export const deleteDomainHandler: RouteHandler<typeof deleteDomainRoute, AppEnv>
   // 3. Delete from DB
   const deleteResult = await deleteDomain(db, hostname);
   if (Result.isError(deleteResult)) {
-    if (deleteResult.error._tag === "DatabaseError") {
-      Sentry.captureException(deleteResult.error);
-    }
+    captureResultError(deleteResult.error, { operation: "domains.delete" });
     console.error(
       JSON.stringify({
         message: "Failed to delete custom domain from database",

@@ -17,6 +17,9 @@ export interface PricingTier {
   buttonText: string;
   isHighlighted?: boolean;
   features: PricingFeature[];
+  /** Optional plan keys for checkout (monthly / yearly). */
+  monthlyPlanName?: string;
+  yearlyPlanName?: string;
 }
 
 export interface Pricing2Props {
@@ -26,6 +29,13 @@ export interface Pricing2Props {
   monthlyLabel?: string;
   discountText?: string;
   tiers?: PricingTier[];
+  /**
+   * When set, tier CTAs call this with the selected plan name (and period).
+   * Prefer over bare buttons for real checkout wiring.
+   */
+  onSelectPlan?: (plan: { tierId: string; planName: string; isMonthly: boolean }) => void;
+  /** Disable all CTAs (e.g. while checkout is in flight). */
+  selecting?: boolean;
 }
 
 const defaultTiers: PricingTier[] = [
@@ -96,6 +106,8 @@ export default function Pricing2({
   monthlyLabel = "Pay Monthly",
   discountText = "Save 20%",
   tiers = defaultTiers,
+  onSelectPlan,
+  selecting = false,
 }: Pricing2Props) {
   const [isMonthly, setIsMonthly] = useState(true);
 
@@ -205,6 +217,18 @@ export default function Pricing2({
                   )}
                   variant={isHighlighted ? "secondary" : "default"}
                   size="lg"
+                  disabled={selecting}
+                  onClick={() => {
+                    if (!onSelectPlan) return;
+                    const planName = isMonthly
+                      ? (tier.monthlyPlanName ?? tier.id)
+                      : (tier.yearlyPlanName ?? tier.monthlyPlanName ?? tier.id);
+                    onSelectPlan({
+                      tierId: tier.id,
+                      planName,
+                      isMonthly,
+                    });
+                  }}
                 >
                   {tier.buttonText}
                 </Button>

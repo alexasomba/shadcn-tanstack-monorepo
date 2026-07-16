@@ -1,10 +1,11 @@
 import * as Sentry from "@sentry/cloudflare";
 
 import type { Bindings } from "../types";
-import { drainOutbox } from "./queue";
+import type { JobMessage } from "./catalog";
+import { drainOutbox } from "./handlers";
 
 /**
- * Cron entry stub. Keep each task short and logged for observability.
+ * Cron entry: drain outbox, then enqueue light product jobs.
  */
 export async function handleScheduled(
   event: ScheduledEvent,
@@ -23,9 +24,20 @@ export async function handleScheduled(
     { scheduledTime, cron: event.cron },
   );
 
-  // Optional: enqueue a queue job for heavier work
   if (env.JOBS_QUEUE) {
-    await env.JOBS_QUEUE.send({ type: "ping", at: scheduledTime });
+    const jobs: Array<JobMessage> = [
+      { type: "ping", at: scheduledTime },
+      { type: "billing.reconcile" },
+      {
+        type: "analytics.track",
+        event: "cron.tick",
+        properties: { cron: event.cron, scheduledTime },
+        at: scheduledTime,
+      },
+    ];
+    for (const job of jobs) {
+      await env.JOBS_QUEUE.send(job);
+    }
   }
 }
 

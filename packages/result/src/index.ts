@@ -37,4 +37,13 @@ export {
   type AppError,
 } from "./errors";
 
-export { unwrapResult, appErrorStatus, appErrorCode, appErrorBody, tryAsync } from "./unwrap";
+export {
+  unwrapResult,
+  unwrapResultWithCapture,
+  isReportableServerError,
+  appErrorStatus,
+  appErrorCode,
+  appErrorBody,
+  tryAsync,
+  type ResultErrorCaptureContext,
+} from "./unwrap";

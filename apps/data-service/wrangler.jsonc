@@ -54,14 +54,10 @@
       "bucket_name": "app-bucket",
     },
   ],
-  "vars": {
-    "ONESIGNAL_APP_ID": "",
-    "ONESIGNAL_API_KEY": "",
-    "DISCORD_WEBHOOK_URL": "",
-    "CLOUDFLARE_API_TOKEN": "",
-    "CLOUDFLARE_ZONE_ID": "",
-    "CLOUDFLARE_CNAME_TARGET": "",
-  },
+  // Secrets (ONESIGNAL_API_KEY, CLOUDFLARE_API_TOKEN, DISCORD_WEBHOOK_URL): .dev.vars or
+  // `wrangler secret put` — do not put empty secret keys in vars (they override secrets).
+  // Non-secret examples: ONESIGNAL_APP_ID, CLOUDFLARE_ZONE_ID, CLOUDFLARE_CNAME_TARGET, DOMAIN_SDK_MODE.
+  // Full list: env.example
   "workflows": [
     {
       "name": "user-onboarding-workflow",

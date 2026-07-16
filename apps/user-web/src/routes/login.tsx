@@ -17,6 +17,7 @@ import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";
 import { authClient } from "#/lib/auth-client";
 import { getSession } from "#/lib/auth.functions";
+import { stashAuthRedirect } from "#/lib/security.queries";
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),
@@ -33,9 +34,13 @@ export const Route = createFileRoute("/login")({
     }
   },
   component: LoginPage,
-  head: () => ({
-    meta: [{ title: "Sign in — Starter" }],
-  }),
+  head: ({ match }) => {
+    const tenant = match.context.tenant;
+    const brand = tenant?.organizationName ?? "Starter";
+    return {
+      meta: [{ title: `Sign in — ${brand}` }],
+    };
+  },
 });
 
 function normalizeReferralCode(value: string) {
@@ -46,6 +51,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const { redirect: redirectTo, ref: refFromSearch } = Route.useSearch();
+  const { tenant } = Route.useRouteContext();
   const [isSignUp, setIsSignUp] = useState(Boolean(refFromSearch));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -93,6 +99,7 @@ function LoginPage() {
           return;
         }
       } else {
+        stashAuthRedirect(redirectTo);
         const result = await authClient.signIn.email({
           email,
           password,
@@ -100,6 +107,15 @@ function LoginPage() {
         });
         if (result.error) {
           setError(result.error.message || "Sign in failed");
+          return;
+        }
+        // BA twoFactorClient may hard-redirect via twoFactorPage; also handle inline.
+        const data = result.data as { twoFactorRedirect?: boolean } | null | undefined;
+        if (data && data.twoFactorRedirect) {
+          await navigate({
+            to: "/two-factor",
+            search: redirectTo ? { redirect: redirectTo } : {},
+          });
           return;
         }
       }
@@ -123,7 +139,9 @@ function LoginPage() {
             <CardDescription>
               {isSignUp
                 ? "Email and password via Better Auth. Optional referral code on signup."
-                : "Sign in to open your portfolio dashboard"}
+                : tenant
+                  ? `Sign in to ${tenant.organizationName}`
+                  : "Sign in to open your portfolio dashboard"}
             </CardDescription>
           </CardHeader>
           <CardContent>

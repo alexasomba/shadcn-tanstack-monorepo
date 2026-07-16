@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { SettingsStub } from "#/components/app-shell/settings-stub";
+import { SecuritySettingsPanel } from "#/components/security/security-settings-panel";
 
 export const Route = createFileRoute("/_protected/settings/security")({
   component: SecuritySettingsPage,
@@ -10,11 +10,5 @@ export const Route = createFileRoute("/_protected/settings/security")({
 });
 
 function SecuritySettingsPage() {
-  return (
-    <SettingsStub
-      title="Security"
-      description="Two-factor authentication, backup codes, and passkeys."
-      milestone="M11 — Security settings"
-    />
-  );
+  return <SecuritySettingsPanel />;
 }

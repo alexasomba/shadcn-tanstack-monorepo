@@ -15,61 +15,33 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { authClient } from "#/lib/auth-client";
-
-type OrgRow = {
-  id: string;
-  name: string;
-  slug?: string | null;
-};
+import {
+  setActiveOrganization,
+  useActiveOrganization,
+  useOrganizationsList,
+} from "#/lib/organization.queries";
 
 /**
- * Active organization switcher.
- * Lists orgs from Better Auth when available; empty state links to settings (M9).
+ * Active organization switcher using Better Auth reactive hooks
+ * (`useListOrganizations` / `useActiveOrganization`).
  */
 export function OrgSwitcher() {
   const { isMobile } = useSidebar();
-  const [organizations, setOrganizations] = useState<OrgRow[]>([]);
-  const [activeOrgId, setActiveOrgId] = useState<string | null>(null);
+  const listState = useOrganizationsList();
+  const activeState = useActiveOrganization();
+  const [busy, setBusy] = useState(false);
 
-  const refresh = useCallback(async () => {
-    try {
-      const listRes = await authClient.organization.list();
-      const rows = (listRes.data ?? []) as OrgRow[];
-      setOrganizations(rows);
-
-      const full = await authClient.organization.getFullOrganization();
-      const active = full.data as OrgRow | null;
-      setActiveOrgId(active?.id ?? null);
-    } catch (err) {
-      console.error("[OrgSwitcher] refresh failed", err);
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  const activeOrg = organizations.find((o) => o.id === activeOrgId);
+  const organizations = listState.data ?? [];
+  const activeOrg = activeState.data;
   let displayName = "No organization";
   if (activeOrg) {
     displayName = activeOrg.name;
   } else if (organizations.length > 0) {
     displayName = organizations[0].name;
   }
-  const planLabel =
-    activeOrgId !== null ? "Active" : organizations.length > 0 ? "Select org" : "Personal";
-
-  const setActive = async (organizationId: string) => {
-    try {
-      await authClient.organization.setActive({ organizationId });
-      setActiveOrgId(organizationId);
-    } catch (err) {
-      console.error("[OrgSwitcher] setActive failed", err);
-    }
-  };
+  const planLabel = activeOrg ? "Active" : organizations.length > 0 ? "Select org" : "Personal";
 
   return (
     <SidebarMenu>
@@ -107,19 +79,21 @@ export function OrgSwitcher() {
                   No organizations yet
                 </DropdownMenuItem>
               ) : (
-                organizations.map((org) => (
+                organizations.map((org: { id: string; name: string }) => (
                   <DropdownMenuItem
                     key={org.id}
                     className="gap-2 p-2"
+                    disabled={busy}
                     onClick={() => {
-                      void setActive(org.id);
+                      setBusy(true);
+                      void setActiveOrganization(org.id).finally(() => setBusy(false));
                     }}
                   >
                     <div className="flex size-6 items-center justify-center rounded-md border">
                       <BuildingsIcon className="size-3.5" />
                     </div>
                     <span className="truncate">{org.name}</span>
-                    {activeOrgId === org.id ? (
+                    {activeOrg?.id === org.id ? (
                       <span className="ml-auto text-xs text-muted-foreground">Active</span>
                     ) : null}
                   </DropdownMenuItem>

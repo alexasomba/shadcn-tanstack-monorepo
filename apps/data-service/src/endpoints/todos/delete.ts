@@ -1,9 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody } from "@workspace/result";
 import { createDatabase, deleteTodo } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { ErrorSchema, TodoIdParamSchema } from "./schemas";
 
@@ -69,8 +69,8 @@ export const deleteTodoHandler: RouteHandler<typeof deleteTodoRoute, AppEnv> = a
   const result = await deleteTodo(db, id, organizationId);
 
   if (Result.isError(result)) {
+    captureResultError(result.error, { operation: "todos.delete" });
     if (result.error._tag === "DatabaseError") {
-      Sentry.captureException(result.error);
       return c.json(appErrorBody(result.error), 500);
     }
     return c.json(appErrorBody(result.error), 404);

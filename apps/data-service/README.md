@@ -46,9 +46,25 @@ Create the queue once (remote): `wrangler queues create app-jobs`.
 
 Local helpers: `POST /internal/jobs/ping` enqueues a ping when the binding is present.
 
-## Email
+## Notifications
 
-Auth reset/verify uses `createMailerFromEnv` from data-ops. Set `RESEND_API_KEY` + `EMAIL_FROM` for Resend; otherwise logs to console.
+**Primary:** better-notify with **OneSignal** (`ONESIGNAL_APP_ID`, `ONESIGNAL_API_KEY` via `.dev.vars` / secrets). Auth verify/reset/invite/OTP and job handlers use `getNotifyClient`.
+
+Without OneSignal credentials, delivery is **dry-run** (mock transport — no provider HTTP, lower CPU ms). Optional Resend (`RESEND_API_KEY` + `EMAIL_FROM`) is only used as onboarding workflow fallback if the notify send throws.
+
+**Custom domains → org slugs:** domain-sdk attaches TLS hostnames; product mapping is **hostname → organization.slug**.
+
+| Host                             | Maps via                   |
+| -------------------------------- | -------------------------- |
+| `{slug}.{PLATFORM_BASE_DOMAIN}`  | org.slug (vanity)          |
+| Custom (e.g. `www.customer.com`) | `domains` row → org → slug |
+
+- Manage: `GET/POST /domains` (API key + domains entitlement; active org session)
+- Resolve traffic: `GET /tenant/resolve?host=` (public, single D1 lookup)
+- Env: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_CNAME_TARGET`, `PLATFORM_BASE_DOMAIN`
+- Local without CF: `DOMAIN_SDK_MODE=memory`
+
+See `env.example`.
 
 ## Dev
 

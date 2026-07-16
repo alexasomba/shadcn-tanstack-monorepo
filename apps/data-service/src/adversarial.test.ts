@@ -32,6 +32,12 @@ vi.mock("data-ops", async (importOriginal) => {
       }
       return original.listDomains(db, orgId);
     },
+    listDomainsWithOrganization: async (db: any, orgId: any, options?: any) => {
+      if (mockListDomainsThrow.value) {
+        throw new Error("Simulated unhandled domain error");
+      }
+      return original.listDomainsWithOrganization(db, orgId, options);
+    },
   };
 });
 
@@ -245,6 +251,20 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         .bind(orgIdB, "Org B", "org-b", Date.now())
         .run();
 
+      // Paid plan required for /domains/* (entitlements gate)
+      for (const [subId, orgId] of [
+        ["sub-a", orgIdA],
+        ["sub-b", orgIdB],
+      ] as const) {
+        await d1
+          .prepare(
+            `INSERT INTO subscription (id, plan, reference_id, status, period_start, period_end)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+          )
+          .bind(subId, "pro", orgId, "active", Date.now(), Date.now() + 86400000)
+          .run();
+      }
+
       // Seed a custom domain belonging to Org A
       await d1
         .prepare(
@@ -260,7 +280,8 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         key: {
           id: "apikey-B",
           referenceId: orgIdB,
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "api-key-B",
         },
       };
@@ -285,7 +306,8 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         key: {
           id: "apikey-B",
           referenceId: orgIdB,
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "api-key-B",
         },
       };
@@ -308,7 +330,8 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         key: {
           id: "apikey-B",
           referenceId: orgIdB,
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "api-key-B",
         },
       };
@@ -332,7 +355,8 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         key: {
           id: "apikey-A",
           referenceId: orgIdA,
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "api-key-A",
         },
       };
@@ -358,7 +382,8 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
         key: {
           id: "apikey-B",
           referenceId: orgIdB, // active organization is Org B
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "api-key-B",
         },
       };
@@ -448,12 +473,27 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
     });
 
     it("4.2 should capture unhandled route execution exceptions and report them to Sentry", async () => {
-      // Simulate an unhandled error during database query or handler execution
+      // Org + paid plan so we pass requireApiKey / requireFeature into the list handler
+      await d1
+        .prepare(
+          "INSERT OR IGNORE INTO organization (id, name, slug, created_at) VALUES (?, ?, ?, ?)",
+        )
+        .bind("org-123", "Sentry Org", "sentry-org", Date.now())
+        .run();
+      await d1
+        .prepare(
+          `INSERT OR IGNORE INTO subscription (id, plan, reference_id, status, period_start, period_end)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+        )
+        .bind("sub-sentry", "pro", "org-123", "active", Date.now(), Date.now() + 86400000)
+        .run();
+
       mockApiKeyResult.value = {
         key: {
           id: "apikey-123",
           referenceId: "org-123",
-          prefix: "test",
+          configId: "organization",
+          prefix: "sk_org_",
           key: "valid-key-but-db-fails",
         },
       };

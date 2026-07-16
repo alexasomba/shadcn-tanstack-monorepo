@@ -12,12 +12,73 @@ import {
 /**
  * Unwrap Ok or throw the Err value.
  * Use inside `createServerFn` handlers after domain work returns Result.
+ *
+ * For Sentry (or other) reporting at the Start edge, prefer
+ * `unwrapResultWithCapture` so 5xx domain errors are captured before throw.
  */
 export function unwrapResult<T, E extends Error>(result: Result<T, E>): T {
   if (Result.isOk(result)) {
     return result.value;
   }
   throw result.error;
+}
+
+export type ResultErrorCaptureContext = {
+  tags?: Record<string, string>;
+  extra?: Record<string, unknown>;
+  /** Route / handler id for grouping (e.g. "todos.list"). */
+  operation?: string;
+};
+
+/**
+ * True when the error should create a Sentry issue (server / unexpected).
+ * Client-expected failures (401/404/400/409) stay as breadcrumbs only.
+ *
+ * Sentry best practice: do not flood Issues with expected domain failures;
+ * still capture unexpected / 5xx Result.err paths that never throw uncaught.
+ */
+export function isReportableServerError(error: AppError | Error): boolean {
+  const status = appErrorStatus(error);
+  if (status >= 500) return true;
+  if (DatabaseError.is(error)) return true;
+  // Untagged plain Error (not a known AppError) — treat as unexpected.
+  if (
+    !UnauthorizedError.is(error) &&
+    !NotFoundError.is(error) &&
+    !ValidationError.is(error) &&
+    !ConflictError.is(error) &&
+    !DatabaseError.is(error)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Unwrap Result, invoking `onError` for reportable failures before rethrow.
+ * Wire `onError` to `Sentry.captureException` at the app boundary.
+ */
+export function unwrapResultWithCapture<T, E extends Error>(
+  result: Result<T, E>,
+  onError: (error: E, context: ResultErrorCaptureContext) => void,
+  context: ResultErrorCaptureContext = {},
+): T {
+  if (Result.isOk(result)) {
+    return result.value;
+  }
+  const error = result.error;
+  if (isReportableServerError(error)) {
+    onError(error, {
+      ...context,
+      tags: {
+        result_boundary: "true",
+        error_code: appErrorCode(error),
+        ...(context.operation ? { operation: context.operation } : {}),
+        ...context.tags,
+      },
+    });
+  }
+  throw error;
 }
 
 /**

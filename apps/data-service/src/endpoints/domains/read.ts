@@ -1,9 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, getDomainByHostname } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
 import {
@@ -84,9 +84,7 @@ export const readDomainHandler: RouteHandler<typeof readDomainRoute, AppEnv> = a
   // 1. Fetch domain from DB to verify ownership
   const dbResult = await getDomainByHostname(db, hostname);
   if (Result.isError(dbResult)) {
-    if (dbResult.error._tag === "DatabaseError") {
-      Sentry.captureException(dbResult.error);
-    }
+    captureResultError(dbResult.error, { operation: "domains.read" });
     return c.json(appErrorBody(dbResult.error), appErrorStatus(dbResult.error) as 404 | 500);
   }
 

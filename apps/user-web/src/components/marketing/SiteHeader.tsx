@@ -1,5 +1,5 @@
 import { ListIcon } from "@phosphor-icons/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -13,9 +13,12 @@ import { useState } from "react";
 
 import ThemeToggle from "#/components/ThemeToggle";
 import { marketingNav } from "#/lib/nav";
+import { tenantBrandLabel } from "#/lib/tenant";
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { tenant } = useRouteContext({ from: "__root__" });
+  const brand = tenantBrandLabel(tenant ?? null);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -28,7 +31,7 @@ export default function SiteHeader() {
           <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary transition group-hover:bg-primary/25">
             <span className="size-2 rounded-full bg-primary" />
           </span>
-          <span className="text-base">Starter</span>
+          <span className="text-base">{brand}</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

@@ -26,7 +26,7 @@ const quickLinks = [
   {
     to: "/settings/organization" as const,
     title: "Organization",
-    description: "Create and switch tenants (M9).",
+    description: "Create, switch, and manage tenants.",
     icon: BuildingsIcon,
   },
   {
@@ -38,13 +38,13 @@ const quickLinks = [
   {
     to: "/settings/api-keys" as const,
     title: "API Keys",
-    description: "Developer keys for data-service (M10).",
+    description: "Create and revoke developer keys for data-service.",
     icon: KeyIcon,
   },
   {
     to: "/settings/security" as const,
     title: "Security",
-    description: "2FA and passkeys (M11).",
+    description: "2FA, backup codes, and passkeys.",
     icon: ShieldCheckIcon,
   },
 ];

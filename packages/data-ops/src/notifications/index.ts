@@ -1,4 +1,5 @@
 import { createNotify, createClient } from "@betternotify/core";
+import { createMockTransport } from "@betternotify/core/transports";
 import { discordChannel, discordTransport } from "@betternotify/discord";
 import { emailChannel } from "@betternotify/email";
 import { onesignalEmailTransport, onesignalPushTransport } from "@betternotify/onesignal";
@@ -104,25 +105,93 @@ export const notificationCatalog = rpc.catalog({
 
 export type NotificationCatalog = typeof notificationCatalog;
 
-export function getNotifyClient(env: {
+export type NotifyEnv = {
   ONESIGNAL_APP_ID?: string;
   ONESIGNAL_API_KEY?: string;
   DISCORD_WEBHOOK_URL?: string;
-}) {
+  /** Force dry-run even when OneSignal is configured (tests). */
+  NOTIFY_DRY_RUN?: string;
+  NODE_ENV?: string;
+  CF_PAGES?: string;
+  VITEST?: string;
+};
+
+function trim(value: string | undefined): string | undefined {
+  const v = value?.trim();
+  return v && v.length > 0 ? v : undefined;
+}
+
+function isProductionLike(env: NotifyEnv): boolean {
+  return env.NODE_ENV === "production" || env.CF_PAGES === "1";
+}
+
+/** True when OneSignal can accept real deliveries (no mock/dry-run). */
+export function hasOnesignalCredentials(env: NotifyEnv): boolean {
+  return Boolean(trim(env.ONESIGNAL_APP_ID) && trim(env.ONESIGNAL_API_KEY));
+}
+
+export type NotifyDeliveryMode = "onesignal" | "dry-run";
+
+/**
+ * Resolve delivery mode without allocating transports.
+ * Prefer dry-run over fake OneSignal keys: zero outbound HTTP → lower CPU ms + no silent failures.
+ */
+export function resolveNotifyMode(env: NotifyEnv): NotifyDeliveryMode {
+  if (trim(env.NOTIFY_DRY_RUN) === "1" || trim(env.NOTIFY_DRY_RUN) === "true") {
+    return "dry-run";
+  }
+  if (trim(env.VITEST) === "true") {
+    return "dry-run";
+  }
+  return hasOnesignalCredentials(env) ? "onesignal" : "dry-run";
+}
+
+/**
+ * Typed notification client.
+ *
+ * **SaaS default:** OneSignal email + push when `ONESIGNAL_APP_ID` + `ONESIGNAL_API_KEY` are set.
+ * Without credentials (or `NOTIFY_DRY_RUN=1`), uses mock transports so auth/signup never
+ * burn Worker CPU on doomed provider calls.
+ */
+export function getNotifyClient(env: NotifyEnv = {}) {
+  const mode = resolveNotifyMode(env);
+  const appId = trim(env.ONESIGNAL_APP_ID);
+  const apiKey = trim(env.ONESIGNAL_API_KEY);
+  const discordUrl = trim(env.DISCORD_WEBHOOK_URL);
+
+  if (mode === "dry-run") {
+    if (isProductionLike(env) && !hasOnesignalCredentials(env)) {
+      console.error(
+        "[notify] ONESIGNAL_APP_ID/ONESIGNAL_API_KEY missing in production — transactional email is dry-run only",
+      );
+    } else {
+      console.info(
+        "[notify] dry-run mode (set ONESIGNAL_APP_ID + ONESIGNAL_API_KEY for live delivery)",
+      );
+    }
+  }
+
+  const mock = () =>
+    createMockTransport({
+      name: "dry-run",
+      reply: () =>
+        ({
+          messageId: `dry-run-${Date.now()}`,
+        }) as never,
+    });
+
   return createClient({
     catalog: notificationCatalog,
     transportsByChannel: {
-      email: onesignalEmailTransport({
-        appId: env.ONESIGNAL_APP_ID || "mock-app-id",
-        apiKey: env.ONESIGNAL_API_KEY || "mock-api-key",
-      }),
-      push: onesignalPushTransport({
-        appId: env.ONESIGNAL_APP_ID || "mock-app-id",
-        apiKey: env.ONESIGNAL_API_KEY || "mock-api-key",
-      }),
-      discord: discordTransport({
-        webhookUrl: env.DISCORD_WEBHOOK_URL || "https://discord.com/api/webhooks/mock",
-      }),
+      email:
+        mode === "onesignal" && appId && apiKey
+          ? onesignalEmailTransport({ appId, apiKey })
+          : mock(),
+      push:
+        mode === "onesignal" && appId && apiKey
+          ? onesignalPushTransport({ appId, apiKey })
+          : mock(),
+      discord: discordUrl ? discordTransport({ webhookUrl: discordUrl }) : mock(),
     },
   });
 }

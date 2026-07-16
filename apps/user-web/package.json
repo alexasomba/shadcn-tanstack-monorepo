@@ -20,6 +20,8 @@
     "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
   },
   "dependencies": {
+    "@alexasomba/better-auth-paystack": "^3.0.0",
+    "@better-auth/api-key": "1.7.0-rc.1",
     "@better-auth/drizzle-adapter": "catalog:",
     "@better-auth/passkey": "catalog:",
     "@cloudflare/tanstack-ai": "catalog:",
@@ -63,6 +65,7 @@
     "highlight.js": "catalog:",
     "hono": "catalog:",
     "marked": "catalog:",
+    "qrcode.react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-icons": "catalog:",

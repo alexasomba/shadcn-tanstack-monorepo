@@ -15,13 +15,34 @@ export const domainsApp = new OpenAPIHono<AppEnv>();
 
 let cachedTestingProvider: DomainProvider | null = null;
 
-/** Helper to instantiate the domain client with either Cloudflare or mock testing provider. */
-export function getDomainSdkClient(env: Bindings) {
-  const token = env.CLOUDFLARE_API_TOKEN;
-  const zoneId = env.CLOUDFLARE_ZONE_ID;
-  const cnameTarget = env.CLOUDFLARE_CNAME_TARGET || "cname.ourplatform.com";
+function trim(value: string | undefined): string | undefined {
+  const v = value?.trim();
+  return v && v.length > 0 ? v : undefined;
+}
 
-  if (token && zoneId && token.trim() !== "" && zoneId.trim() !== "") {
+function isProductionLike(_env: Bindings): boolean {
+  try {
+    const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
+    return proc?.env?.NODE_ENV === "production" || proc?.env?.CF_PAGES === "1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Domain SDK client.
+ *
+ * Live: Cloudflare for SaaS when token + zone are set (secrets via wrangler secret / .dev.vars).
+ * Memory: only when `DOMAIN_SDK_MODE=memory` or non-production without credentials.
+ * Never silently use memory in production — that hides misconfiguration.
+ */
+export function getDomainSdkClient(env: Bindings) {
+  const token = trim(env.CLOUDFLARE_API_TOKEN);
+  const zoneId = trim(env.CLOUDFLARE_ZONE_ID);
+  const cnameTarget = trim(env.CLOUDFLARE_CNAME_TARGET) || "cname.ourplatform.com";
+  const forceMemory = trim(env.DOMAIN_SDK_MODE) === "memory";
+
+  if (!forceMemory && token && zoneId) {
     return createDomainClient({
       provider: cloudflareSaaS({
         apiToken: token,
@@ -31,13 +52,18 @@ export function getDomainSdkClient(env: Bindings) {
     });
   }
 
-  if (!cachedTestingProvider) {
-    cachedTestingProvider = memoryProvider();
+  if (forceMemory || !isProductionLike(env)) {
+    if (!cachedTestingProvider) {
+      cachedTestingProvider = memoryProvider();
+    }
+    return createDomainClient({
+      provider: cachedTestingProvider,
+    });
   }
 
-  return createDomainClient({
-    provider: cachedTestingProvider,
-  });
+  throw new Error(
+    "Custom domains require CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID (or DOMAIN_SDK_MODE=memory for tests)",
+  );
 }
 
 domainsApp.openapi(listDomainsRoute, listDomainsHandler);

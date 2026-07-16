@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { SettingsStub } from "#/components/app-shell/settings-stub";
+import { MembersSettingsPanel } from "#/components/organization/members-settings-panel";
 
 export const Route = createFileRoute("/_protected/settings/members")({
   component: MembersSettingsPage,
@@ -10,11 +10,6 @@ export const Route = createFileRoute("/_protected/settings/members")({
 });
 
 function MembersSettingsPage() {
-  return (
-    <SettingsStub
-      title="Members"
-      description="Invite teammates, manage roles, and remove members."
-      milestone="M9 — Organization management UI"
-    />
-  );
+  const { user } = Route.useRouteContext();
+  return <MembersSettingsPanel userId={user.id} />;
 }

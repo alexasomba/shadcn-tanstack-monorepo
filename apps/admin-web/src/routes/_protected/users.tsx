@@ -4,11 +4,13 @@ import {
   CheckCircleIcon,
   UserSwitchIcon,
   ShieldCheckIcon,
+  ArrowRightIcon,
 } from "@phosphor-icons/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
   Card,
   CardContent,
@@ -26,8 +28,17 @@ import {
   TableRow,
 } from "@workspace/ui/components/table";
 import { useState } from "react";
+import type { FormEvent } from "react";
 
-import { authClient } from "#/lib/auth-client";
+import {
+  banAdminUser,
+  createAdminUser,
+  impersonateAdminUser,
+  listAdminUsers,
+  setAdminUserRole,
+  unbanAdminUser,
+} from "#/lib/admin.queries";
+import type { AdminUser } from "#/lib/admin.queries";
 
 export const Route = createFileRoute("/_protected/users")({
   component: UsersAdminPage,
@@ -36,16 +47,6 @@ export const Route = createFileRoute("/_protected/users")({
   }),
 });
 
-type AdminUser = {
-  id: string;
-  name: string;
-  email: string;
-  role?: string | null;
-  banned?: boolean | null;
-  banReason?: string | null;
-  createdAt?: Date | string;
-};
-
 const PAGE_SIZE = 20;
 
 function UsersAdminPage() {
@@ -53,70 +54,40 @@ function UsersAdminPage() {
   const [offset, setOffset] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const [searchField, setSearchField] = useState<"email" | "name">("email");
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [createName, setCreateName] = useState("");
+  const [createEmail, setCreateEmail] = useState("");
+  const [createPassword, setCreatePassword] = useState("");
+  const [createRole, setCreateRole] = useState<"user" | "admin">("user");
+  const [createBusy, setCreateBusy] = useState(false);
 
   const {
     data,
     isLoading,
     error: queryError,
-  } = useQuery<{
-    users: AdminUser[];
-    total: number;
-  }>({
-    queryKey: ["admin-users", { offset, search }],
-    queryFn: async () => {
-      const result = await authClient.admin.listUsers({
-        query: {
-          limit: PAGE_SIZE,
-          offset,
-          ...(search.trim()
-            ? {
-                searchValue: search.trim(),
-                searchField: "email" as const,
-                searchOperator: "contains" as const,
-              }
-            : {}),
-          sortBy: "createdAt",
-          sortDirection: "desc" as const,
-        },
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to list users");
-      }
-
-      const listData = result.data as {
-        users?: Array<AdminUser>;
-        total?: number;
-      } | null;
-
-      return {
-        users: listData?.users ?? [],
-        total: listData?.total ?? 0,
-      };
-    },
+  } = useQuery({
+    queryKey: ["admin-users", { offset, search, searchField }],
+    queryFn: () => listAdminUsers({ limit: PAGE_SIZE, offset, search, searchField }),
   });
 
   const users = data?.users ?? [];
   const total = data?.total ?? 0;
   const displayError = queryError ? queryError.message : error;
 
-  const runAction = async (
-    userId: string,
-    action: () => Promise<{ error?: { message?: string } | null }>,
-  ) => {
+  const runAction = async (userId: string, action: () => Promise<unknown>) => {
     setBusyId(userId);
     setError("");
     try {
-      const result = await action();
-      if (result.error) {
-        setError(result.error.message || "Action failed");
-        return;
-      }
+      await action();
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-    } catch {
-      setError("Action failed");
+    } catch (e) {
+      setError(
+        e && typeof e === "object" && "message" in e && typeof e.message === "string"
+          ? String((e as { message: string }).message)
+          : "Action failed",
+      );
     } finally {
       setBusyId(null);
     }
@@ -125,20 +96,109 @@ function UsersAdminPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const currentPage = Math.floor(offset / PAGE_SIZE) + 1;
 
+  const onCreate = async (e: FormEvent) => {
+    e.preventDefault();
+    setCreateBusy(true);
+    setError("");
+    try {
+      await createAdminUser({
+        name: createName.trim(),
+        email: createEmail.trim(),
+        password: createPassword,
+        role: createRole,
+      });
+      setCreateName("");
+      setCreateEmail("");
+      setCreatePassword("");
+      setCreateRole("user");
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (err) {
+      setError(
+        err && typeof err === "object" && "message" in err && typeof err.message === "string"
+          ? String((err as { message: string }).message)
+          : "Create failed",
+      );
+    } finally {
+      setCreateBusy(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
         <p className="text-sm text-muted-foreground">
-          Manage accounts with the Better Auth admin plugin (roles, bans, impersonation).
+          Better Auth{" "}
+          <a
+            href="https://www.better-auth.com/docs/plugins/admin"
+            className="underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            admin plugin
+          </a>
+          : create, roles, bans, sessions, impersonation.
         </p>
       </div>
 
       <Card className="border-border/70">
         <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Create user</CardTitle>
+          <CardDescription>
+            POST /admin/create-user — optional role defaults to <code>user</code>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+            onSubmit={(e) => void onCreate(e)}
+          >
+            <Input
+              placeholder="Name"
+              value={createName}
+              onChange={(e) => setCreateName(e.target.value)}
+              required
+              disabled={createBusy}
+            />
+            <Input
+              type="email"
+              placeholder="Email"
+              value={createEmail}
+              onChange={(e) => setCreateEmail(e.target.value)}
+              required
+              disabled={createBusy}
+            />
+            <Input
+              type="password"
+              placeholder="Password (min 12 in kit)"
+              value={createPassword}
+              onChange={(e) => setCreatePassword(e.target.value)}
+              required
+              minLength={12}
+              disabled={createBusy}
+            />
+            <select
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              value={createRole}
+              onChange={(e) => setCreateRole(e.target.value as "user" | "admin")}
+              disabled={createBusy}
+            >
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+            <Button type="submit" disabled={createBusy}>
+              {createBusy ? "Creating…" : "Create"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/70">
+        <CardHeader className="pb-3">
           <CardTitle className="text-lg">Directory</CardTitle>
           <CardDescription>
-            {total} user{total === 1 ? "" : "s"} · page {currentPage} of {totalPages}
+            {total} user{total === 1 ? "" : "s"} · page {currentPage} of {totalPages} · limit{" "}
+            {PAGE_SIZE}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -155,10 +215,18 @@ function UsersAdminPage() {
               <Input
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search by email…"
+                placeholder={searchField === "email" ? "Search by email…" : "Search by name…"}
                 className="pl-9"
               />
             </div>
+            <select
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value as "email" | "name")}
+            >
+              <option value="email">email</option>
+              <option value="name">name</option>
+            </select>
             <Button type="submit" disabled={isLoading}>
               Search
             </Button>
@@ -194,19 +262,26 @@ function UsersAdminPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  users.map((user) => {
+                  users.map((user: AdminUser) => {
                     const busy = busyId === user.id;
                     const isAdmin = (user.role ?? "").split(",").includes("admin");
                     return (
                       <TableRow key={user.id}>
                         <TableCell>
-                          <div className="min-w-0">
-                            <p className="truncate font-medium">{user.name || "—"}</p>
+                          <Link
+                            to="/users/$userId"
+                            params={{ userId: user.id }}
+                            preload="intent"
+                            className="block min-w-0 no-underline hover:opacity-80"
+                          >
+                            <p className="truncate font-medium text-foreground">
+                              {user.name || "—"}
+                            </p>
                             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                             <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
                               {user.id}
                             </p>
-                          </div>
+                          </Link>
                         </TableCell>
                         <TableCell>
                           <Badge variant={isAdmin ? "default" : "secondary"}>
@@ -222,6 +297,15 @@ function UsersAdminPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex flex-wrap justify-end gap-1">
+                            <ButtonLink
+                              size="sm"
+                              variant="ghost"
+                              to="/users/$userId"
+                              params={{ userId: user.id }}
+                            >
+                              <ArrowRightIcon className="size-4" />
+                              Detail
+                            </ButtonLink>
                             <Button
                               size="sm"
                               variant="outline"
@@ -229,10 +313,7 @@ function UsersAdminPage() {
                               title={isAdmin ? "Demote to user" : "Promote to admin"}
                               onClick={() =>
                                 void runAction(user.id, () =>
-                                  authClient.admin.setRole({
-                                    userId: user.id,
-                                    role: isAdmin ? "user" : "admin",
-                                  }),
+                                  setAdminUserRole(user.id, isAdmin ? "user" : "admin"),
                                 )
                               }
                             >
@@ -246,11 +327,8 @@ function UsersAdminPage() {
                               onClick={() =>
                                 void runAction(user.id, () =>
                                   user.banned
-                                    ? authClient.admin.unbanUser({ userId: user.id })
-                                    : authClient.admin.banUser({
-                                        userId: user.id,
-                                        banReason: "Banned by admin console",
-                                      }),
+                                    ? unbanAdminUser(user.id)
+                                    : banAdminUser(user.id, "Banned by admin console"),
                                 )
                               }
                             >
@@ -267,13 +345,8 @@ function UsersAdminPage() {
                               disabled={busy || Boolean(user.banned)}
                               onClick={() =>
                                 void runAction(user.id, async () => {
-                                  const result = await authClient.admin.impersonateUser({
-                                    userId: user.id,
-                                  });
-                                  if (!result.error) {
-                                    window.location.href = "/dashboard";
-                                  }
-                                  return result;
+                                  await impersonateAdminUser(user.id);
+                                  window.location.href = "/dashboard";
                                 })
                               }
                             >

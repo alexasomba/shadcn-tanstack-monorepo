@@ -1,23 +1,38 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody } from "@workspace/result";
-import { createDatabase, listDomains } from "data-ops";
+import { createDatabase, listDomainsWithOrganization } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
-import { DbDomainSchema, ErrorSchema } from "./schemas";
+import { ErrorSchema } from "./schemas";
+
+const DomainListItemSchema = z
+  .object({
+    id: z.string(),
+    organizationId: z.string(),
+    /** Organization slug this custom domain maps to (product identity). */
+    organizationSlug: z.string(),
+    organizationName: z.string(),
+    hostname: z.string(),
+    status: z.string(),
+    createdAt: z.string(),
+    /** Free platform vanity host when PLATFORM_BASE_DOMAIN is configured. */
+    platformHostname: z.string().nullable(),
+  })
+  .openapi("DomainListItem");
 
 export const listDomainsRoute = createRoute({
   method: "get",
   path: "/",
   tags: ["Domains"],
-  summary: "List all registered custom domains for the organization",
+  summary: "List custom domains for the active organization (each maps to org slug)",
   responses: {
     200: {
-      description: "List of registered domains",
+      description: "List of registered domains with organization slug mapping",
       content: {
         "application/json": {
-          schema: z.array(DbDomainSchema),
+          schema: z.array(DomainListItemSchema),
         },
       },
     },
@@ -54,10 +69,12 @@ export const listDomainsHandler: RouteHandler<typeof listDomainsRoute, AppEnv> =
   const organizationId = session.activeOrganizationId;
 
   const db = createDatabase(c.env.DATABASE);
-  const dbResult = await listDomains(db, organizationId);
+  const dbResult = await listDomainsWithOrganization(db, organizationId, {
+    platformBaseDomain: c.env.PLATFORM_BASE_DOMAIN,
+  });
 
   if (Result.isError(dbResult)) {
-    Sentry.captureException(dbResult.error);
+    captureResultError(dbResult.error, { operation: "domains.list" });
     return c.json(appErrorBody(dbResult.error), 500);
   }
 
@@ -65,9 +82,12 @@ export const listDomainsHandler: RouteHandler<typeof listDomainsRoute, AppEnv> =
     dbResult.value.map((row) => ({
       id: row.id,
       organizationId: row.organizationId,
+      organizationSlug: row.organizationSlug,
+      organizationName: row.organizationName,
       hostname: row.hostname,
       status: row.status,
       createdAt: row.createdAt ? row.createdAt.toISOString() : new Date().toISOString(),
+      platformHostname: row.platformHostname,
     })),
     200,
   );

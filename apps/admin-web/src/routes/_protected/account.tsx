@@ -53,11 +53,13 @@ function AccountPage() {
                 variant="secondary"
                 className="w-full"
                 onClick={() => {
-                  void authClient.admin.stopImpersonating().then((result) => {
-                    if (!result.error) {
-                      window.location.href = "/users";
-                    }
-                  });
+                  void authClient.admin
+                    .stopImpersonating()
+                    .then((result: { error?: { message?: string } | null }) => {
+                      if (!result.error) {
+                        window.location.href = "/users";
+                      }
+                    });
                 }}
               >
                 Stop impersonating

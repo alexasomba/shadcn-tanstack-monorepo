@@ -42,6 +42,7 @@ import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users.$userId'
 import { Route as ProtectedCrmObjectKeyRouteImport } from './routes/_protected/crm.$objectKey'
 import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
@@ -216,6 +217,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedUsersUserIdRoute = ProtectedUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => ProtectedUsersRoute,
+} as any)
 const ProtectedCrmObjectKeyRoute = ProtectedCrmObjectKeyRouteImport.update({
   id: '/crm/$objectKey',
   path: '/crm/$objectKey',
@@ -270,7 +276,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof ProtectedAccountRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/referrals': typeof ProtectedReferralsRoute
-  '/users': typeof ProtectedUsersRoute
+  '/users': typeof ProtectedUsersRouteWithChildren
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
   '/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
+  '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -313,7 +320,7 @@ export interface FileRoutesByTo {
   '/account': typeof ProtectedAccountRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/referrals': typeof ProtectedReferralsRoute
-  '/users': typeof ProtectedUsersRoute
+  '/users': typeof ProtectedUsersRouteWithChildren
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/speakers': typeof SpeakersIndexRoute
   '/talks': typeof TalksIndexRoute
   '/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
+  '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -358,7 +366,7 @@ export interface FileRoutesById {
   '/_protected/account': typeof ProtectedAccountRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/referrals': typeof ProtectedReferralsRoute
-  '/_protected/users': typeof ProtectedUsersRoute
+  '/_protected/users': typeof ProtectedUsersRouteWithChildren
   '/api/remy-chat': typeof ApiRemyChatRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
@@ -377,6 +385,7 @@ export interface FileRoutesById {
   '/speakers/': typeof SpeakersIndexRoute
   '/talks/': typeof TalksIndexRoute
   '/_protected/crm/$objectKey': typeof ProtectedCrmObjectKeyRoute
+  '/_protected/users/$userId': typeof ProtectedUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
   '/demo/form/address': typeof DemoFormAddressRoute
@@ -422,6 +431,7 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/talks/'
     | '/crm/$objectKey'
+    | '/users/$userId'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/talks'
     | '/crm/$objectKey'
+    | '/users/$userId'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -509,6 +520,7 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/talks/'
     | '/_protected/crm/$objectKey'
+    | '/_protected/users/$userId'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
     | '/demo/form/address'
@@ -796,6 +808,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/users/$userId': {
+      id: '/_protected/users/$userId'
+      path: '/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof ProtectedUsersUserIdRouteImport
+      parentRoute: typeof ProtectedUsersRoute
+    }
     '/_protected/crm/$objectKey': {
       id: '/_protected/crm/$objectKey'
       path: '/crm/$objectKey'
@@ -862,11 +881,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProtectedUsersRouteChildren {
+  ProtectedUsersUserIdRoute: typeof ProtectedUsersUserIdRoute
+}
+
+const ProtectedUsersRouteChildren: ProtectedUsersRouteChildren = {
+  ProtectedUsersUserIdRoute: ProtectedUsersUserIdRoute,
+}
+
+const ProtectedUsersRouteWithChildren = ProtectedUsersRoute._addFileChildren(
+  ProtectedUsersRouteChildren,
+)
+
 interface ProtectedRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedReferralsRoute: typeof ProtectedReferralsRoute
-  ProtectedUsersRoute: typeof ProtectedUsersRoute
+  ProtectedUsersRoute: typeof ProtectedUsersRouteWithChildren
   ProtectedCrmObjectKeyRoute: typeof ProtectedCrmObjectKeyRoute
   ProtectedCrmIndexRoute: typeof ProtectedCrmIndexRoute
   ProtectedCrmCompaniesCompanyIdRoute: typeof ProtectedCrmCompaniesCompanyIdRoute
@@ -878,7 +909,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedReferralsRoute: ProtectedReferralsRoute,
-  ProtectedUsersRoute: ProtectedUsersRoute,
+  ProtectedUsersRoute: ProtectedUsersRouteWithChildren,
   ProtectedCrmObjectKeyRoute: ProtectedCrmObjectKeyRoute,
   ProtectedCrmIndexRoute: ProtectedCrmIndexRoute,
   ProtectedCrmCompaniesCompanyIdRoute: ProtectedCrmCompaniesCompanyIdRoute,

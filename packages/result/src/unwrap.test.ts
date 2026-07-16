@@ -9,9 +9,11 @@ import {
   appErrorCode,
   appErrorStatus,
   conflict,
+  isReportableServerError,
   notFound,
   unauthorized,
   unwrapResult,
+  unwrapResultWithCapture,
   validation,
 } from "./index";
 
@@ -56,6 +58,39 @@ describe("appErrorBody", () => {
         message: "Todo '3' not found",
       },
     });
+  });
+});
+
+describe("isReportableServerError", () => {
+  it("reports database and plain errors, not expected 4xx domain errors", () => {
+    expect(isReportableServerError(new DatabaseError({ message: "db" }))).toBe(true);
+    expect(isReportableServerError(new Error("boom"))).toBe(true);
+    expect(isReportableServerError(notFound("Todo", 1))).toBe(false);
+    expect(isReportableServerError(validation("bad"))).toBe(false);
+    expect(isReportableServerError(unauthorized())).toBe(false);
+    expect(isReportableServerError(conflict())).toBe(false);
+  });
+});
+
+describe("unwrapResultWithCapture", () => {
+  it("captures reportable errors before throw", () => {
+    const seen: Array<Error> = [];
+    expect(() =>
+      unwrapResultWithCapture(Result.err(new DatabaseError({ message: "db" })), (e) => {
+        seen.push(e);
+      }),
+    ).toThrow(DatabaseError);
+    expect(seen).toHaveLength(1);
+  });
+
+  it("does not capture not-found before throw", () => {
+    const seen: Array<Error> = [];
+    expect(() =>
+      unwrapResultWithCapture(Result.err(notFound("Todo", 1)), (e) => {
+        seen.push(e);
+      }),
+    ).toThrow(NotFoundError);
+    expect(seen).toHaveLength(0);
   });
 });
 

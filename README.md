@@ -160,7 +160,7 @@ vpr db:migrate:local # apply to local D1 (user-web persist path)
 
 After adding plugins: `auth:generate` → `db:generate` → `db:migrate:*`.
 
-**Mailer:** `createMailerFromEnv` (console by default; Resend when `RESEND_API_KEY` + `EMAIL_FROM` set).
+**Notifications (primary):** better-notify → **OneSignal** (`ONESIGNAL_APP_ID` + `ONESIGNAL_API_KEY` on Workers that send). Without keys, dry-run mock transports (no outbound HTTP). In-app: better-inbox (`createInboxNotification` + `<InboxButton />`). Optional Resend only as workflow fallback (`RESEND_API_KEY` + `EMAIL_FROM`). See `apps/*/env.example`.
 
 **data-ops pack:** `pnpm --filter data-ops build` runs `vp pack` → `dist/` (source exports remain for monorepo DX).
 

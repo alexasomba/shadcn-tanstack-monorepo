@@ -48,6 +48,12 @@ export const DomainDetailsSchema = z
     issues: z.array(DomainIssueSchema),
     createdAt: z.string().optional().openapi({ example: "2026-07-10T15:50:00.000Z" }),
     updatedAt: z.string().optional().openapi({ example: "2026-07-10T15:50:00.000Z" }),
+    /** Active org that owns this custom domain (session). */
+    organizationId: z.string().optional().openapi({ example: "org_123" }),
+    /** Product identity: custom host maps to this organization slug. */
+    organizationSlug: z.string().optional().openapi({ example: "acme" }),
+    /** Free vanity host when PLATFORM_BASE_DOMAIN is set: `{slug}.{base}`. */
+    platformHostname: z.string().optional().openapi({ example: "acme.app.example.com" }),
   })
   .openapi("DomainDetails");
 

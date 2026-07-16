@@ -25,8 +25,9 @@ vi.mock("./auth.js", async (importOriginal) => {
               return {
                 key: {
                   id: "key-123",
-                  referenceId: "org-123", // Matches organizationId for domains
-                  prefix: "test",
+                  referenceId: "org-123", // org-scoped key → activeOrganizationId
+                  configId: "organization",
+                  prefix: "sk_org_",
                   key: "test-api-key",
                 },
               };
@@ -140,16 +141,28 @@ describe("Custom Domain Management API", () => {
     const d1 = await setupTestDb();
     const orgId = "org-123";
 
-    // 1. Seed mock organization
+    // Seed organization (slug is product identity custom domains map to)
     await d1
       .prepare("INSERT INTO organization (id, name, slug, created_at) VALUES (?, ?, ?, ?)")
       .bind(orgId, "Test Org", "test-org", Date.now())
+      .run();
+
+    // Domains are a paid feature — seed active pro subscription for org-123
+    await d1
+      .prepare(
+        `INSERT INTO subscription (
+          id, plan, reference_id, status, period_start, period_end
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind("sub-1", "pro", orgId, "active", Date.now(), Date.now() + 86400000)
       .run();
 
     const env = {
       DATABASE: d1,
       BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
       BETTER_AUTH_URL: "http://localhost",
+      PLATFORM_BASE_DOMAIN: "app.example.com",
+      DOMAIN_SDK_MODE: "memory",
     };
 
     const testHeaders = new Headers({
@@ -172,8 +185,10 @@ describe("Custom Domain Management API", () => {
     expect(domainDetails.hostname).toBe("test.customer.com");
     expect(domainDetails.status).toMatch(/^pending/);
     expect(domainDetails.records.length).toBeGreaterThan(0);
+    expect(domainDetails.organizationSlug).toBe("test-org");
+    expect(domainDetails.platformHostname).toBe("test-org.app.example.com");
 
-    // 2. List domains
+    // 2. List domains (includes org slug mapping)
     const listRes = await worker.fetch(
       new Request("http://localhost/domains", {
         method: "GET",
@@ -186,6 +201,8 @@ describe("Custom Domain Management API", () => {
     const domainList = (await listRes.json()) as Array<any>;
     expect(domainList.length).toBe(1);
     expect(domainList[0].hostname).toBe("test.customer.com");
+    expect(domainList[0].organizationSlug).toBe("test-org");
+    expect(domainList[0].platformHostname).toBe("test-org.app.example.com");
 
     // 3. Read domain details
     const readRes = await worker.fetch(
@@ -240,5 +257,70 @@ describe("Custom Domain Management API", () => {
 
     expect(listEmptyRes.status).toBe(200);
     expect((await listEmptyRes.json()) as Array<any>).toEqual([]);
+  });
+
+  it("resolves platform subdomain and active custom domain to organization slug", async () => {
+    const d1 = await setupTestDb();
+    const orgId = "org-resolve";
+    const slug = "acme";
+
+    await d1
+      .prepare("INSERT INTO organization (id, name, slug, created_at) VALUES (?, ?, ?, ?)")
+      .bind(orgId, "Acme Co", slug, Date.now())
+      .run();
+
+    // Platform vanity: {slug}.PLATFORM_BASE_DOMAIN (no domains row needed)
+    const vanityRes = await worker.fetch(
+      new Request("http://localhost/tenant/resolve?host=acme.app.example.com"),
+      {
+        DATABASE: d1,
+        PLATFORM_BASE_DOMAIN: "app.example.com",
+        BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
+        BETTER_AUTH_URL: "http://localhost",
+      },
+    );
+    expect(vanityRes.status).toBe(200);
+    const vanity = (await vanityRes.json()) as any;
+    expect(vanity.organizationSlug).toBe("acme");
+    expect(vanity.match).toBe("platform_subdomain");
+
+    // Custom domain only resolves when status=active
+    await d1
+      .prepare(
+        "INSERT INTO domains (id, organization_id, hostname, status, created_at) VALUES (?, ?, ?, ?, ?)",
+      )
+      .bind("dom-1", orgId, "www.customer.com", "pending", Date.now())
+      .run();
+
+    const pendingRes = await worker.fetch(
+      new Request("http://localhost/tenant/resolve?host=www.customer.com"),
+      {
+        DATABASE: d1,
+        PLATFORM_BASE_DOMAIN: "app.example.com",
+        BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
+        BETTER_AUTH_URL: "http://localhost",
+      },
+    );
+    expect(pendingRes.status).toBe(404);
+
+    await d1
+      .prepare("UPDATE domains SET status = ? WHERE hostname = ?")
+      .bind("active", "www.customer.com")
+      .run();
+
+    const customRes = await worker.fetch(
+      new Request("http://localhost/tenant/resolve?host=www.customer.com"),
+      {
+        DATABASE: d1,
+        PLATFORM_BASE_DOMAIN: "app.example.com",
+        BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
+        BETTER_AUTH_URL: "http://localhost",
+      },
+    );
+    expect(customRes.status).toBe(200);
+    const custom = (await customRes.json()) as any;
+    expect(custom.organizationSlug).toBe("acme");
+    expect(custom.match).toBe("custom_domain");
+    expect(custom.domainStatus).toBe("active");
   });
 });

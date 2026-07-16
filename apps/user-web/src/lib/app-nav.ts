@@ -7,6 +7,7 @@ import {
   KeyIcon,
   ShieldCheckIcon,
   UsersThreeIcon,
+  UsersFourIcon,
 } from "@phosphor-icons/react";
 
 /** App-shell nav targets (protected product routes only). */
@@ -16,6 +17,7 @@ export type AppNavItem = {
     | "/account"
     | "/settings/organization"
     | "/settings/members"
+    | "/settings/teams"
     | "/settings/billing"
     | "/settings/api-keys"
     | "/settings/security";
@@ -39,6 +41,12 @@ export const appNavSettings: AppNavItem[] = [
     to: "/settings/members",
     label: "Members",
     icon: UsersThreeIcon,
+    group: "settings",
+  },
+  {
+    to: "/settings/teams",
+    label: "Teams",
+    icon: UsersFourIcon,
     group: "settings",
   },
   {

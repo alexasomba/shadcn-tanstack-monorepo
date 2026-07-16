@@ -6,6 +6,7 @@ import type { Database } from "../database/setup";
 import * as authSchema from "../drizzle/schema/auth";
 import { createMailerFromEnv } from "../email/mailer";
 import type { Mailer } from "../email/mailer";
+import { createInboxNotification } from "../queries/inbox";
 import { createBaseAuthPlugins } from "./plugins";
 import type { AuthPluginsOptions } from "./plugins";
 
@@ -27,7 +28,7 @@ export type CreateAuthEnv = AuthPluginsOptions & {
   appName?: string;
   /** Override NODE_ENV-style production detection. */
   isProduction?: boolean;
-  /** Transactional email. Defaults to Resend when env is set, else console. */
+  /** Optional mailer fallback (Resend/console). Prefer app-level getNotifyClient → OneSignal. */
   mailer?: Mailer;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
@@ -116,7 +117,27 @@ export function createAuth(db: Database, env: CreateAuthEnv = {}) {
   const secret = resolveSecret(env.secret, isProduction);
   const baseURL = env.baseURL ?? readEnv("BETTER_AUTH_URL");
   const trustedOrigins = env.trustedOrigins ?? defaultTrustedOrigins();
-  const plugins = [...createBaseAuthPlugins(env), ...(env.plugins ?? [])];
+  const plugins = [
+    ...createBaseAuthPlugins({
+      ...env,
+      // In-app only (D1) — no external HTTP on signup path (CPU ms + reliability).
+      onReferralSuccess:
+        env.onReferralSuccess ??
+        (async (referrer, referred) => {
+          const name = referred.name?.trim() || "Someone";
+          await createInboxNotification(db, {
+            userId: referrer.id,
+            type: "referral.signup",
+            title: "New referral signup",
+            body: `${name} joined using your invite link.`,
+            href: "/account",
+            data: { referredUserId: referred.id },
+          });
+        }),
+    }),
+    ...(env.plugins ?? []),
+  ];
+  // Fallback only: apps should prefer getNotifyClient (OneSignal). Resend remains optional secondary.
   const mailer =
     env.mailer ??
     createMailerFromEnv({

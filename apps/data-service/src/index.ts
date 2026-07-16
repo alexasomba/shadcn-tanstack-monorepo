@@ -6,14 +6,17 @@ import { cors } from "hono/cors";
 import { getAuth } from "./auth.js";
 import { databaseApp } from "./endpoints/database/router";
 import { domainsApp } from "./endpoints/domains/router";
+import { entitlementsApp } from "./endpoints/entitlements/router";
 import { healthHandler, healthRoute } from "./endpoints/health";
 import { notificationsApp } from "./endpoints/notifications/router";
 import { r2App } from "./endpoints/r2/router";
+import { tenantApp } from "./endpoints/tenant/router";
 import { todosApp } from "./endpoints/todos/router";
 import { workflowsApp } from "./endpoints/workflows/router";
 import { handleScheduled } from "./jobs/cron";
 import { handleJobsBatch } from "./jobs/queue";
 import { requireApiKey } from "./middleware/api-key.js";
+import { requireFeature } from "./middleware/entitlements.js";
 import type { AppEnv, Bindings, JobsQueueMessage } from "./types";
 
 const app = new OpenAPIHono<AppEnv>({
@@ -94,6 +97,12 @@ app.use("*", async (c, next) => {
 app.use("/todos/*", requireApiKey);
 app.use("/notifications/*", requireApiKey);
 app.use("/domains/*", requireApiKey);
+// Paid features (free tier still uses todos / basic API keys)
+app.use("/domains/*", requireFeature("domains"));
+app.use("/r2/*", requireApiKey);
+app.use("/r2/*", requireFeature("r2"));
+app.use("/entitlements", requireApiKey);
+app.use("/entitlements/*", requireApiKey);
 
 app.on(["GET", "POST"], "/api/auth/*", async (c) => {
   const auth = getAuth(
@@ -127,13 +136,42 @@ app.post("/internal/jobs/ping", async (c) => {
   return c.json({ ok: true });
 });
 
+/**
+ * Dev/helper: enqueue a typed catalog job.
+ * Body must match JobMessageSchema (see jobs/catalog.ts).
+ */
+app.post("/internal/jobs/enqueue", async (c) => {
+  if (!c.env.JOBS_QUEUE) {
+    return c.json({ ok: false, error: "JOBS_QUEUE binding not configured" }, 503);
+  }
+  try {
+    const body: unknown = await c.req.json();
+    const { enqueueJob } = await import("./jobs/enqueue.js");
+    const { parseJobMessage } = await import("./jobs/catalog.js");
+    await enqueueJob(c.env, parseJobMessage(body));
+    return c.json({ ok: true });
+  } catch (error: unknown) {
+    const message =
+      error !== null &&
+      typeof error === "object" &&
+      "message" in error &&
+      typeof error.message === "string"
+        ? (error as { message: string }).message
+        : "Invalid job payload";
+    return c.json({ ok: false, error: message }, 400);
+  }
+});
+
 app.openapi(healthRoute, healthHandler);
 app.route("/todos", todosApp);
 app.route("/notifications", notificationsApp);
 app.route("/domains", domainsApp);
+// Host → org slug (custom domain or {slug}.PLATFORM_BASE_DOMAIN). Public, no API key.
+app.route("/tenant", tenantApp);
 app.route("/database", databaseApp);
 app.route("/r2", r2App);
 app.route("/workflows", workflowsApp);
+app.route("/entitlements", entitlementsApp);
 
 app.get("/api/debug/sentry-test", () => {
   const error = new Error("Sentry test exception");
@@ -183,3 +221,6 @@ export default (isTest
     )) as typeof worker;
 
 export type AppType = typeof app;
+
+// Cloudflare Workflow classes (must be exported from the Worker entry).
+export { UserOnboardingWorkflow, OrgOnboardingWorkflow } from "data-ops";

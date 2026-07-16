@@ -10,6 +10,7 @@ import { env } from "cloudflare:workers";
 export type AppCloudflareEnv = {
   DATABASE: D1Database;
   DATA_SERVICE: Fetcher;
+  R2_BUCKET?: R2Bucket;
   AI?: Ai;
 };
 
@@ -27,6 +28,11 @@ export function getDatabase(): D1Database {
 
 export function getDataService(): Fetcher {
   return asAppEnv().DATA_SERVICE;
+}
+
+/** R2 bucket for product media (avatars, org logos). */
+export function getR2Bucket(): R2Bucket | undefined {
+  return asAppEnv().R2_BUCKET;
 }
 
 /** Workers AI binding when configured; undefined if absent (demos may fall back to Ollama). */

@@ -10,5 +10,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": ["src/**/*.test.ts", "node_modules", "dist"]
 }

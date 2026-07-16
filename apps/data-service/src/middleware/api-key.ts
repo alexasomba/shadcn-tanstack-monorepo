@@ -13,9 +13,12 @@ interface BetterAuthApiWithApiKey {
     key?: {
       id: string;
       referenceId: string;
-      prefix: string;
-      key: string;
+      prefix?: string | null;
+      configId?: string | null;
+      key?: string;
+      metadata?: unknown;
     };
+    valid?: boolean;
   } | null>;
 }
 
@@ -113,7 +116,7 @@ export async function requireApiKey(c: AppContext, next: () => Promise<void>) {
       headers: new Headers(),
     });
 
-    if (!result || !result.key) {
+    if (!result || result.valid === false || !result.key) {
       return c.json(
         {
           success: false,
@@ -123,15 +126,23 @@ export async function requireApiKey(c: AppContext, next: () => Promise<void>) {
       );
     }
 
-    const sessionObj = { activeOrganizationId: result.key.referenceId } as unknown as AuthSession;
+    // Dual configs: organization keys use referenceId = orgId; user keys use referenceId = userId.
+    const isOrgKey =
+      result.key.configId === "organization" || (result.key.prefix?.startsWith("sk_org_") ?? false);
+
+    const userObj = {
+      id: isOrgKey ? `apikey:${result.key.id}` : result.key.referenceId,
+    } as unknown as AuthUser;
+    const sessionObj = {
+      activeOrganizationId: isOrgKey ? result.key.referenceId : null,
+    } as unknown as AuthSession;
 
     // Cache the verification results on the raw request object
     rawReq.__apiKeyVerified = true;
-    rawReq.__apiKeyUser = { id: result.key.referenceId } as unknown as AuthUser;
+    rawReq.__apiKeyUser = userObj;
     rawReq.__apiKeySession = sessionObj;
 
-    c.set("user", { id: result.key.referenceId } as unknown as AuthUser);
-    // Sets the session with activeOrganizationId referencing the org ID associated with the API key
+    c.set("user", userObj);
     c.set("session", sessionObj);
   } catch (error) {
     console.error("[data-service] API key verification failed:", error);

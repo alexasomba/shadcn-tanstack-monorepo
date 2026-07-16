@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TwoFactorRouteImport } from './routes/two-factor'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -16,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
@@ -44,8 +46,11 @@ import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.test
 import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as BillingPaystackCallbackRouteImport } from './routes/billing.paystack.callback'
+import { Route as ApiMediaSplatRouteImport } from './routes/api.media.$'
 import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedSettingsTeamsRouteImport } from './routes/_protected/settings.teams'
 import { Route as ProtectedSettingsSecurityRouteImport } from './routes/_protected/settings.security'
 import { Route as ProtectedSettingsOrganizationRouteImport } from './routes/_protected/settings.organization'
 import { Route as ProtectedSettingsMembersRouteImport } from './routes/_protected/settings.members'
@@ -57,6 +62,11 @@ import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.st
 import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
 import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
 
+const TwoFactorRoute = TwoFactorRouteImport.update({
+  id: '/two-factor',
+  path: '/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -90,6 +100,11 @@ const FaqRoute = FaqRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptInviteRoute = AcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -231,6 +246,16 @@ const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
   path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BillingPaystackCallbackRoute = BillingPaystackCallbackRouteImport.update({
+  id: '/billing/paystack/callback',
+  path: '/billing/paystack/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMediaSplatRoute = ApiMediaSplatRouteImport.update({
+  id: '/api/media/$',
+  path: '/api/media/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDebugSentryTestRoute = ApiDebugSentryTestRouteImport.update({
   id: '/api/debug/sentry-test',
   path: '/api/debug/sentry-test',
@@ -240,6 +265,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedSettingsTeamsRoute = ProtectedSettingsTeamsRouteImport.update({
+  id: '/settings/teams',
+  path: '/settings/teams',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedSettingsSecurityRoute =
   ProtectedSettingsSecurityRouteImport.update({
@@ -300,6 +330,7 @@ const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -307,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/two-factor': typeof TwoFactorRoute
   '/account': typeof ProtectedAccountRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
@@ -332,8 +364,11 @@ export interface FileRoutesByFullPath {
   '/settings/members': typeof ProtectedSettingsMembersRoute
   '/settings/organization': typeof ProtectedSettingsOrganizationRoute
   '/settings/security': typeof ProtectedSettingsSecurityRoute
+  '/settings/teams': typeof ProtectedSettingsTeamsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
+  '/billing/paystack/callback': typeof BillingPaystackCallbackRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -348,6 +383,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -355,6 +391,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/two-factor': typeof TwoFactorRoute
   '/account': typeof ProtectedAccountRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
@@ -380,8 +417,11 @@ export interface FileRoutesByTo {
   '/settings/members': typeof ProtectedSettingsMembersRoute
   '/settings/organization': typeof ProtectedSettingsOrganizationRoute
   '/settings/security': typeof ProtectedSettingsSecurityRoute
+  '/settings/teams': typeof ProtectedSettingsTeamsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
+  '/billing/paystack/callback': typeof BillingPaystackCallbackRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -398,6 +438,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteWithChildren
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -405,6 +446,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/two-factor': typeof TwoFactorRoute
   '/_protected/account': typeof ProtectedAccountRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/api/remy-chat': typeof ApiRemyChatRoute
@@ -430,8 +472,11 @@ export interface FileRoutesById {
   '/_protected/settings/members': typeof ProtectedSettingsMembersRoute
   '/_protected/settings/organization': typeof ProtectedSettingsOrganizationRoute
   '/_protected/settings/security': typeof ProtectedSettingsSecurityRoute
+  '/_protected/settings/teams': typeof ProtectedSettingsTeamsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/debug/sentry-test': typeof ApiDebugSentryTestRoute
+  '/api/media/$': typeof ApiMediaSplatRoute
+  '/billing/paystack/callback': typeof BillingPaystackCallbackRoute
   '/demo/form/address': typeof DemoFormAddressRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
@@ -448,6 +493,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/accept-invite'
     | '/contact'
     | '/faq'
     | '/llms.txt'
@@ -455,6 +501,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/two-factor'
     | '/account'
     | '/dashboard'
     | '/api/remy-chat'
@@ -480,8 +527,11 @@ export interface FileRouteTypes {
     | '/settings/members'
     | '/settings/organization'
     | '/settings/security'
+    | '/settings/teams'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
+    | '/api/media/$'
+    | '/billing/paystack/callback'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -496,6 +546,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/accept-invite'
     | '/contact'
     | '/faq'
     | '/llms.txt'
@@ -503,6 +554,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/two-factor'
     | '/account'
     | '/dashboard'
     | '/api/remy-chat'
@@ -528,8 +580,11 @@ export interface FileRouteTypes {
     | '/settings/members'
     | '/settings/organization'
     | '/settings/security'
+    | '/settings/teams'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
+    | '/api/media/$'
+    | '/billing/paystack/callback'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -545,6 +600,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_protected'
     | '/about'
+    | '/accept-invite'
     | '/contact'
     | '/faq'
     | '/llms.txt'
@@ -552,6 +608,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/two-factor'
     | '/_protected/account'
     | '/_protected/dashboard'
     | '/api/remy-chat'
@@ -577,8 +634,11 @@ export interface FileRouteTypes {
     | '/_protected/settings/members'
     | '/_protected/settings/organization'
     | '/_protected/settings/security'
+    | '/_protected/settings/teams'
     | '/api/auth/$'
     | '/api/debug/sentry-test'
+    | '/api/media/$'
+    | '/billing/paystack/callback'
     | '/demo/form/address'
     | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
@@ -595,6 +655,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRoute: typeof ProtectedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AcceptInviteRoute: typeof AcceptInviteRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
@@ -602,6 +663,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TwoFactorRoute: typeof TwoFactorRoute
   ApiRemyChatRoute: typeof ApiRemyChatRoute
   DemoAiChatRoute: typeof DemoAiChatRoute
   DemoAiImageRoute: typeof DemoAiImageRoute
@@ -622,6 +684,8 @@ export interface RootRouteChildren {
   TalksIndexRoute: typeof TalksIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDebugSentryTestRoute: typeof ApiDebugSentryTestRoute
+  ApiMediaSplatRoute: typeof ApiMediaSplatRoute
+  BillingPaystackCallbackRoute: typeof BillingPaystackCallbackRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
@@ -636,6 +700,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/two-factor': {
+      id: '/two-factor'
+      path: '/two-factor'
+      fullPath: '/two-factor'
+      preLoaderRoute: typeof TwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -683,6 +754,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accept-invite': {
+      id: '/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/accept-invite'
+      preLoaderRoute: typeof AcceptInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -881,6 +959,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/billing/paystack/callback': {
+      id: '/billing/paystack/callback'
+      path: '/billing/paystack/callback'
+      fullPath: '/billing/paystack/callback'
+      preLoaderRoute: typeof BillingPaystackCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/media/$': {
+      id: '/api/media/$'
+      path: '/api/media/$'
+      fullPath: '/api/media/$'
+      preLoaderRoute: typeof ApiMediaSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/debug/sentry-test': {
       id: '/api/debug/sentry-test'
       path: '/api/debug/sentry-test'
@@ -894,6 +986,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_protected/settings/teams': {
+      id: '/_protected/settings/teams'
+      path: '/settings/teams'
+      fullPath: '/settings/teams'
+      preLoaderRoute: typeof ProtectedSettingsTeamsRouteImport
+      parentRoute: typeof ProtectedRoute
     }
     '/_protected/settings/security': {
       id: '/_protected/settings/security'
@@ -976,6 +1075,7 @@ interface ProtectedRouteChildren {
   ProtectedSettingsMembersRoute: typeof ProtectedSettingsMembersRoute
   ProtectedSettingsOrganizationRoute: typeof ProtectedSettingsOrganizationRoute
   ProtectedSettingsSecurityRoute: typeof ProtectedSettingsSecurityRoute
+  ProtectedSettingsTeamsRoute: typeof ProtectedSettingsTeamsRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
@@ -986,6 +1086,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedSettingsMembersRoute: ProtectedSettingsMembersRoute,
   ProtectedSettingsOrganizationRoute: ProtectedSettingsOrganizationRoute,
   ProtectedSettingsSecurityRoute: ProtectedSettingsSecurityRoute,
+  ProtectedSettingsTeamsRoute: ProtectedSettingsTeamsRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -996,6 +1097,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AcceptInviteRoute: AcceptInviteRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
@@ -1003,6 +1105,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TwoFactorRoute: TwoFactorRoute,
   ApiRemyChatRoute: ApiRemyChatRoute,
   DemoAiChatRoute: DemoAiChatRoute,
   DemoAiImageRoute: DemoAiImageRoute,
@@ -1023,6 +1126,8 @@ const rootRouteChildren: RootRouteChildren = {
   TalksIndexRoute: TalksIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDebugSentryTestRoute: ApiDebugSentryTestRoute,
+  ApiMediaSplatRoute: ApiMediaSplatRoute,
+  BillingPaystackCallbackRoute: BillingPaystackCallbackRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,

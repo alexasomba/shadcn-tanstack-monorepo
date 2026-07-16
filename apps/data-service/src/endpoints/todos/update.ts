@@ -1,9 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody } from "@workspace/result";
 import { createDatabase, todoToApi, updateTodo } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { ErrorSchema, TodoIdParamSchema, TodoSchema, TodoUpdateSchema } from "./schemas";
 
@@ -86,8 +86,8 @@ export const updateTodoHandler: RouteHandler<typeof updateTodoRoute, AppEnv> = a
   const result = await updateTodo(db, id, title, organizationId);
 
   if (Result.isError(result)) {
+    captureResultError(result.error, { operation: "todos.update" });
     if (result.error._tag === "DatabaseError") {
-      Sentry.captureException(result.error);
       return c.json(appErrorBody(result.error), 500);
     }
     if (result.error._tag === "NotFoundError") {

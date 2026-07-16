@@ -33,6 +33,6 @@ export const Route = createFileRoute("/_protected")({
 });
 
 function ProtectedLayout() {
-  const { user } = Route.useRouteContext();
-  return <AdminShell user={user} />;
+  const { user, session } = Route.useRouteContext();
+  return <AdminShell user={user} session={session} />;
 }

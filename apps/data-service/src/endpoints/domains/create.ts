@@ -1,9 +1,15 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
-import { createDatabase, createDomain, deleteDomain, updateDomainStatus } from "data-ops";
+import {
+  createDatabase,
+  createDomain,
+  deleteDomain,
+  getOrganizationSlugById,
+  updateDomainStatus,
+} from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
 import { DomainCreateSchema, DomainDetailsSchema, ErrorSchema, domainToApi } from "./schemas";
@@ -12,7 +18,7 @@ export const createDomainRoute = createRoute({
   method: "post",
   path: "/",
   tags: ["Domains"],
-  summary: "Register a custom domain",
+  summary: "Register a custom domain mapped to the active organization slug",
   request: {
     body: {
       content: {
@@ -78,9 +84,7 @@ export const createDomainHandler: RouteHandler<typeof createDomainRoute, AppEnv>
   // 1. Create in local database first (validates duplicates and constraints)
   const dbResult = await createDomain(db, organizationId, hostname);
   if (Result.isError(dbResult)) {
-    if (dbResult.error._tag === "DatabaseError") {
-      Sentry.captureException(dbResult.error);
-    }
+    captureResultError(dbResult.error, { operation: "domains.create" });
     console.error(
       JSON.stringify({
         message: "Failed to create custom domain in local database",
@@ -135,15 +139,30 @@ export const createDomainHandler: RouteHandler<typeof createDomainRoute, AppEnv>
     await updateDomainStatus(db, hostname, domain.status);
   }
 
+  const orgMeta = await getOrganizationSlugById(db, organizationId);
+  const organizationSlug = Result.isOk(orgMeta) ? orgMeta.value.slug : undefined;
+
   console.log(
     JSON.stringify({
       message: "Custom domain registered successfully",
       organizationId,
+      organizationSlug,
       hostname,
       domainId: domain.id,
       status: domain.status,
     }),
   );
 
-  return c.json(domainToApi(domain), 201);
+  // Product: custom hostname traffic resolves to this org slug (see GET /tenant/resolve).
+  return c.json(
+    {
+      ...domainToApi(domain),
+      organizationId,
+      organizationSlug,
+      platformHostname: c.env.PLATFORM_BASE_DOMAIN
+        ? `${organizationSlug ?? "org"}.${c.env.PLATFORM_BASE_DOMAIN}`
+        : undefined,
+    },
+    201,
+  );
 };

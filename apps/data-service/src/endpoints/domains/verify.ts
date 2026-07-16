@@ -1,9 +1,9 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { RouteHandler } from "@hono/zod-openapi";
-import * as Sentry from "@sentry/cloudflare";
 import { Result, appErrorBody, appErrorStatus } from "@workspace/result";
 import { createDatabase, getDomainByHostname, updateDomainStatus } from "data-ops";
 
+import { captureResultError } from "../../lib/result-boundary";
 import type { AppEnv } from "../../types";
 import { getDomainSdkClient } from "./router";
 import {
@@ -84,9 +84,7 @@ export const verifyDomainHandler: RouteHandler<typeof verifyDomainRoute, AppEnv>
   // 1. Fetch domain from DB to verify ownership
   const dbResult = await getDomainByHostname(db, hostname);
   if (Result.isError(dbResult)) {
-    if (dbResult.error._tag === "DatabaseError") {
-      Sentry.captureException(dbResult.error);
-    }
+    captureResultError(dbResult.error, { operation: "domains.verify" });
     return c.json(appErrorBody(dbResult.error), appErrorStatus(dbResult.error) as 404 | 500);
   }
 
@@ -101,14 +99,16 @@ export const verifyDomainHandler: RouteHandler<typeof verifyDomainRoute, AppEnv>
     );
   }
 
-  // 2. Query Cloudflare/testing provider to verify domain
+  // 2. Single provider round-trip (refresh → get). Avoid waitUntilActive on the
+  // request path — polling burns Worker CPU ms; clients re-check / background jobs poll.
   const sdk = getDomainSdkClient(c.env);
+  const refreshResult = await Result.tryPromise({
+    try: () => sdk.refresh(hostname),
+    catch: (cause) => cause,
+  });
+
   let domain;
-  try {
-    // Wait up to 2 seconds for DNS activation if it just propagated
-    domain = await sdk.waitUntilActive(hostname, { timeoutMs: 2000 });
-  } catch {
-    // If it times out or fails to become active, fetch the current status
+  if (Result.isError(refreshResult)) {
     const getResult = await Result.tryPromise({
       try: () => sdk.get(hostname),
       catch: (cause) => cause,
@@ -140,6 +140,8 @@ export const verifyDomainHandler: RouteHandler<typeof verifyDomainRoute, AppEnv>
       );
     }
     domain = getResult.value;
+  } else {
+    domain = refreshResult.value;
   }
 
   // 3. Update DB with new status

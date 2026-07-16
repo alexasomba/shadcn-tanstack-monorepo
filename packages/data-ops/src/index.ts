@@ -27,6 +27,33 @@ export {
   createUserAuthClientPlugins,
   createAdminAuthClientPlugins,
 } from "./auth/client-plugins";
+export {
+  KIT_PAYSTACK_PLANS,
+  getPaystackSubscriptionPlans,
+  formatMoney,
+  type KitPaystackPlan,
+} from "./auth/paystack-plans";
+export {
+  entitlementsForPlan,
+  resolveEntitlements,
+  hasFeature,
+  isActiveSubscriptionStatus,
+  normalizePlanFamily,
+  listActiveSubscriptions,
+  type PlanFeature,
+  type PlanEntitlements,
+  type ResolvedEntitlements,
+} from "./entitlements";
+export {
+  ensureFreeSubscription,
+  applyUserProfileDefaults,
+  ensureOrgFreePlanMetadata,
+  getUserEmailForOnboarding,
+  getOrgForOnboarding,
+  countActiveFreeSubscriptions,
+  type EnsureFreeSubscriptionResult,
+  type UserProfileDefaults,
+} from "./queries/billing-onboarding";
 export { parseUserRoles, userHasAdminRole, isAdminUser } from "./auth/roles";
 export {
   listTodos,
@@ -66,7 +93,20 @@ export {
   type SendEmailInput,
 } from "./email/mailer";
 export { buildRobotsTxt, buildSitemapXml, buildLlmsTxt, type DiscoveryUrl } from "./seo/discovery";
-export { getNotifyClient, notificationCatalog, type NotificationCatalog } from "./notifications";
+export {
+  getNotifyClient,
+  hasOnesignalCredentials,
+  resolveNotifyMode,
+  notificationCatalog,
+  type NotificationCatalog,
+  type NotifyEnv,
+  type NotifyDeliveryMode,
+} from "./notifications";
+export {
+  createInboxNotification,
+  type CreateInboxNotificationInput,
+  type CreateInboxNotificationResult,
+} from "./queries/inbox";
 export {
   listDomains,
   getDomainByHostname,
@@ -75,6 +115,19 @@ export {
   deleteDomain,
   type DomainRow,
 } from "./queries/domains";
+export {
+  normalizeHostname,
+  extractPlatformSubdomainSlug,
+  resolveOrganizationByHost,
+  listDomainsWithOrganization,
+  getOrganizationSlugById,
+  countActiveDomainsForOrganization,
+  isUserMemberOfOrganization,
+  type TenantHostMatch,
+  type ResolvedTenant,
+  type ResolveTenantOptions,
+  type DomainWithOrganization,
+} from "./queries/tenant-host";
 export {
   DomainSchema,
   DomainCreateSchema,

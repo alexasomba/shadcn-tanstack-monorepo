@@ -25,8 +25,9 @@ vi.mock("./auth", async (importOriginal) => {
               return {
                 key: {
                   id: "key-123",
-                  referenceId: "org-123", // Matches organizationId for domains
-                  prefix: "test",
+                  referenceId: "org-123",
+                  configId: "organization",
+                  prefix: "sk_org_",
                   key: "test-api-key",
                 },
               };
@@ -145,16 +146,24 @@ describe("API Key Authentication Middleware", () => {
     const d1 = await setupTestDb();
     const orgId = "org-123";
 
-    // Seed mock organization
+    // Seed mock organization + paid plan (domains feature)
     await d1
       .prepare("INSERT INTO organization (id, name, slug, created_at) VALUES (?, ?, ?, ?)")
       .bind(orgId, "Test Org", "test-org", Date.now())
+      .run();
+    await d1
+      .prepare(
+        `INSERT INTO subscription (id, plan, reference_id, status, period_start, period_end)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind("sub-api-key", "pro", orgId, "active", Date.now(), Date.now() + 86400000)
       .run();
 
     const env = {
       DATABASE: d1,
       BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
       BETTER_AUTH_URL: "http://localhost",
+      DOMAIN_SDK_MODE: "memory",
     };
 
     // 1. Unauthenticated request should fail

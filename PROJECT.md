@@ -87,15 +87,15 @@ Backend SaaS expansion completed and verified (E2E + data-service tests). Status
 | ID      | Name                        | Priority | Depends | Scope                                                                           | Status   |
 | ------- | --------------------------- | -------- | ------- | ------------------------------------------------------------------------------- | -------- |
 | **M8**  | App shell & settings layout | P0       | —       | Multi-tenant SaaS shell; settings nav; org switcher; demos stay under `/demo/*` | **DONE** |
-| **M9**  | Organization management UI  | P0       | M8      | Create/switch/invite/roles/leave/delete org                                     | PLANNED  |
-| **M10** | API keys product surface    | P0       | M8      | `apiKeyClient` + create/list/revoke UI; copy-once secret                        | PLANNED  |
-| **M11** | Security settings           | P0       | M8      | 2FA TOTP, backup codes, passkeys, login challenge                               | PLANNED  |
+| **M9**  | Organization management UI  | P0       | M8      | Create/switch/invite/roles/leave/delete org                                     | **DONE** |
+| **M10** | API keys product surface    | P0       | M8      | `apiKeyClient` + create/list/revoke UI; copy-once secret                        | **DONE** |
+| **M11** | Security settings           | P0       | M8      | 2FA TOTP, backup codes, passkeys, login challenge                               | **DONE** |
 
 ### M8 acceptance
 
 - Signed-in user lands on shell (not bare portfolio-only chrome).
 - Nav: Overview, Organization, Members, Billing, API Keys, Security, Account.
-- Active organization visible (switcher can be stubbed until M9 wires full org APIs).
+- Active organization visible (M9 wires full org APIs + switcher).
 - Mobile usable; marketing routes unchanged.
 
 **Implementable checklist:** [docs/milestones/M8-app-shell-tasks.md](docs/milestones/M8-app-shell-tasks.md)
@@ -112,11 +112,11 @@ Backend SaaS expansion completed and verified (E2E + data-service tests). Status
 
 ## Phase B — Billing product loop (P0–P1)
 
-| ID      | Name                                   | Priority | Depends | Scope                                              | Status  |
-| ------- | -------------------------------------- | -------- | ------- | -------------------------------------------------- | ------- |
-| **M12** | Paystack plans & catalog               | P0       | Phase 0 | Fill `plans: []`; plan codes/env; seed plans       | PLANNED |
-| **M13** | Checkout, portal & subscription status | P0       | M12, M8 | Wire pricing CTAs; billing settings; real webhooks | PLANNED |
-| **M14** | Entitlements & plan guards             | P1       | M13     | Plan → limits; middleware; UI upgrade prompts      | PLANNED |
+| ID      | Name                                   | Priority | Depends | Scope                                              | Status   |
+| ------- | -------------------------------------- | -------- | ------- | -------------------------------------------------- | -------- |
+| **M12** | Paystack plans & catalog               | P0       | Phase 0 | Fill `plans: []`; plan codes/env; seed plans       | **DONE** |
+| **M13** | Checkout, portal & subscription status | P0       | M12, M8 | Wire pricing CTAs; billing settings; real webhooks | **DONE** |
+| **M14** | Entitlements & plan guards             | P1       | M13     | Plan → limits; middleware; UI upgrade prompts      | **DONE** |
 
 ### Notes
 
@@ -127,22 +127,23 @@ Backend SaaS expansion completed and verified (E2E + data-service tests). Status
 
 ## Phase C — Make platform paths real (P1)
 
-| ID      | Name                           | Priority | Depends              | Scope                                               | Status  |
-| ------- | ------------------------------ | -------- | -------------------- | --------------------------------------------------- | ------- |
-| **M15** | Real onboarding workflows      | P1       | mailer; M12 optional | Replace no-op steps with email, defaults, free plan | PLANNED |
-| **M16** | R2 product UX                  | P1       | M8 + R2 APIs         | Avatar + org logo upload                            | PLANNED |
-| **M17** | Jobs & product queue handlers  | P1       | queue stubs          | Typed job catalog beyond outbox/ping                | PLANNED |
-| **M18** | Sentry Result-boundary capture | P1       | Phase 0 Sentry       | Capture `Result` errors before HTTP 500             | PLANNED |
+| ID        | Name                           | Priority | Depends              | Scope                                               | Status   |
+| --------- | ------------------------------ | -------- | -------------------- | --------------------------------------------------- | -------- |
+| **M14.x** | Paystack callback + hooks      | P1       | M13–M14              | Verify return path, typed client, lifecycle logs    | **DONE** |
+| **M15**   | Real onboarding workflows      | P1       | mailer; M12 optional | Replace no-op steps with email, defaults, free plan | **DONE** |
+| **M16**   | R2 product UX                  | P1       | M8 + R2 APIs         | Avatar + org logo upload                            | **DONE** |
+| **M17**   | Jobs & product queue handlers  | P1       | queue stubs          | Typed job catalog beyond outbox/ping                | **DONE** |
+| **M18**   | Sentry Result-boundary capture | P1       | Phase 0 Sentry       | Capture `Result` errors before HTTP 500             | **DONE** |
 
 ---
 
 ## Phase D — Admin kit completeness (P1–P2)
 
-| ID      | Name                           | Priority | Depends      | Scope                               | Status  |
-| ------- | ------------------------------ | -------- | ------------ | ----------------------------------- | ------- |
-| **M19** | Admin impersonation & user ops | P1       | admin plugin | Impersonate, ban, user detail       | PLANNED |
-| **M20** | Admin billing & referrals ops  | P2       | M13          | Subscription list; expand referrals | PLANNED |
-| **M21** | Audit log foundation           | P2       | M9, M19      | Write + admin table for key actions | PLANNED |
+| ID      | Name                           | Priority | Depends      | Scope                               | Status   |
+| ------- | ------------------------------ | -------- | ------------ | ----------------------------------- | -------- |
+| **M19** | Admin impersonation & user ops | P1       | admin plugin | Impersonate, ban, user detail       | **DONE** |
+| **M20** | Admin billing & referrals ops  | P2       | M13          | Subscription list; expand referrals | PLANNED  |
+| **M21** | Audit log foundation           | P2       | M9, M19      | Write + admin table for key actions | PLANNED  |
 
 ---
 
@@ -174,48 +175,50 @@ Backend SaaS expansion completed and verified (E2E + data-service tests). Status
 
 ## Master tracking table
 
-| ID  | Milestone                              | Priority | Phase | Status   |
-| --- | -------------------------------------- | -------- | ----- | -------- |
-| 1–7 | Platform expansion (R1–R5 + E2E)       | —        | 0     | **DONE** |
-| M8  | App shell & settings layout            | P0       | A     | **DONE** |
-| M9  | Organization management UI             | P0       | A     | PLANNED  |
-| M10 | API keys product surface               | P0       | A     | PLANNED  |
-| M11 | Security settings (2FA/passkeys)       | P0       | A     | PLANNED  |
-| M12 | Paystack plans & catalog               | P0       | B     | PLANNED  |
-| M13 | Checkout, portal & subscription status | P0       | B     | PLANNED  |
-| M14 | Entitlements & plan guards             | P1       | B     | PLANNED  |
-| M15 | Real onboarding workflows              | P1       | C     | PLANNED  |
-| M16 | R2 product UX                          | P1       | C     | PLANNED  |
-| M17 | Jobs & product queue handlers          | P1       | C     | PLANNED  |
-| M18 | Sentry Result-boundary capture         | P1       | C     | PLANNED  |
-| M19 | Admin impersonation & user ops         | P1       | D     | PLANNED  |
-| M20 | Admin billing & referrals ops          | P2       | D     | PLANNED  |
-| M21 | Audit log foundation                   | P2       | D     | PLANNED  |
-| M22 | Marketing / demo cleanup               | P2       | E     | PLANNED  |
-| M23 | Auth client & docs parity              | P2       | E     | PLANNED  |
-| M24 | First-run onboarding wizard            | P2       | E     | PLANNED  |
-| M25 | Email templates polish                 | P2       | E     | PLANNED  |
-| M26 | Feature flags                          | P3       | F     | PLANNED  |
-| M27 | Dual billing (Stripe)                  | P3       | F     | PLANNED  |
-| M28 | Advanced developer portal              | P3       | F     | PLANNED  |
-| M29 | Multi-locale product UI                | P3       | F     | PLANNED  |
-| M30 | Compliance & trust pages               | P3       | F     | PLANNED  |
-| M31 | Hardened multi-tenant defaults         | P3       | F     | PLANNED  |
-| M32 | Agents productization                  | P3       | F     | PLANNED  |
-| M33 | Template packaging & release           | P3       | F     | PLANNED  |
+| ID    | Milestone                              | Priority | Phase | Status   |
+| ----- | -------------------------------------- | -------- | ----- | -------- |
+| 1–7   | Platform expansion (R1–R5 + E2E)       | —        | 0     | **DONE** |
+| M8    | App shell & settings layout            | P0       | A     | **DONE** |
+| M9    | Organization management UI             | P0       | A     | **DONE** |
+| M10   | API keys product surface               | P0       | A     | **DONE** |
+| M11   | Security settings (2FA/passkeys)       | P0       | A     | **DONE** |
+| M12   | Paystack plans & catalog               | P0       | B     | **DONE** |
+| M13   | Checkout, portal & subscription status | P0       | B     | **DONE** |
+| M14   | Entitlements & plan guards             | P1       | B     | **DONE** |
+| M14.x | Paystack callback, typing & hooks      | P1       | B     | **DONE** |
+| M15   | Real onboarding workflows              | P1       | C     | **DONE** |
+| M16   | R2 product UX                          | P1       | C     | **DONE** |
+| M17   | Jobs & product queue handlers          | P1       | C     | **DONE** |
+| M18   | Sentry Result-boundary capture         | P1       | C     | **DONE** |
+| M19   | Admin impersonation & user ops         | P1       | D     | **DONE** |
+| M20   | Admin billing & referrals ops          | P2       | D     | PLANNED  |
+| M21   | Audit log foundation                   | P2       | D     | PLANNED  |
+| M22   | Marketing / demo cleanup               | P2       | E     | PLANNED  |
+| M23   | Auth client & docs parity              | P2       | E     | PLANNED  |
+| M24   | First-run onboarding wizard            | P2       | E     | PLANNED  |
+| M25   | Email templates polish                 | P2       | E     | PLANNED  |
+| M26   | Feature flags                          | P3       | F     | PLANNED  |
+| M27   | Dual billing (Stripe)                  | P3       | F     | PLANNED  |
+| M28   | Advanced developer portal              | P3       | F     | PLANNED  |
+| M29   | Multi-locale product UI                | P3       | F     | PLANNED  |
+| M30   | Compliance & trust pages               | P3       | F     | PLANNED  |
+| M31   | Hardened multi-tenant defaults         | P3       | F     | PLANNED  |
+| M32   | Agents productization                  | P3       | F     | PLANNED  |
+| M33   | Template packaging & release           | P3       | F     | PLANNED  |
 
 ---
 
 ## Known gaps (carry into milestones)
 
-| Gap                                               | Milestone     |
-| ------------------------------------------------- | ------------- |
-| Product UI missing for org / keys / billing / 2FA | M8–M13, M11   |
-| `paystack` `plans: []` empty                      | M12           |
-| Pricing page is demo copy                         | M13, M22      |
-| Onboarding workflows are no-op steps              | M15           |
-| Queue handlers only outbox + ping                 | M17           |
-| `Result.tryPromise` 500s skip Sentry              | M18           |
-| No `apiKeyClient` / paystack client on user-web   | M10, M13, M23 |
-| Portfolio/Web3 dashboards as “product” home       | M8            |
-| Conference/demo marketing residue                 | M22           |
+| Gap                                         | Milestone        |
+| ------------------------------------------- | ---------------- |
+| Product UI missing for billing checkout     | M12–M13          |
+| Real onboarding workflow steps              | M15 (**done**)   |
+| Pricing page is demo copy                   | M13, M22         |
+| Onboarding workflows are no-op steps        | M15 (**done**)   |
+| Paystack checkout return without verify     | M14.x (**done**) |
+| Queue handlers only outbox + ping           | M17 (**done**)   |
+| `Result.tryPromise` 500s skip Sentry        | M18 (**done**)   |
+| Paystack client / checkout UX on user-web   | M13, M23         |
+| Portfolio/Web3 dashboards as “product” home | M8               |
+| Conference/demo marketing residue           | M22              |

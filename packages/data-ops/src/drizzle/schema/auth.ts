@@ -51,6 +51,7 @@ export const session = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     activeOrganizationId: text("active_organization_id"),
+    activeTeamId: text("active_team_id"),
     impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
@@ -113,8 +114,49 @@ export const organization = sqliteTable(
     logo: text("logo"),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     metadata: text("metadata"),
+    paystackCustomerCode: text("paystack_customer_code"),
+    email: text("email"),
   },
-  (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
+  (table) => [
+    uniqueIndex("organization_slug_uidx").on(table.slug),
+    index("organization_paystackCustomerCode_idx").on(table.paystackCustomerCode),
+  ],
+);
+
+export const team = sqliteTable(
+  "team",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    memberCount: integer("member_count").default(0).notNull(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).$onUpdate(
+      () => /* @__PURE__ */ new Date(),
+    ),
+  },
+  (table) => [index("team_organizationId_idx").on(table.organizationId)],
+);
+
+export const teamMember = sqliteTable(
+  "team_member",
+  {
+    id: text("id").primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => team.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    membershipKey: text("membership_key").unique(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }),
+  },
+  (table) => [
+    index("teamMember_teamId_idx").on(table.teamId),
+    index("teamMember_userId_idx").on(table.userId),
+  ],
 );
 
 export const member = sqliteTable(
@@ -145,6 +187,7 @@ export const invitation = sqliteTable(
       .references(() => organization.id, { onDelete: "cascade" }),
     email: text("email").notNull(),
     role: text("role"),
+    teamId: text("team_id"),
     status: text("status").default("pending").notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -208,20 +251,28 @@ export const referrals = sqliteTable("referrals", {
     .notNull(),
 });
 
-export const notification = sqliteTable("notification", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  organizationId: text("organization_id"),
-  type: text("type").notNull(),
-  title: text("title").notNull(),
-  body: text("body"),
-  href: text("href"),
-  data: text("data", { mode: "json" }),
-  read: integer("read", { mode: "boolean" }).default(false).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-});
+/** better-inbox table — list index required for badge/list query (plugin cannot declare indexes). */
+export const notification = sqliteTable(
+  "notification",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id"),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    href: text("href"),
+    data: text("data", { mode: "json" }),
+    read: integer("read", { mode: "boolean" }).default(false).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [
+    // List + unread badge: WHERE user_id = ? ORDER BY created_at DESC
+    index("notification_user_created_idx").on(table.userId, table.createdAt),
+  ],
+);
 
 export const passkey = sqliteTable(
   "passkey",
@@ -371,6 +422,8 @@ export const authRelations = defineRelationsPart(
     account,
     verification,
     organization,
+    team,
+    teamMember,
     member,
     invitation,
     twoFactor,
@@ -393,6 +446,10 @@ export const authRelations = defineRelationsPart(
       accounts: r.many.account({
         from: r.user.id,
         to: r.account.userId,
+      }),
+      teamMembers: r.many.teamMember({
+        from: r.user.id,
+        to: r.teamMember.userId,
       }),
       members: r.many.member({
         from: r.user.id,
@@ -436,6 +493,10 @@ export const authRelations = defineRelationsPart(
       }),
     },
     organization: {
+      teams: r.many.team({
+        from: r.organization.id,
+        to: r.team.organizationId,
+      }),
       members: r.many.member({
         from: r.organization.id,
         to: r.member.organizationId,
@@ -443,6 +504,26 @@ export const authRelations = defineRelationsPart(
       invitations: r.many.invitation({
         from: r.organization.id,
         to: r.invitation.organizationId,
+      }),
+    },
+    team: {
+      organization: r.one.organization({
+        from: r.team.organizationId,
+        to: r.organization.id,
+      }),
+      teamMembers: r.many.teamMember({
+        from: r.team.id,
+        to: r.teamMember.teamId,
+      }),
+    },
+    teamMember: {
+      team: r.one.team({
+        from: r.teamMember.teamId,
+        to: r.team.id,
+      }),
+      user: r.one.user({
+        from: r.teamMember.userId,
+        to: r.user.id,
       }),
     },
     member: {

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { SettingsStub } from "#/components/app-shell/settings-stub";
+import { ApiKeysSettingsPanel } from "#/components/api-keys/api-keys-settings-panel";
 
 export const Route = createFileRoute("/_protected/settings/api-keys")({
   component: ApiKeysSettingsPage,
@@ -10,11 +10,5 @@ export const Route = createFileRoute("/_protected/settings/api-keys")({
 });
 
 function ApiKeysSettingsPage() {
-  return (
-    <SettingsStub
-      title="API Keys"
-      description="Create and revoke developer keys for data-service (Bearer / x-api-key)."
-      milestone="M10 — API keys product surface"
-    />
-  );
+  return <ApiKeysSettingsPanel />;
 }
