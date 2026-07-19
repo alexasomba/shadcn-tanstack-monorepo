@@ -35,9 +35,11 @@ jobs:
           restore-keys: |
             vite-task-${{ runner.os }}-${{ runner.arch }}-
 
-      # Pre-generate content collections so types are available for the check step
-      - name: Generate content collections
-        run: vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build
+      # Pre-generate content collections and paraglide so types are available for the check step
+      - name: Generate content collections and paraglide
+        run: |
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match paraglide:compile
 
       - run: vpr ci:check
       - run: vpr ci:test
