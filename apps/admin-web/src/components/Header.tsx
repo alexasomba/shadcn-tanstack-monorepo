@@ -6,11 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { ModeToggle } from "@workspace/ui/components/mode-toggle";
 
 import { adminDemoNav, adminNav } from "#/lib/nav";
 
 import BetterAuthHeader from "../integrations/better-auth/header-user.js";
-import ThemeToggle from "./ThemeToggle.js";
 
 /** Chrome for admin demo / conference routes outside the protected shell. */
 export default function Header() {
@@ -64,7 +64,7 @@ export default function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
+          <ModeToggle />
           <BetterAuthHeader />
         </div>
       </nav>

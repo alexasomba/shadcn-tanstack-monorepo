@@ -2,6 +2,7 @@ import { ListIcon } from "@phosphor-icons/react";
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
+import { ModeToggle } from "@workspace/ui/components/mode-toggle";
 import {
   Sheet,
   SheetContent,
@@ -11,7 +12,6 @@ import {
 } from "@workspace/ui/components/sheet";
 import { useState } from "react";
 
-import ThemeToggle from "#/components/ThemeToggle";
 import { marketingNav } from "#/lib/nav";
 import { tenantBrandLabel } from "#/lib/tenant";
 
@@ -52,7 +52,7 @@ export default function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <ModeToggle />
           <div className="hidden items-center gap-2 sm:flex">
             <ButtonLink to="/login" variant="outline" size="sm">
               Sign in

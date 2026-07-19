@@ -27,18 +27,18 @@
     "eslint-plugin-zod": "catalog:",
     "eslint-plugin-zod-openapi": "catalog:",
     "typescript": "6.0.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.5",
     "vite-plus": "catalog:"
   },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "11.13.0",
+      "version": "11.14.0",
       "onFail": "download"
     }
   },
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.13.0"
+  "packageManager": "pnpm@11.14.0"
 }

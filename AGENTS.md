@@ -37,7 +37,7 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - **data-ops pack**: `pnpm --filter data-ops build` → `vp pack` (tsdown `dist/`); workspace still resolves `src/` for DX.
 - **data-service** endpoints: `@hono/zod-openapi` under `src/endpoints/<resource>/`. Prefer data-ops queries. **Queues/cron stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
 - **SEO discovery (user-web)**: `/sitemap.xml`, `/robots.txt`, `/llms.txt` server routes (`src/lib/discovery.ts`).
-- **UI**: `packages/ui/src/components` = shadcn **primitives**; `packages/ui/src/components/ui` = **Watermelon** marketing/dashboard compositions (use them). Apps compose both.
+- **UI**: `packages/ui/src/components` = shadcn **primitives**; `packages/ui/src/components/ui` = **Watermelon** marketing/dashboard compositions (use them); `packages/ui/src/blocks/*` = larger page compositions/modules (e.g. `blocks/preview`). Apps compose these. This project uses **shadcn/ui** with **Base UI** (style: `base-rhea`). Follow Base UI conventions: use `render` instead of `asChild` for triggers/closes (e.g. `<DialogTrigger render={<Button />} />`), use the `items` prop on `Select`, and see [packages/ui/AGENTS.md](file:///Users/alexasomba/Documents/GitHub/alexasomba/shadcn-tanstack-monorepo/packages/ui/AGENTS.md) for full guidelines.
 - **Start auth boundary**: private `createServerFn` must use `requireAuthMiddleware` (RPC security). Route `beforeLoad` is UX only. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
 - **Result (`@workspace/result`)**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus` (early return for Hono typed responses). Prefer `@workspace/result` over direct `better-result` imports.
 
@@ -53,3 +53,9 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - **DRY Types**: Avoid duplicating schema structures into TypeScript interfaces. Always use `z.infer<typeof Schema>` to keep types and validations in sync.
 - **Strict Response Signatures**: Avoid status code unions in RouteHandler return types. Use explicit conditional blocks and return manual error responses with `success: false as const` to satisfy the strict `z.literal(false)` constraint of `ErrorSchema`.
 - **Centralized Database Types**: Define and export inferred database types centrally in `schema.ts` using `InferSelectModel`/`InferInsertModel`. Query helper files and other packages must import and reuse these models (e.g. `DbTodo`, `DbDomain`, `DbOutboxEvent`) rather than repeating legacy `typeof table.$inferSelect` casts.
+
+**CRITICAL RULES:**
+
+- No push = not done. Never leave feature in worktree.
+- Push hooks must pass. Manual gates only on skip/disabled.
+- Never stop before pushing. Push fail -> fix + retry. No user ask.

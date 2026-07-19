@@ -73,4 +73,5 @@ This workspace uses a hybrid approach integrating **shadcn/ui** conventions and 
 - **Component Layers:**
   - `src/components/*` contains **shadcn/ui primitives** (Button, Card, Dialog, Sidebar). Use these for application chrome, layout structures, and core forms.
   - `src/components/ui/*` contains **Watermelon UI compositions** (pre-built marketing sections, dashboard cards). Compose new Watermelon components strictly by importing from `src/components/*`.
+  - `src/blocks/*` contains **blocks** (larger pre-built page layouts/modules like dashboard, login, sidebar, or the UI showcase/preview under `src/blocks/preview`).
 - **Icon Library:** Strictly use **Phosphor Icons** (`@phosphor-icons/react`) for UI actions and states, and **react-icons** ONLY for brand/social icons. Do not import `lucide-react` or Hugeicons.

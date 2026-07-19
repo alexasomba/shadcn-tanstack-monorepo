@@ -19,5 +19,9 @@
   },
   "rtl": false,
   "menuColor": "default",
-  "menuAccent": "subtle"
+  "menuAccent": "subtle",
+  "registries": {
+    "@watermelon": "https://raw.githubusercontent.com/alexasomba/watermellon-registry/main/public/r/{name}.json",
+    "@bundui": "https://bundui.io/r/{name}.json"
+  }
 }

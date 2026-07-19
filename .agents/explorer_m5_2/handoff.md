@@ -6,9 +6,7 @@
   ```typescript
   export declare function seed<
     DB extends
-      | PgDatabase<any, any>
-      | MySqlDatabase<any, any, any, any>
-      | BaseSQLiteDatabase<any, any>,
+      PgDatabase<any, any> | MySqlDatabase<any, any, any, any> | BaseSQLiteDatabase<any, any>,
     SCHEMA extends {
       [key: string]: PgTable | PgSchema | MySqlTable | MySqlSchema | SQLiteTable | Relations | any;
     },

@@ -16,18 +16,10 @@ This report provides the analysis, design, and next steps for implementing the d
     ```typescript
     export declare function seed<
       DB extends
-        | PgDatabase<any, any>
-        | MySqlDatabase<any, any, any, any>
-        | BaseSQLiteDatabase<any, any>,
+        PgDatabase<any, any> | MySqlDatabase<any, any, any, any> | BaseSQLiteDatabase<any, any>,
       SCHEMA extends {
         [key: string]:
-          | PgTable
-          | PgSchema
-          | MySqlTable
-          | MySqlSchema
-          | SQLiteTable
-          | Relations
-          | any;
+          PgTable | PgSchema | MySqlTable | MySqlSchema | SQLiteTable | Relations | any;
       },
       VERSION extends "2" | "1" | undefined,
     >(
@@ -44,9 +36,7 @@ This report provides the analysis, design, and next steps for implementing the d
     ```typescript
     export declare function reset<
       DB extends
-        | PgDatabase<any, any>
-        | MySqlDatabase<any, any, any, any>
-        | BaseSQLiteDatabase<any, any>,
+        PgDatabase<any, any> | MySqlDatabase<any, any, any, any> | BaseSQLiteDatabase<any, any>,
       SCHEMA extends {
         [key: string]: PgTable | PgSchema | MySqlTable | MySqlSchema | SQLiteTable | any;
       },
