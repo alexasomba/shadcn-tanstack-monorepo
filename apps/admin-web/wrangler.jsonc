@@ -11,6 +11,12 @@
     "port": 8301,
     "inspector_port": 9231,
   },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+  },
   "ai": {
     "binding": "AI",
     "remote": true,

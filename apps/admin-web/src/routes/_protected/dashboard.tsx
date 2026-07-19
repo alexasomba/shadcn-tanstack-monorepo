@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Web3Dashboard } from "@workspace/ui/components/ui/web3-dashboard";
+import { Web3Dashboard } from "@workspace/ui/components/ui/dashboards/web3-dashboard";
 
 import { authClient } from "#/lib/auth-client";
 import { getWeb3Dashboard } from "#/lib/web3.functions";

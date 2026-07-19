@@ -1,4 +1,4 @@
-import type { PortfolioData } from "@workspace/ui/components/ui/portfolio-dashboard";
+import type { PortfolioData } from "@workspace/ui/components/ui/dashboards/portfolio-dashboard";
 
 /** Demo portfolio series for the authenticated user dashboard. */
 export const demoPortfolioData: PortfolioData = {

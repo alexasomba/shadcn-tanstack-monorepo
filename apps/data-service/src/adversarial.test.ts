@@ -168,6 +168,7 @@ describe("Milestone 7 Phase 2: Adversarial Coverage Hardening Tests (Tier 5)", (
       DATABASE: d1,
       BETTER_AUTH_SECRET: "test-secret-value-longer-than-32-chars-long",
       BETTER_AUTH_URL: "http://localhost",
+      DOMAIN_SDK_MODE: "memory",
     };
   });
 

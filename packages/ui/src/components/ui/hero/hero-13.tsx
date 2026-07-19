@@ -1,6 +1,6 @@
 "use client";
 import { Play, CaretDown } from "@phosphor-icons/react";
-import LogoIcon from "@workspace/ui/components/ui/logo-icon";
+import LogoIcon from "@workspace/ui/components/ui/widgets/logo-icon";
 import { motion, useMotionValue, useMotionTemplate } from "motion/react";
 import React from "react";
 

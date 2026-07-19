@@ -9,7 +9,7 @@
     "./components/*": "./src/components/*.tsx",
     "./blocks/*": "./src/blocks/*",
     "./hooks/*": "./src/hooks/*.ts",
-    "./components/ui/*": "./src/components/ui/*.tsx"
+    "./components/ui/*": "./src/components/ui/*"
   },
   "scripts": {
     "lint": "vp lint",

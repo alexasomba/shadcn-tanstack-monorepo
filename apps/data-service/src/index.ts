@@ -210,15 +210,26 @@ const worker = {
 const isTest =
   typeof process !== "undefined" && (process.env.VITEST || process.env.NODE_ENV === "test");
 
-export default (isTest
+function resolveSentryOptions(env: Bindings) {
+  const raw = env.SENTRY_DSN || env.VITE_SENTRY_DSN;
+  const dsn =
+    typeof raw === "string" && raw.length > 0 && !raw.includes("mock-dsn") ? raw : undefined;
+  return {
+    dsn,
+    // No mock DSN — disable SDK when unset so errors are not swallowed to nowhere
+    enabled: Boolean(dsn),
+    tracesSampleRate: 1.0 as const,
+  };
+}
+
+/** Sentry only when a real DSN is configured (no mock-dsn fallback). */
+export default isTest
   ? worker
-  : Sentry.withSentry(
-      (env: Bindings) => ({
-        dsn: env.SENTRY_DSN || env.VITE_SENTRY_DSN || "https://mock-dsn@sentry.io/123",
-        tracesSampleRate: 1.0,
-      }),
+  : (Sentry.withSentry(
+      (env: Bindings) => resolveSentryOptions(env),
+      // Sentry ExportedHandler generics don't match Hono+queue+scheduled handlers
       worker as unknown as ExportedHandler<Bindings>,
-    )) as typeof worker;
+    ) as unknown as typeof worker);
 
 export type AppType = typeof app;
 

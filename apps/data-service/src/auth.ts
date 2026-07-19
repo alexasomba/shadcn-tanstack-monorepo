@@ -1,6 +1,7 @@
 import { createAuth, createDatabase, getNotifyClient } from "data-ops";
 import type { Auth, AuthSession, AuthUser } from "data-ops";
 
+import { logError, logInfo } from "./lib/log";
 import type { Bindings } from "./types";
 
 function readEnv(name: string): string | undefined {
@@ -43,7 +44,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
             params: { userId: user.id },
           });
         } catch (err) {
-          console.error("Failed to automatically trigger UserOnboardingWorkflow:", err);
+          logError("auth.workflow.user_onboarding_failed", { userId: user.id, error: err });
         }
       }
     },
@@ -56,7 +57,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
             params: { orgId: org.id },
           });
         } catch (err) {
-          console.error("Failed to automatically trigger OrgOnboardingWorkflow:", err);
+          logError("auth.workflow.org_onboarding_failed", { orgId: org.id, error: err });
         }
       }
     },
@@ -68,7 +69,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
           input: { name: "User", url },
         });
       } else {
-        console.log(`[auth:verifyEmail] to=${user.email} url=${url}`);
+        logInfo("auth.verifyEmail.console", { to: user.email });
       }
     },
 
@@ -79,7 +80,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
           input: { name: "User", url },
         });
       } else {
-        console.log(`[auth:resetPassword] to=${user.email} url=${url}`);
+        logInfo("auth.resetPassword.console", { to: user.email });
       }
     },
 
@@ -95,7 +96,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
           },
         });
       } else {
-        console.log(`[auth:orgInvitation] to=${email} org=${organization.name}`);
+        logInfo("auth.orgInvitation.console", { to: email, org: organization.name });
       }
     },
 
@@ -106,7 +107,7 @@ export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?:
           input: { otp },
         });
       } else {
-        console.log(`[auth:twoFactorOtp] to=${user.email} code=${otp}`);
+        logInfo("auth.twoFactorOtp.console", { to: user.email });
       }
     },
   });

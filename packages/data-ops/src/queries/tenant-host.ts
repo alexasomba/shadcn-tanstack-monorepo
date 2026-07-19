@@ -126,24 +126,14 @@ async function loadOrganization(
   return null;
 }
 
-/**
- * Resolve Host → organization slug (+ id).
- * Prefer custom domain row first (customer apex wins over coincidental platform names),
- * then platform subdomain.
- */
-export async function resolveOrganizationByHost(
+type ResolveTenantError = DatabaseError | NotFoundError | ValidationError;
+
+/** Custom domain row → org (or null if no domain row for host). */
+async function resolveByCustomDomain(
   db: Database,
-  hostInput: string,
-  options: ResolveTenantOptions = {},
-): Promise<Result<ResolvedTenant, DatabaseError | NotFoundError | ValidationError>> {
-  const host = normalizeHostname(hostInput);
-  if (!host) {
-    return Result.err(validation("Host is required", "host"));
-  }
-
-  const requireActive = options.requireActiveCustomDomain !== false;
-
-  // 1) Custom domain by unique hostname, then org by id (two indexed lookups).
+  host: string,
+  requireActive: boolean,
+): Promise<Result<ResolvedTenant | null, ResolveTenantError>> {
   const customDomain = await Result.tryPromise({
     try: () =>
       db.query.domains.findFirst({
@@ -157,57 +147,105 @@ export async function resolveOrganizationByHost(
   }
 
   const domainRow = customDomain.value;
-  if (domainRow !== undefined) {
-    if (requireActive && domainRow.status !== "active") {
-      return Result.err(notFound("ActiveDomain", host));
-    }
-
-    const org = await Result.tryPromise({
-      try: () => loadOrganization(db, { id: domainRow.organizationId }),
-      catch: (cause) => databaseError("resolveOrganizationByHost.customOrg", cause),
-    });
-    if (Result.isError(org)) {
-      return Result.err(org.error);
-    }
-    const orgRow = org.value;
-    if (orgRow === null) {
-      return Result.err(notFound("Organization", domainRow.organizationId));
-    }
-
-    return Result.ok({
-      organizationId: orgRow.id,
-      organizationSlug: orgRow.slug,
-      organizationName: orgRow.name,
-      host: domainRow.hostname,
-      match: "custom_domain" as const,
-      domainStatus: domainRow.status,
-      domainId: domainRow.id,
-    });
+  if (domainRow === undefined) {
+    return Result.ok(null);
   }
 
-  // 2) Platform vanity: {slug}.{PLATFORM_BASE_DOMAIN}
-  const base = options.platformBaseDomain?.trim();
-  if (base) {
-    const slug = extractPlatformSubdomainSlug(host, base);
-    if (slug) {
-      const bySlug = await Result.tryPromise({
-        try: () => loadOrganization(db, { slug }),
-        catch: (cause) => databaseError("resolveOrganizationByHost.slug", cause),
-      });
-      if (Result.isError(bySlug)) {
-        return Result.err(bySlug.error);
-      }
-      const slugOrg = bySlug.value;
-      if (slugOrg !== null) {
-        return Result.ok({
-          organizationId: slugOrg.id,
-          organizationSlug: slugOrg.slug,
-          organizationName: slugOrg.name,
-          host,
-          match: "platform_subdomain" as const,
-        });
-      }
-    }
+  if (requireActive && domainRow.status !== "active") {
+    return Result.err(notFound("ActiveDomain", host));
+  }
+
+  const org = await Result.tryPromise({
+    try: () => loadOrganization(db, { id: domainRow.organizationId }),
+    catch: (cause) => databaseError("resolveOrganizationByHost.customOrg", cause),
+  });
+  if (Result.isError(org)) {
+    return Result.err(org.error);
+  }
+  const orgRow = org.value;
+  if (orgRow === null) {
+    return Result.err(notFound("Organization", domainRow.organizationId));
+  }
+
+  return Result.ok({
+    organizationId: orgRow.id,
+    organizationSlug: orgRow.slug,
+    organizationName: orgRow.name,
+    host: domainRow.hostname,
+    match: "custom_domain",
+    domainStatus: domainRow.status,
+    domainId: domainRow.id,
+  });
+}
+
+/** Platform vanity `{slug}.{base}` → org (or null if no match / no base). */
+async function resolveByPlatformSubdomain(
+  db: Database,
+  host: string,
+  platformBaseDomain: string | undefined,
+): Promise<Result<ResolvedTenant | null, ResolveTenantError>> {
+  const base = platformBaseDomain?.trim();
+  if (!base) {
+    return Result.ok(null);
+  }
+
+  const slug = extractPlatformSubdomainSlug(host, base);
+  if (!slug) {
+    return Result.ok(null);
+  }
+
+  const bySlug = await Result.tryPromise({
+    try: () => loadOrganization(db, { slug }),
+    catch: (cause) => databaseError("resolveOrganizationByHost.slug", cause),
+  });
+  if (Result.isError(bySlug)) {
+    return Result.err(bySlug.error);
+  }
+  const slugOrg = bySlug.value;
+  if (slugOrg === null) {
+    return Result.ok(null);
+  }
+
+  return Result.ok({
+    organizationId: slugOrg.id,
+    organizationSlug: slugOrg.slug,
+    organizationName: slugOrg.name,
+    host,
+    match: "platform_subdomain",
+  });
+}
+
+/**
+ * Resolve Host → organization slug (+ id).
+ * Prefer custom domain row first (customer apex wins over coincidental platform names),
+ * then platform subdomain.
+ */
+export async function resolveOrganizationByHost(
+  db: Database,
+  hostInput: string,
+  options: ResolveTenantOptions = {},
+): Promise<Result<ResolvedTenant, ResolveTenantError>> {
+  const host = normalizeHostname(hostInput);
+  if (!host) {
+    return Result.err(validation("Host is required", "host"));
+  }
+
+  const requireActive = options.requireActiveCustomDomain !== false;
+
+  const custom = await resolveByCustomDomain(db, host, requireActive);
+  if (Result.isError(custom)) {
+    return Result.err(custom.error);
+  }
+  if (custom.value !== null) {
+    return Result.ok(custom.value);
+  }
+
+  const vanity = await resolveByPlatformSubdomain(db, host, options.platformBaseDomain);
+  if (Result.isError(vanity)) {
+    return Result.err(vanity.error);
+  }
+  if (vanity.value !== null) {
+    return Result.ok(vanity.value);
   }
 
   return Result.err(notFound("Tenant", host));

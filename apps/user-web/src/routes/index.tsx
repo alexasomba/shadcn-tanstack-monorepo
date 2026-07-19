@@ -9,11 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Faq1 } from "@workspace/ui/components/ui/faq-1";
-import Features1 from "@workspace/ui/components/ui/feature-1";
-import Features3 from "@workspace/ui/components/ui/feature-3";
-import Pricing2 from "@workspace/ui/components/ui/pricing-2";
-import Stats3 from "@workspace/ui/components/ui/stats-3";
+import { Faq1 } from "@workspace/ui/components/ui/faq/faq-1";
+import Features1 from "@workspace/ui/components/ui/features/feature-1";
+import Features3 from "@workspace/ui/components/ui/features/feature-3";
+import Pricing2 from "@workspace/ui/components/ui/pricing/pricing-2";
+import Stats3 from "@workspace/ui/components/ui/stats/stats-3";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";

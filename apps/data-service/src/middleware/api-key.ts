@@ -1,25 +1,37 @@
 import { getAuth } from "../auth.js";
 import type { AuthSession, AuthUser } from "../auth.js";
+import { logError } from "../lib/log.js";
 import type { AppContext } from "../types.js";
 
-interface ApiKeyRequest extends Request {
+/** Request-scoped cache on the fetch Request (not module globals). */
+type ApiKeyRequestBag = {
   __apiKeyVerified?: boolean;
   __apiKeyUser?: AuthUser;
   __apiKeySession?: AuthSession;
-}
+};
 
-interface BetterAuthApiWithApiKey {
-  verifyApiKey: (options: { body: { key: string }; headers: Headers }) => Promise<{
-    key?: {
-      id: string;
-      referenceId: string;
-      prefix?: string | null;
-      configId?: string | null;
-      key?: string;
-      metadata?: unknown;
-    };
-    valid?: boolean;
-  } | null>;
+type VerifiedApiKey = {
+  id: string;
+  referenceId: string;
+  prefix?: string | null;
+  configId?: string | null;
+  key?: string;
+  metadata?: unknown;
+};
+
+type VerifyApiKeyResult = {
+  key?: VerifiedApiKey;
+  valid?: boolean;
+} | null;
+
+type VerifyApiKeyFn = (options: {
+  body: { key: string };
+  headers: Headers;
+}) => Promise<VerifyApiKeyResult>;
+
+function getVerifyApiKey(auth: ReturnType<typeof getAuth>): VerifyApiKeyFn | null {
+  const api = auth.api as { verifyApiKey?: VerifyApiKeyFn };
+  return typeof api.verifyApiKey === "function" ? api.verifyApiKey.bind(api) : null;
 }
 
 function extractApiKey(c: AppContext): string {
@@ -35,7 +47,10 @@ function classifyError(error: unknown): {
   message: string;
   status: 403 | 401;
 } {
-  const err = error as Record<string, unknown>;
+  const err =
+    error && typeof error === "object"
+      ? (error as Record<string, unknown>)
+      : ({} as Record<string, unknown>);
   const message = typeof err.message === "string" ? err.message.toLowerCase() : "";
   const code =
     typeof err.code === "string"
@@ -70,17 +85,33 @@ function classifyError(error: unknown): {
   };
 }
 
+function requestBag(c: AppContext): ApiKeyRequestBag {
+  // Hono/Workers Request is a single object for the request lifetime.
+  return c.req.raw as Request & ApiKeyRequestBag;
+}
+
+function toApiKeyPrincipal(key: VerifiedApiKey): { user: AuthUser; session: AuthSession } {
+  const isOrgKey = key.configId === "organization" || (key.prefix?.startsWith("sk_org_") ?? false);
+
+  // Minimal principal for Hono context (only fields consumers read).
+  const user = { id: isOrgKey ? `apikey:${key.id}` : key.referenceId } as AuthUser;
+  const session = {
+    activeOrganizationId: isOrgKey ? key.referenceId : null,
+  } as unknown as AuthSession;
+
+  return { user, session };
+}
+
 /**
  * Middleware to require and verify a developer API key.
  * Resolves the key using Better Auth, and populates the user and session context.
  */
 export async function requireApiKey(c: AppContext, next: () => Promise<void>) {
-  // Request-level de-duplication check to prevent multiple executions per request lifecycle.
-  const rawReq = c.req.raw as unknown as ApiKeyRequest;
-  if (rawReq.__apiKeyVerified) {
-    if (rawReq.__apiKeyUser) {
-      c.set("user", rawReq.__apiKeyUser);
-      c.set("session", rawReq.__apiKeySession ?? null);
+  const bag = requestBag(c);
+  if (bag.__apiKeyVerified) {
+    if (bag.__apiKeyUser) {
+      c.set("user", bag.__apiKeyUser);
+      c.set("session", bag.__apiKeySession ?? null);
     }
     await next();
     return;
@@ -109,9 +140,19 @@ export async function requireApiKey(c: AppContext, next: () => Promise<void>) {
       c.env,
     );
 
-    // Call verifyApiKey using a sterile headers container (omitting cookies).
-    const authApi = auth.api as unknown as BetterAuthApiWithApiKey;
-    const result = await authApi.verifyApiKey({
+    const verifyApiKey = getVerifyApiKey(auth);
+    if (!verifyApiKey) {
+      logError("api_key.verify_unavailable", {});
+      return c.json(
+        {
+          success: false,
+          error: { code: "UNAUTHORIZED", message: "API key verification unavailable" },
+        },
+        401,
+      );
+    }
+
+    const result = await verifyApiKey({
       body: { key },
       headers: new Headers(),
     });
@@ -126,26 +167,16 @@ export async function requireApiKey(c: AppContext, next: () => Promise<void>) {
       );
     }
 
-    // Dual configs: organization keys use referenceId = orgId; user keys use referenceId = userId.
-    const isOrgKey =
-      result.key.configId === "organization" || (result.key.prefix?.startsWith("sk_org_") ?? false);
+    const { user, session } = toApiKeyPrincipal(result.key);
 
-    const userObj = {
-      id: isOrgKey ? `apikey:${result.key.id}` : result.key.referenceId,
-    } as unknown as AuthUser;
-    const sessionObj = {
-      activeOrganizationId: isOrgKey ? result.key.referenceId : null,
-    } as unknown as AuthSession;
+    bag.__apiKeyVerified = true;
+    bag.__apiKeyUser = user;
+    bag.__apiKeySession = session;
 
-    // Cache the verification results on the raw request object
-    rawReq.__apiKeyVerified = true;
-    rawReq.__apiKeyUser = userObj;
-    rawReq.__apiKeySession = sessionObj;
-
-    c.set("user", userObj);
-    c.set("session", sessionObj);
+    c.set("user", user);
+    c.set("session", session);
   } catch (error) {
-    console.error("[data-service] API key verification failed:", error);
+    logError("api_key.verification_failed", { error });
     const classification = classifyError(error);
     return c.json(
       {

@@ -199,18 +199,24 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
   }
 }
 
-export default withSentry(
-  (env: Env) => ({
-    dsn: env.SENTRY_DSN || env.VITE_SENTRY_DSN || "https://mock-dsn@sentry.io/123",
+const agentHandler = {
+  async fetch(request: Request, env: Env) {
+    const url = new URL(request.url);
+    if (url.pathname === "/api/debug/sentry-test") {
+      throw new Error("Sentry test exception");
+    }
+    return (await routeAgentRequest(request, env)) || new Response("Not found", { status: 404 });
+  },
+} satisfies ExportedHandler<Env>;
+
+/** Sentry only when a real DSN is set (no mock-dsn fallback). */
+export default withSentry((env: Env) => {
+  const raw = env.SENTRY_DSN || env.VITE_SENTRY_DSN;
+  const dsn =
+    typeof raw === "string" && raw.length > 0 && !raw.includes("mock-dsn") ? raw : undefined;
+  return {
+    dsn,
+    enabled: Boolean(dsn),
     tracesSampleRate: 1.0,
-  }),
-  {
-    async fetch(request: Request, env: Env) {
-      const url = new URL(request.url);
-      if (url.pathname === "/api/debug/sentry-test") {
-        throw new Error("Sentry test exception");
-      }
-      return (await routeAgentRequest(request, env)) || new Response("Not found", { status: 404 });
-    },
-  } satisfies ExportedHandler<Env>,
-);
+  };
+}, agentHandler);

@@ -11,6 +11,13 @@
     "port": 8300,
     "inspector_port": 9230,
   },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      // Lower in high-traffic prod if cost matters
+      "head_sampling_rate": 1,
+    },
+  },
   "ai": {
     "binding": "AI",
     "remote": true,
@@ -50,4 +57,13 @@
       "class_name": "OrgOnboardingWorkflow",
     },
   ],
+  // Non-secret config only. Secrets: .dev.vars or `wrangler secret put`
+  // (ONESIGNAL_API_KEY, BETTER_AUTH_SECRET, CLOUDFLARE_API_TOKEN if needed).
+  // Production CF for SaaS: see docs/cloudflare-for-saas.md (routes / fallback origin).
+  "vars": {
+    // Vanity hosts: {slug}.PLATFORM_BASE_DOMAIN → organization.slug
+    // "PLATFORM_BASE_DOMAIN": "app.example.com",
+    // Host→tenant Cache API TTL seconds (default 60 in code if unset)
+    "TENANT_CACHE_TTL_SECONDS": "60",
+  },
 }

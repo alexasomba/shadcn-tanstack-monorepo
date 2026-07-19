@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "@phosphor-icons/react";
-import LogoIcon from "@workspace/ui/components/ui/logo-icon";
+import LogoIcon from "@workspace/ui/components/ui/widgets/logo-icon";
 import { motion } from "motion/react";
 import type { Variants } from "motion/react";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";

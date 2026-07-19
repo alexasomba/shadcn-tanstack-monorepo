@@ -2,15 +2,18 @@ import { env } from "cloudflare:workers";
 
 /**
  * Cloudflare bindings for this Worker.
- * Prefer `import { env } from "cloudflare:workers"` (current platform API)
- * over legacy vinxi/event-context plumbing.
+ * Prefer `import { env } from "cloudflare:workers"`.
  *
- * @see https://developers.cloudflare.com/workers/framework-guides/web-apps/tanstack-start/
+ * After changing wrangler.jsonc, regenerate:
+ *   pnpm --filter admin-web-app exec wrangler types worker-configuration.d.ts --include-runtime false
+ *
+ * Optional fields not always in generated Env are intersectioned below.
  */
-export type AppCloudflareEnv = {
-  DATABASE: D1Database;
-  DATA_SERVICE: Fetcher;
-  AI?: Ai;
+export type AppCloudflareEnv = Env & {
+  ONESIGNAL_APP_ID?: string;
+  ONESIGNAL_API_KEY?: string;
+  NOTIFY_DRY_RUN?: string;
+  VITE_APP_URL?: string;
 };
 
 function asAppEnv(): AppCloudflareEnv {

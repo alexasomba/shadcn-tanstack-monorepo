@@ -1,7 +1,7 @@
 import { BuildingsIcon, EnvelopeIcon, HeadsetIcon, MapPinIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ButtonLink } from "@workspace/ui/components/button-link";
-import ContactBlock from "@workspace/ui/components/ui/contact-1";
+import ContactBlock from "@workspace/ui/components/ui/contact/contact-1";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
 import SiteHeader from "#/components/marketing/SiteHeader";

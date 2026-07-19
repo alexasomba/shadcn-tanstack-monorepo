@@ -9,53 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TalksIndexRouteImport } from './routes/talks.index'
-import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
-import { Route as ScheduleIndexRouteImport } from './routes/schedule.index'
-import { Route as TalksSlugRouteImport } from './routes/talks.$slug'
-import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoTableRouteImport } from './routes/demo/table'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as DemoI18nRouteImport } from './routes/demo.i18n'
-import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
-import { Route as DemoDbChatApiRouteImport } from './routes/demo/db-chat-api'
-import { Route as DemoDbChatRouteImport } from './routes/demo/db-chat'
-import { Route as DemoBetterAuthRouteImport } from './routes/demo/better-auth'
-import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
-import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
-import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
-import { Route as ApiRemyChatRouteImport } from './routes/api.remy-chat'
-import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
-import { Route as ProtectedReferralsRouteImport } from './routes/_protected/referrals'
-import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedRouteImport } from './routes/_protected'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
-import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as ProtectedReferralsRouteImport } from './routes/_protected/referrals'
+import { Route as ProtectedUsersRouteImport } from './routes/_protected/users'
+import { Route as ApiRemyChatRouteImport } from './routes/api.remy-chat'
+import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
+import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
+import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
+import { Route as DemoBetterAuthRouteImport } from './routes/demo/better-auth'
+import { Route as DemoDbChatRouteImport } from './routes/demo/db-chat'
+import { Route as DemoDbChatApiRouteImport } from './routes/demo/db-chat-api'
+import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
+import { Route as DemoI18nRouteImport } from './routes/demo.i18n'
+import { Route as DemoPreviewRouteImport } from './routes/demo/preview'
+import { Route as DemoStoreRouteImport } from './routes/demo/store'
+import { Route as DemoTableRouteImport } from './routes/demo/table'
+import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
+import { Route as ScheduleIndexRouteImport } from './routes/schedule.index'
+import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
+import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
+import { Route as TalksIndexRouteImport } from './routes/talks.index'
+import { Route as TalksSlugRouteImport } from './routes/talks.$slug'
 import { Route as ProtectedCrmIndexRouteImport } from './routes/_protected/crm.index'
-import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
-import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
-import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
-import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
-import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users.$userId'
 import { Route as ProtectedCrmObjectKeyRouteImport } from './routes/_protected/crm.$objectKey'
-import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
-import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
-import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
-import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
-import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
-import { Route as ProtectedCrmDealsIdRouteImport } from './routes/_protected/crm.deals.$id'
-import { Route as ProtectedCrmContactsIdRouteImport } from './routes/_protected/crm.contacts.$id'
+import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users.$userId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiDebugSentryTestRouteImport } from './routes/api/debug/sentry-test'
+import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
+import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
+import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
+import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
 import { Route as ProtectedCrmCompaniesCompanyIdRouteImport } from './routes/_protected/crm.companies.$companyId'
+import { Route as ProtectedCrmContactsIdRouteImport } from './routes/_protected/crm.contacts.$id'
+import { Route as ProtectedCrmDealsIdRouteImport } from './routes/_protected/crm.deals.$id'
+import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
+import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
+import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
+import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
+import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -63,108 +68,14 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/_protected',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TalksIndexRoute = TalksIndexRouteImport.update({
-  id: '/talks/',
-  path: '/talks/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
-  id: '/speakers/',
-  path: '/speakers/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScheduleIndexRoute = ScheduleIndexRouteImport.update({
-  id: '/schedule/',
-  path: '/schedule/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TalksSlugRoute = TalksSlugRouteImport.update({
-  id: '/talks/$slug',
-  path: '/talks/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
-  id: '/speakers/$slug',
-  path: '/speakers/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoI18nRoute = DemoI18nRouteImport.update({
-  id: '/demo/i18n',
-  path: '/demo/i18n',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
-  id: '/demo/drizzle',
-  path: '/demo/drizzle',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDbChatApiRoute = DemoDbChatApiRouteImport.update({
-  id: '/demo/db-chat-api',
-  path: '/demo/db-chat-api',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDbChatRoute = DemoDbChatRouteImport.update({
-  id: '/demo/db-chat',
-  path: '/demo/db-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoBetterAuthRoute = DemoBetterAuthRouteImport.update({
-  id: '/demo/better-auth',
-  path: '/demo/better-auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
-  id: '/demo/ai-structured',
-  path: '/demo/ai-structured',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiImageRoute = DemoAiImageRouteImport.update({
-  id: '/demo/ai-image',
-  path: '/demo/ai-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiChatRoute = DemoAiChatRouteImport.update({
-  id: '/demo/ai-chat',
-  path: '/demo/ai-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiRemyChatRoute = ApiRemyChatRouteImport.update({
-  id: '/api/remy-chat',
-  path: '/api/remy-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const ProtectedReferralsRoute = ProtectedReferralsRouteImport.update({
-  id: '/referrals',
-  path: '/referrals',
+const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
@@ -172,14 +83,104 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const ProtectedReferralsRoute = ProtectedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
-  id: '/demo/guitars/',
-  path: '/demo/guitars/',
+const ProtectedUsersRoute = ProtectedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ApiRemyChatRoute = ApiRemyChatRouteImport.update({
+  id: '/api/remy-chat',
+  path: '/api/remy-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoAiChatRoute = DemoAiChatRouteImport.update({
+  id: '/demo/ai-chat',
+  path: '/demo/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoAiImageRoute = DemoAiImageRouteImport.update({
+  id: '/demo/ai-image',
+  path: '/demo/ai-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
+  id: '/demo/ai-structured',
+  path: '/demo/ai-structured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoBetterAuthRoute = DemoBetterAuthRouteImport.update({
+  id: '/demo/better-auth',
+  path: '/demo/better-auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoDbChatRoute = DemoDbChatRouteImport.update({
+  id: '/demo/db-chat',
+  path: '/demo/db-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoDbChatApiRoute = DemoDbChatApiRouteImport.update({
+  id: '/demo/db-chat-api',
+  path: '/demo/db-chat-api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
+  id: '/demo/drizzle',
+  path: '/demo/drizzle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoI18nRoute = DemoI18nRouteImport.update({
+  id: '/demo/i18n',
+  path: '/demo/i18n',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoPreviewRoute = DemoPreviewRouteImport.update({
+  id: '/demo/preview',
+  path: '/demo/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoStoreRoute = DemoStoreRouteImport.update({
+  id: '/demo/store',
+  path: '/demo/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTableRoute = DemoTableRouteImport.update({
+  id: '/demo/table',
+  path: '/demo/table',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
+  id: '/demo/tanstack-query',
+  path: '/demo/tanstack-query',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScheduleIndexRoute = ScheduleIndexRouteImport.update({
+  id: '/schedule/',
+  path: '/schedule/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
+  id: '/speakers/',
+  path: '/speakers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
+  id: '/speakers/$slug',
+  path: '/speakers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TalksIndexRoute = TalksIndexRouteImport.update({
+  id: '/talks/',
+  path: '/talks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TalksSlugRoute = TalksSlugRouteImport.update({
+  id: '/talks/$slug',
+  path: '/talks/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedCrmIndexRoute = ProtectedCrmIndexRouteImport.update({
@@ -187,24 +188,19 @@ const ProtectedCrmIndexRoute = ProtectedCrmIndexRouteImport.update({
   path: '/crm/',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/demo/sentry/testing',
-  path: '/demo/sentry/testing',
-  getParentRoute: () => rootRouteImport,
+const ProtectedCrmObjectKeyRoute = ProtectedCrmObjectKeyRouteImport.update({
+  id: '/crm/$objectKey',
+  path: '/crm/$objectKey',
+  getParentRoute: () => ProtectedRoute,
 } as any)
-const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
-  id: '/demo/guitars/$guitarId',
-  path: '/demo/guitars/$guitarId',
-  getParentRoute: () => rootRouteImport,
+const ProtectedUsersUserIdRoute = ProtectedUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => ProtectedUsersRoute,
 } as any)
-const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: '/demo/form/simple',
-  path: '/demo/form/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: '/demo/form/address',
-  path: '/demo/form/address',
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDebugSentryTestRoute = ApiDebugSentryTestRouteImport.update({
@@ -212,55 +208,30 @@ const ApiDebugSentryTestRoute = ApiDebugSentryTestRouteImport.update({
   path: '/api/debug/sentry-test',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
+  id: '/demo/form/address',
+  path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedUsersUserIdRoute = ProtectedUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => ProtectedUsersRoute,
-} as any)
-const ProtectedCrmObjectKeyRoute = ProtectedCrmObjectKeyRouteImport.update({
-  id: '/crm/$objectKey',
-  path: '/crm/$objectKey',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
-  id: '/demo/api/ai/tts',
-  path: '/demo/api/ai/tts',
+const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
+  id: '/demo/form/simple',
+  path: '/demo/form/simple',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
-  id: '/demo/api/ai/transcription',
-  path: '/demo/api/ai/transcription',
+const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
+  id: '/demo/guitars/',
+  path: '/demo/guitars/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
-  id: '/demo/api/ai/structured',
-  path: '/demo/api/ai/structured',
+const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
+  id: '/demo/guitars/$guitarId',
+  path: '/demo/guitars/$guitarId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
-  id: '/demo/api/ai/image',
-  path: '/demo/api/ai/image',
+const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
+  id: '/demo/sentry/testing',
+  path: '/demo/sentry/testing',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
-  id: '/demo/api/ai/chat',
-  path: '/demo/api/ai/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedCrmDealsIdRoute = ProtectedCrmDealsIdRouteImport.update({
-  id: '/crm/deals/$id',
-  path: '/crm/deals/$id',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const ProtectedCrmContactsIdRoute = ProtectedCrmContactsIdRouteImport.update({
-  id: '/crm/contacts/$id',
-  path: '/crm/contacts/$id',
-  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedCrmCompaniesCompanyIdRoute =
   ProtectedCrmCompaniesCompanyIdRouteImport.update({
@@ -268,6 +239,41 @@ const ProtectedCrmCompaniesCompanyIdRoute =
     path: '/crm/companies/$companyId',
     getParentRoute: () => ProtectedRoute,
   } as any)
+const ProtectedCrmContactsIdRoute = ProtectedCrmContactsIdRouteImport.update({
+  id: '/crm/contacts/$id',
+  path: '/crm/contacts/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCrmDealsIdRoute = ProtectedCrmDealsIdRouteImport.update({
+  id: '/crm/deals/$id',
+  path: '/crm/deals/$id',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
+  id: '/demo/api/ai/chat',
+  path: '/demo/api/ai/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
+  id: '/demo/api/ai/image',
+  path: '/demo/api/ai/image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
+  id: '/demo/api/ai/structured',
+  path: '/demo/api/ai/structured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
+  id: '/demo/api/ai/transcription',
+  path: '/demo/api/ai/transcription',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
+  id: '/demo/api/ai/tts',
+  path: '/demo/api/ai/tts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -286,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -376,6 +384,7 @@ export interface FileRoutesById {
   '/demo/db-chat-api': typeof DemoDbChatApiRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/i18n': typeof DemoI18nRoute
+  '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
@@ -422,6 +431,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/demo/db-chat-api'
     | '/demo/drizzle'
     | '/demo/i18n'
+    | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
     | '/demo/tanstack-query'
@@ -553,6 +565,7 @@ export interface RootRouteChildren {
   DemoDbChatApiRoute: typeof DemoDbChatApiRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoI18nRoute: typeof DemoI18nRoute
+  DemoPreviewRoute: typeof DemoPreviewRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
@@ -577,18 +590,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected': {
@@ -598,144 +604,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/talks/': {
-      id: '/talks/'
-      path: '/talks'
-      fullPath: '/talks/'
-      preLoaderRoute: typeof TalksIndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/speakers/': {
-      id: '/speakers/'
-      path: '/speakers'
-      fullPath: '/speakers/'
-      preLoaderRoute: typeof SpeakersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/schedule/': {
-      id: '/schedule/'
-      path: '/schedule'
-      fullPath: '/schedule/'
-      preLoaderRoute: typeof ScheduleIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/talks/$slug': {
-      id: '/talks/$slug'
-      path: '/talks/$slug'
-      fullPath: '/talks/$slug'
-      preLoaderRoute: typeof TalksSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/speakers/$slug': {
-      id: '/speakers/$slug'
-      path: '/speakers/$slug'
-      fullPath: '/speakers/$slug'
-      preLoaderRoute: typeof SpeakersSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/i18n': {
-      id: '/demo/i18n'
-      path: '/demo/i18n'
-      fullPath: '/demo/i18n'
-      preLoaderRoute: typeof DemoI18nRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/drizzle': {
-      id: '/demo/drizzle'
-      path: '/demo/drizzle'
-      fullPath: '/demo/drizzle'
-      preLoaderRoute: typeof DemoDrizzleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/db-chat-api': {
-      id: '/demo/db-chat-api'
-      path: '/demo/db-chat-api'
-      fullPath: '/demo/db-chat-api'
-      preLoaderRoute: typeof DemoDbChatApiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/db-chat': {
-      id: '/demo/db-chat'
-      path: '/demo/db-chat'
-      fullPath: '/demo/db-chat'
-      preLoaderRoute: typeof DemoDbChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/better-auth': {
-      id: '/demo/better-auth'
-      path: '/demo/better-auth'
-      fullPath: '/demo/better-auth'
-      preLoaderRoute: typeof DemoBetterAuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-structured': {
-      id: '/demo/ai-structured'
-      path: '/demo/ai-structured'
-      fullPath: '/demo/ai-structured'
-      preLoaderRoute: typeof DemoAiStructuredRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-image': {
-      id: '/demo/ai-image'
-      path: '/demo/ai-image'
-      fullPath: '/demo/ai-image'
-      preLoaderRoute: typeof DemoAiImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-chat': {
-      id: '/demo/ai-chat'
-      path: '/demo/ai-chat'
-      fullPath: '/demo/ai-chat'
-      preLoaderRoute: typeof DemoAiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/remy-chat': {
-      id: '/api/remy-chat'
-      path: '/api/remy-chat'
-      fullPath: '/api/remy-chat'
-      preLoaderRoute: typeof ApiRemyChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected/users': {
-      id: '/_protected/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof ProtectedUsersRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
-    '/_protected/referrals': {
-      id: '/_protected/referrals'
-      path: '/referrals'
-      fullPath: '/referrals'
-      preLoaderRoute: typeof ProtectedReferralsRouteImport
+    '/_protected/account': {
+      id: '/_protected/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof ProtectedAccountRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/dashboard': {
@@ -745,18 +632,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/account': {
-      id: '/_protected/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof ProtectedAccountRouteImport
+    '/_protected/referrals': {
+      id: '/_protected/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ProtectedReferralsRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/demo/guitars/': {
-      id: '/demo/guitars/'
-      path: '/demo/guitars'
-      fullPath: '/demo/guitars/'
-      preLoaderRoute: typeof DemoGuitarsIndexRouteImport
+    '/_protected/users': {
+      id: '/_protected/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof ProtectedUsersRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/api/remy-chat': {
+      id: '/api/remy-chat'
+      path: '/api/remy-chat'
+      fullPath: '/api/remy-chat'
+      preLoaderRoute: typeof ApiRemyChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/ai-chat': {
+      id: '/demo/ai-chat'
+      path: '/demo/ai-chat'
+      fullPath: '/demo/ai-chat'
+      preLoaderRoute: typeof DemoAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/ai-image': {
+      id: '/demo/ai-image'
+      path: '/demo/ai-image'
+      fullPath: '/demo/ai-image'
+      preLoaderRoute: typeof DemoAiImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/ai-structured': {
+      id: '/demo/ai-structured'
+      path: '/demo/ai-structured'
+      fullPath: '/demo/ai-structured'
+      preLoaderRoute: typeof DemoAiStructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/better-auth': {
+      id: '/demo/better-auth'
+      path: '/demo/better-auth'
+      fullPath: '/demo/better-auth'
+      preLoaderRoute: typeof DemoBetterAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/db-chat': {
+      id: '/demo/db-chat'
+      path: '/demo/db-chat'
+      fullPath: '/demo/db-chat'
+      preLoaderRoute: typeof DemoDbChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/db-chat-api': {
+      id: '/demo/db-chat-api'
+      path: '/demo/db-chat-api'
+      fullPath: '/demo/db-chat-api'
+      preLoaderRoute: typeof DemoDbChatApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/drizzle': {
+      id: '/demo/drizzle'
+      path: '/demo/drizzle'
+      fullPath: '/demo/drizzle'
+      preLoaderRoute: typeof DemoDrizzleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/i18n': {
+      id: '/demo/i18n'
+      path: '/demo/i18n'
+      fullPath: '/demo/i18n'
+      preLoaderRoute: typeof DemoI18nRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/preview': {
+      id: '/demo/preview'
+      path: '/demo/preview'
+      fullPath: '/demo/preview'
+      preLoaderRoute: typeof DemoPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/store': {
+      id: '/demo/store'
+      path: '/demo/store'
+      fullPath: '/demo/store'
+      preLoaderRoute: typeof DemoStoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/table': {
+      id: '/demo/table'
+      path: '/demo/table'
+      fullPath: '/demo/table'
+      preLoaderRoute: typeof DemoTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/tanstack-query': {
+      id: '/demo/tanstack-query'
+      path: '/demo/tanstack-query'
+      fullPath: '/demo/tanstack-query'
+      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedule/': {
+      id: '/schedule/'
+      path: '/schedule'
+      fullPath: '/schedule/'
+      preLoaderRoute: typeof ScheduleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/': {
+      id: '/speakers/'
+      path: '/speakers'
+      fullPath: '/speakers/'
+      preLoaderRoute: typeof SpeakersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/$slug': {
+      id: '/speakers/$slug'
+      path: '/speakers/$slug'
+      fullPath: '/speakers/$slug'
+      preLoaderRoute: typeof SpeakersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/talks/': {
+      id: '/talks/'
+      path: '/talks'
+      fullPath: '/talks/'
+      preLoaderRoute: typeof TalksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/talks/$slug': {
+      id: '/talks/$slug'
+      path: '/talks/$slug'
+      fullPath: '/talks/$slug'
+      preLoaderRoute: typeof TalksSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/crm/': {
@@ -766,32 +779,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCrmIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/demo/sentry/testing': {
-      id: '/demo/sentry/testing'
-      path: '/demo/sentry/testing'
-      fullPath: '/demo/sentry/testing'
-      preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_protected/crm/$objectKey': {
+      id: '/_protected/crm/$objectKey'
+      path: '/crm/$objectKey'
+      fullPath: '/crm/$objectKey'
+      preLoaderRoute: typeof ProtectedCrmObjectKeyRouteImport
+      parentRoute: typeof ProtectedRoute
     }
-    '/demo/guitars/$guitarId': {
-      id: '/demo/guitars/$guitarId'
-      path: '/demo/guitars/$guitarId'
-      fullPath: '/demo/guitars/$guitarId'
-      preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_protected/users/$userId': {
+      id: '/_protected/users/$userId'
+      path: '/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof ProtectedUsersUserIdRouteImport
+      parentRoute: typeof ProtectedUsersRoute
     }
-    '/demo/form/simple': {
-      id: '/demo/form/simple'
-      path: '/demo/form/simple'
-      fullPath: '/demo/form/simple'
-      preLoaderRoute: typeof DemoFormSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/address': {
-      id: '/demo/form/address'
-      path: '/demo/form/address'
-      fullPath: '/demo/form/address'
-      preLoaderRoute: typeof DemoFormAddressRouteImport
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/debug/sentry-test': {
@@ -801,67 +807,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDebugSentryTestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+    '/demo/form/address': {
+      id: '/demo/form/address'
+      path: '/demo/form/address'
+      fullPath: '/demo/form/address'
+      preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/users/$userId': {
-      id: '/_protected/users/$userId'
-      path: '/$userId'
-      fullPath: '/users/$userId'
-      preLoaderRoute: typeof ProtectedUsersUserIdRouteImport
-      parentRoute: typeof ProtectedUsersRoute
-    }
-    '/_protected/crm/$objectKey': {
-      id: '/_protected/crm/$objectKey'
-      path: '/crm/$objectKey'
-      fullPath: '/crm/$objectKey'
-      preLoaderRoute: typeof ProtectedCrmObjectKeyRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
-    '/demo/api/ai/tts': {
-      id: '/demo/api/ai/tts'
-      path: '/demo/api/ai/tts'
-      fullPath: '/demo/api/ai/tts'
-      preLoaderRoute: typeof DemoApiAiTtsRouteImport
+    '/demo/form/simple': {
+      id: '/demo/form/simple'
+      path: '/demo/form/simple'
+      fullPath: '/demo/form/simple'
+      preLoaderRoute: typeof DemoFormSimpleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/transcription': {
-      id: '/demo/api/ai/transcription'
-      path: '/demo/api/ai/transcription'
-      fullPath: '/demo/api/ai/transcription'
-      preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
+    '/demo/guitars/': {
+      id: '/demo/guitars/'
+      path: '/demo/guitars'
+      fullPath: '/demo/guitars/'
+      preLoaderRoute: typeof DemoGuitarsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/structured': {
-      id: '/demo/api/ai/structured'
-      path: '/demo/api/ai/structured'
-      fullPath: '/demo/api/ai/structured'
-      preLoaderRoute: typeof DemoApiAiStructuredRouteImport
+    '/demo/guitars/$guitarId': {
+      id: '/demo/guitars/$guitarId'
+      path: '/demo/guitars/$guitarId'
+      fullPath: '/demo/guitars/$guitarId'
+      preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/image': {
-      id: '/demo/api/ai/image'
-      path: '/demo/api/ai/image'
-      fullPath: '/demo/api/ai/image'
-      preLoaderRoute: typeof DemoApiAiImageRouteImport
+    '/demo/sentry/testing': {
+      id: '/demo/sentry/testing'
+      path: '/demo/sentry/testing'
+      fullPath: '/demo/sentry/testing'
+      preLoaderRoute: typeof DemoSentryTestingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/chat': {
-      id: '/demo/api/ai/chat'
-      path: '/demo/api/ai/chat'
-      fullPath: '/demo/api/ai/chat'
-      preLoaderRoute: typeof DemoApiAiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected/crm/deals/$id': {
-      id: '/_protected/crm/deals/$id'
-      path: '/crm/deals/$id'
-      fullPath: '/crm/deals/$id'
-      preLoaderRoute: typeof ProtectedCrmDealsIdRouteImport
+    '/_protected/crm/companies/$companyId': {
+      id: '/_protected/crm/companies/$companyId'
+      path: '/crm/companies/$companyId'
+      fullPath: '/crm/companies/$companyId'
+      preLoaderRoute: typeof ProtectedCrmCompaniesCompanyIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/crm/contacts/$id': {
@@ -871,12 +856,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCrmContactsIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/crm/companies/$companyId': {
-      id: '/_protected/crm/companies/$companyId'
-      path: '/crm/companies/$companyId'
-      fullPath: '/crm/companies/$companyId'
-      preLoaderRoute: typeof ProtectedCrmCompaniesCompanyIdRouteImport
+    '/_protected/crm/deals/$id': {
+      id: '/_protected/crm/deals/$id'
+      path: '/crm/deals/$id'
+      fullPath: '/crm/deals/$id'
+      preLoaderRoute: typeof ProtectedCrmDealsIdRouteImport
       parentRoute: typeof ProtectedRoute
+    }
+    '/demo/api/ai/chat': {
+      id: '/demo/api/ai/chat'
+      path: '/demo/api/ai/chat'
+      fullPath: '/demo/api/ai/chat'
+      preLoaderRoute: typeof DemoApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/ai/image': {
+      id: '/demo/api/ai/image'
+      path: '/demo/api/ai/image'
+      fullPath: '/demo/api/ai/image'
+      preLoaderRoute: typeof DemoApiAiImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/ai/structured': {
+      id: '/demo/api/ai/structured'
+      path: '/demo/api/ai/structured'
+      fullPath: '/demo/api/ai/structured'
+      preLoaderRoute: typeof DemoApiAiStructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/ai/transcription': {
+      id: '/demo/api/ai/transcription'
+      path: '/demo/api/ai/transcription'
+      fullPath: '/demo/api/ai/transcription'
+      preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/api/ai/tts': {
+      id: '/demo/api/ai/tts'
+      path: '/demo/api/ai/tts'
+      fullPath: '/demo/api/ai/tts'
+      preLoaderRoute: typeof DemoApiAiTtsRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -935,6 +955,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoDbChatApiRoute: DemoDbChatApiRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoI18nRoute: DemoI18nRoute,
+  DemoPreviewRoute: DemoPreviewRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
@@ -959,13 +980,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

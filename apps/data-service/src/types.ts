@@ -5,42 +5,48 @@ import type { JobMessage } from "./jobs/catalog";
 
 /**
  * Worker bindings for data-service.
- * Keep in sync with wrangler.jsonc + worker-configuration.d.ts.
+ *
+ * Infrastructure bindings come from `wrangler types` → `CloudflareBindings`
+ * (`worker-configuration.d.ts`). Re-run after wrangler.jsonc changes:
+ *   pnpm --filter data-service exec wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false
+ *
+ * Secrets / optional vars (secret put, .dev.vars, dashboard) are listed as optional
+ * string fields — not duplicated as fake empty wrangler vars.
+ *
+ * @see docs/cloudflare-for-saas.md
  */
-export type Bindings = {
-  DATABASE: D1Database;
+/**
+ * Generated bindings + optional secrets/vars.
+ * JOBS_QUEUE / workflows optional so tests and partial local envs type-check.
+ */
+export type Bindings = Omit<
+  CloudflareBindings,
+  "JOBS_QUEUE" | "USER_ONBOARDING_WORKFLOW" | "ORG_ONBOARDING_WORKFLOW" | "R2_BUCKET"
+> & {
+  JOBS_QUEUE?: Queue;
+  USER_ONBOARDING_WORKFLOW?: Workflow;
+  ORG_ONBOARDING_WORKFLOW?: Workflow;
+  R2_BUCKET?: R2Bucket;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
-  /** OneSignal App ID (public). Pair with secret API key for live email/push. */
+  /** OneSignal App ID (public). */
   ONESIGNAL_APP_ID?: string;
-  /** OneSignal REST API key — set via `wrangler secret` / `.dev.vars`, not wrangler vars. */
+  /** OneSignal REST API key — wrangler secret / .dev.vars only. */
   ONESIGNAL_API_KEY?: string;
   DISCORD_WEBHOOK_URL?: string;
-  /** Force better-notify mock transports (`1` / `true`). */
   NOTIFY_DRY_RUN?: string;
   /** Cloudflare for SaaS API token — secret. */
   CLOUDFLARE_API_TOKEN?: string;
   CLOUDFLARE_ZONE_ID?: string;
   CLOUDFLARE_CNAME_TARGET?: string;
-  /** `memory` forces Domain SDK test provider (local/e2e only). */
   DOMAIN_SDK_MODE?: string;
-  /**
-   * Platform host for vanity org subdomains, e.g. `app.example.com`
-   * so `{slug}.app.example.com` maps to organization.slug.
-   * Custom domains still map via the `domains` table → same slug.
-   */
   PLATFORM_BASE_DOMAIN?: string;
-  /** Producer + consumer for background jobs. */
-  JOBS_QUEUE?: Queue;
-  R2_BUCKET?: R2Bucket;
   R2_ACCOUNT_ID?: string;
   R2_ACCESS_KEY_ID?: string;
   R2_SECRET_ACCESS_KEY?: string;
   R2_BUCKET_NAME?: string;
-  USER_ONBOARDING_WORKFLOW?: Workflow;
-  ORG_ONBOARDING_WORKFLOW?: Workflow;
   SENTRY_DSN?: string;
   VITE_SENTRY_DSN?: string;
 };

@@ -1,4 +1,4 @@
-import type { PricingTier } from "@workspace/ui/components/ui/pricing-2";
+import type { PricingTier } from "@workspace/ui/components/ui/pricing/pricing-2";
 import { formatMoney, KIT_PAYSTACK_PLANS } from "data-ops";
 
 /** Map kit catalog into Pricing2 tiers (monthly + yearly siblings). */

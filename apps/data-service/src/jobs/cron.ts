@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/cloudflare";
 
+import { logError, logInfo } from "../lib/log";
 import type { Bindings } from "../types";
 import type { JobMessage } from "./catalog";
 import { drainOutbox } from "./handlers";
@@ -13,13 +14,13 @@ export async function handleScheduled(
   _ctx: ExecutionContext,
 ): Promise<void> {
   const scheduledTime = new Date(event.scheduledTime).toISOString();
-  console.log("[cron] tick", { cron: event.cron, scheduledTime });
+  logInfo("cron.tick", { cron: event.cron, scheduledTime });
 
   await cronTask(
     "outbox.drain",
     async () => {
       const n = await drainOutbox(env);
-      console.log(`[cron:outbox.drain] processed=${n}`);
+      logInfo("cron.outbox.drain", { processed: n });
     },
     { scheduledTime, cron: event.cron },
   );
@@ -48,12 +49,12 @@ async function cronTask(
 ): Promise<void> {
   const start = Date.now();
   try {
-    console.log(`[cron:${name}] start`);
+    logInfo("cron.task.start", { task: name });
     await fn();
-    console.log(`[cron:${name}] done`, { durationMs: Date.now() - start });
+    logInfo("cron.task.done", { task: name, durationMs: Date.now() - start });
   } catch (error) {
     const durationMs = Date.now() - start;
-    console.error(`[cron:${name}] error`, { durationMs, error });
+    logError("cron.task.error", { task: name, durationMs, error });
 
     if (!error || !(error as Record<string, unknown>).sentryCaptured) {
       Sentry.captureException(error, {

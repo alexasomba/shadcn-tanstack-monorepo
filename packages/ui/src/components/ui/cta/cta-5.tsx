@@ -1,5 +1,5 @@
 import { CaretDown, Envelope } from "@phosphor-icons/react";
-import LogoIcon from "@workspace/ui/components/ui/logo-icon";
+import LogoIcon from "@workspace/ui/components/ui/widgets/logo-icon";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 

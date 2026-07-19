@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { Result, unwrapResult } from "@workspace/result";
-import type { Web3DashboardData } from "@workspace/ui/components/ui/web3-dashboard";
+import type { Web3DashboardData } from "@workspace/ui/components/ui/dashboards/web3-dashboard";
 
 import { requireAuthMiddleware } from "./auth.middleware";
 

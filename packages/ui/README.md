@@ -25,9 +25,9 @@ import { Card, CardHeader, CardTitle } from "@workspace/ui/components/card";
 **Watermelon compositions** (landing, dashboards):
 
 ```ts
-import { Hero2 } from "@workspace/ui/components/ui/hero-2";
-import { PortfolioDashboard } from "@workspace/ui/components/ui/portfolio-dashboard";
-import { Web3Dashboard } from "@workspace/ui/components/ui/web3-dashboard";
+import { Hero2 } from "@workspace/ui/components/ui/hero/hero-2";
+import { PortfolioDashboard } from "@workspace/ui/components/ui/dashboards/portfolio-dashboard";
+import { Web3Dashboard } from "@workspace/ui/components/ui/dashboards/web3-dashboard";
 ```
 
 ## Rules

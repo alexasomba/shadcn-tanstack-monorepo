@@ -15,4 +15,5 @@ export const adminDemoNav = linkOptions([
   { to: "/demo/ai-chat", label: "AI chat" },
   { to: "/talks", label: "Talks" },
   { to: "/speakers", label: "Speakers" },
+  { to: "/demo/preview", label: "Shadcn Preview" },
 ]);

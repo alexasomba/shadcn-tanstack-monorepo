@@ -1,4 +1,4 @@
-import LogoIcon from "@workspace/ui/components/ui/logo-icon";
+import LogoIcon from "@workspace/ui/components/ui/widgets/logo-icon";
 import { AnimatePresence, motion } from "motion/react";
 import type { Variants } from "motion/react";
 import { useState } from "react";

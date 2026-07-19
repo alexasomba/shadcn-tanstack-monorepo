@@ -162,6 +162,8 @@ After adding plugins: `auth:generate` → `db:generate` → `db:migrate:*`.
 
 **Notifications (primary):** better-notify → **OneSignal** (`ONESIGNAL_APP_ID` + `ONESIGNAL_API_KEY` on Workers that send). Without keys, dry-run mock transports (no outbound HTTP). In-app: better-inbox (`createInboxNotification` + `<InboxButton />`). Optional Resend only as workflow fallback (`RESEND_API_KEY` + `EMAIL_FROM`). See `apps/*/env.example`.
 
+**Custom domains (Cloudflare for SaaS):** Host → `organization.slug` (vanity + custom hostnames). Deploy checklist, SSL Full (strict), fallback origin, secrets vs vars: [docs/cloudflare-for-saas.md](docs/cloudflare-for-saas.md).
+
 **data-ops pack:** `pnpm --filter data-ops build` runs `vp pack` → `dist/` (source exports remain for monorepo DX).
 
 **Discovery (user-web):** dynamic `/sitemap.xml`, `/robots.txt`, `/llms.txt` (no static public files).

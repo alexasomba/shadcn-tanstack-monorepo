@@ -1,6 +1,7 @@
 /**
  * Host → organization slug resolution (server-only).
- * Uses local D1 (user-web owns app-db) — no data-service hop (lower CPU ms / latency).
+ * Uses local D1 (user-web owns app-db) — no data-service hop.
+ * Cache API short TTL reduces D1 reads / CPU ms on hot Hosts.
  */
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { Result } from "@workspace/result";
@@ -13,7 +14,7 @@ import {
 import type { ResolvedTenant } from "data-ops";
 
 import { getAuth } from "./auth";
-import { getDatabase } from "./cloudflare-env";
+import { getCloudflareEnv, getDatabase } from "./cloudflare-env";
 
 export type TenantContext = {
   organizationId: string;
@@ -24,14 +25,52 @@ export type TenantContext = {
   domainStatus?: string;
 };
 
-function readEnv(name: string): string | undefined {
+const DEFAULT_TENANT_CACHE_TTL_SECONDS = 60;
+
+function errorMessage(err: unknown): string {
+  if (err && typeof err === "object" && "message" in err) {
+    const msg = err.message;
+    if (typeof msg === "string") return msg;
+  }
+  return String(err);
+}
+
+/** Cache key host must be absolute URL (Workers Cache API requirement). */
+function tenantCacheRequest(host: string): Request {
+  return new Request(`https://tenant-resolve.internal/v1/${encodeURIComponent(host)}`);
+}
+
+/** Workers expose `caches.default`; browser DOM typings omit it. */
+function getDefaultCache(): Cache | null {
+  const store: CacheStorage & { default?: Cache } = caches;
+  return store.default ?? null;
+}
+
+function readBindingOrProcessEnv(name: string): string | undefined {
+  try {
+    const fromBinding = Reflect.get(getCloudflareEnv(), name);
+    if (typeof fromBinding === "string" && fromBinding.trim().length > 0) {
+      return fromBinding.trim();
+    }
+  } catch {
+    // cloudflare:workers env unavailable (unit tests)
+  }
   try {
     const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
     const value = proc?.env?.[name];
-    return typeof value === "string" && value.length > 0 ? value : undefined;
+    return typeof value === "string" && value.length > 0 ? value.trim() : undefined;
   } catch {
     return undefined;
   }
+}
+
+function tenantCacheTtlSeconds(): number {
+  const raw = readBindingOrProcessEnv("TENANT_CACHE_TTL_SECONDS");
+  if (!raw) return DEFAULT_TENANT_CACHE_TTL_SECONDS;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 0) return DEFAULT_TENANT_CACHE_TTL_SECONDS;
+  // Cap to avoid multi-hour stale tenant after domain transfer
+  return Math.min(n, 300);
 }
 
 /** Hosts that always mean the primary product (no tenant branding). */
@@ -45,9 +84,8 @@ function isPrimaryPlatformHost(host: string, platformBase: string | undefined): 
     if (host === base || host === `www.${base}`) return true;
   }
 
-  // Match BETTER_AUTH_URL / VITE_APP_URL host when it is the main origin
   for (const key of ["BETTER_AUTH_URL", "VITE_APP_URL"] as const) {
-    const raw = readEnv(key);
+    const raw = readBindingOrProcessEnv(key);
     if (!raw) continue;
     try {
       const urlHost = normalizeHostname(new URL(raw).host);
@@ -66,6 +104,50 @@ function hostFromHeaders(headers: Headers): string {
   return normalizeHostname(host);
 }
 
+async function readTenantCache(host: string): Promise<TenantContext | null | undefined> {
+  try {
+    const cache = getDefaultCache();
+    if (!cache) return undefined;
+    const hit = await cache.match(tenantCacheRequest(host));
+    if (!hit) return undefined;
+    const body = await hit.json();
+    if (body.miss === true) return null;
+    if (body.tenant && typeof body.tenant.organizationId === "string") {
+      return body.tenant;
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function writeTenantCache(host: string, tenant: TenantContext | null): Promise<void> {
+  const positiveTtl = tenantCacheTtlSeconds();
+  if (positiveTtl === 0) return;
+  // Negative cache shorter so newly-activated domains become visible quickly
+  const ttl = tenant === null ? Math.min(15, positiveTtl) : positiveTtl;
+  try {
+    const cache = getDefaultCache();
+    if (!cache) return;
+    const payload = tenant === null ? { miss: true as const } : { miss: false as const, tenant };
+    const response = new Response(JSON.stringify(payload), {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": `public, max-age=${ttl}`,
+      },
+    });
+    await cache.put(tenantCacheRequest(host), response);
+  } catch (err) {
+    console.warn(
+      JSON.stringify({
+        message: "tenant cache put failed",
+        host,
+        error: errorMessage(err),
+      }),
+    );
+  }
+}
+
 /**
  * Resolve request Host to a tenant (org slug), or null on the primary platform host.
  * Failures return null (do not break the request path).
@@ -73,10 +155,15 @@ function hostFromHeaders(headers: Headers): string {
 export async function resolveTenantFromRequest(): Promise<TenantContext | null> {
   const headers = getRequestHeaders();
   const host = hostFromHeaders(headers);
-  const platformBase = readEnv("PLATFORM_BASE_DOMAIN");
+  const platformBase = readBindingOrProcessEnv("PLATFORM_BASE_DOMAIN");
 
   if (isPrimaryPlatformHost(host, platformBase)) {
     return null;
+  }
+
+  const cached = await readTenantCache(host);
+  if (cached !== undefined) {
+    return cached;
   }
 
   try {
@@ -86,11 +173,12 @@ export async function resolveTenantFromRequest(): Promise<TenantContext | null> 
     });
 
     if (Result.isError(result)) {
+      await writeTenantCache(host, null);
       return null;
     }
 
     const t = result.value;
-    return {
+    const tenant: TenantContext = {
       organizationId: t.organizationId,
       organizationSlug: t.organizationSlug,
       organizationName: t.organizationName,
@@ -98,8 +186,16 @@ export async function resolveTenantFromRequest(): Promise<TenantContext | null> 
       match: t.match,
       domainStatus: t.domainStatus,
     };
+    await writeTenantCache(host, tenant);
+    return tenant;
   } catch (err) {
-    console.warn("[tenant] resolve failed", err);
+    console.warn(
+      JSON.stringify({
+        message: "tenant resolve failed",
+        host,
+        error: errorMessage(err),
+      }),
+    );
     return null;
   }
 }
@@ -126,7 +222,6 @@ export async function syncActiveOrganizationFromTenant(
   try {
     const headers = getRequestHeaders();
     const auth = getAuth(getDatabase());
-    // better-auth organization plugin
     const api = auth.api as {
       setActiveOrganization?: (opts: {
         body: { organizationId: string };
@@ -145,7 +240,13 @@ export async function syncActiveOrganizationFromTenant(
     });
     return { switched: true };
   } catch (err) {
-    console.warn("[tenant] setActiveOrganization failed", err);
+    console.warn(
+      JSON.stringify({
+        message: "setActiveOrganization failed",
+        organizationId: tenant.organizationId,
+        error: errorMessage(err),
+      }),
+    );
     return { switched: false, reason: "set_active_failed" };
   }
 }

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { PortfolioDashboard } from "@workspace/ui/components/ui/portfolio-dashboard";
+import { PortfolioDashboard } from "@workspace/ui/components/ui/dashboards/portfolio-dashboard";
 
 import { authClient } from "#/lib/auth-client";
 import { getSession } from "#/lib/auth.functions";
