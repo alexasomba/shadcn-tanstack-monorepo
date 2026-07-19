@@ -35,7 +35,10 @@ jobs:
           restore-keys: |
             vite-task-${{ runner.os }}-${{ runner.arch }}-
 
-      # Order matches Vite+ CI guide: check → test → build.
+      # Pre-generate content collections so types are available for the check step
+      - name: Generate content collections
+        run: pnpm --filter user-web-app --filter admin-web-app exec npx @content-collections/cli build
+
       - run: vpr ci:check
       - run: vpr ci:test
       - run: vpr build
