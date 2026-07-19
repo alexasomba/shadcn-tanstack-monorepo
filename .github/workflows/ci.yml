@@ -37,7 +37,7 @@ jobs:
 
       # Pre-generate content collections so types are available for the check step
       - name: Generate content collections
-        run: pnpm --filter user-web-app --filter admin-web-app exec npx @content-collections/cli build
+        run: vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build
 
       - run: vpr ci:check
       - run: vpr ci:test
