@@ -31,4 +31,5 @@ export const demoNav = linkOptions([
   { to: "/demo/sentry/testing", label: "Sentry" },
   { to: "/demo/i18n", label: "i18n" },
   { to: "/demo/preview", label: "Shadcn Preview" },
+  { to: "/demo/typeset", label: "Typeset" },
 ]);

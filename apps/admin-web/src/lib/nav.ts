@@ -16,4 +16,5 @@ export const adminDemoNav = linkOptions([
   { to: "/talks", label: "Talks" },
   { to: "/speakers", label: "Speakers" },
   { to: "/demo/preview", label: "Shadcn Preview" },
+  { to: "/demo/typeset", label: "Typeset" },
 ]);
