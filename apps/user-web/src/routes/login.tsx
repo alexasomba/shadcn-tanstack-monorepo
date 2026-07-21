@@ -132,7 +132,7 @@ function LoginPage() {
       <SiteHeader />
       <main className="mx-auto flex max-w-md flex-col justify-center px-4 py-16 sm:py-24">
         <Card className="border-border/70 shadow-xl shadow-primary/5">
-          <CardHeader className="space-y-1">
+          <CardHeader className="flex flex-col gap-1">
             <CardTitle className="text-2xl tracking-tight">
               {isSignUp ? "Create an account" : "Welcome back"}
             </CardTitle>

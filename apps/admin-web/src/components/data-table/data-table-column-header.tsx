@@ -28,23 +28,25 @@ export function DataTableColumnHeader<TData, TValue>({
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="-ml-3 h-8 data-[state=open]:bg-accent"
-          >
-            <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
-              <CaretDown className="ml-2 h-4 w-4" aria-hidden="true" />
-            ) : column.getIsSorted() === "asc" ? (
-              <CaretUp className="ml-2 h-4 w-4" aria-hidden="true" />
-            ) : (
-              <CaretUpDown className="ml-2 h-4 w-4" aria-hidden="true" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="-ml-3 h-8 data-[state=open]:bg-accent"
+            >
+              <span>{title}</span>
+              {column.getIsSorted() === "desc" ? (
+                <CaretDown className="ml-2" aria-hidden="true" />
+              ) : column.getIsSorted() === "asc" ? (
+                <CaretUp className="ml-2" aria-hidden="true" />
+              ) : (
+                <CaretUpDown className="ml-2" aria-hidden="true" />
+              )}
+            </Button>
+          }
+        />
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
             <CaretUp className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" aria-hidden="true" />

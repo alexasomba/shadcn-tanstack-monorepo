@@ -44,7 +44,7 @@ function SimpleForm() {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-6"
+          className="flex flex-col gap-6"
         >
           <form.AppField name="title">{(field) => <field.TextField label="Title" />}</form.AppField>
 

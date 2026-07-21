@@ -3,6 +3,7 @@ import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
@@ -18,15 +19,12 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl">
       <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 py-3">
         <Link
-          to="/dashboard"
-          preload="intent"
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-sm font-semibold no-underline"
+          to="/"
+          className="font-display mr-auto text-lg font-bold tracking-tight text-foreground"
         >
-          <span className="size-2 rounded-full bg-primary" />
-          Admin
+          Conference Admin
         </Link>
-
-        <div className="flex flex-wrap items-center gap-1 text-sm font-medium">
+        <div className="flex items-center gap-2">
           {adminNav.map(({ label, ...link }) => (
             <Link
               key={link.to}
@@ -42,23 +40,27 @@ export default function Header() {
           ))}
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="rounded-full">
-                Demos
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="ghost" size="sm" className="rounded-full">
+                  Demos
+                </Button>
+              }
+            />
             <DropdownMenuContent align="start" className="min-w-48">
-              {adminDemoNav.map(({ label, ...link }) => (
-                <DropdownMenuItem key={link.to} className="p-0">
-                  <Link
-                    {...link}
-                    preload="intent"
-                    className="flex w-full items-center rounded-xl px-2 py-1.5 text-sm no-underline"
-                  >
-                    {label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
+              <DropdownMenuGroup>
+                {adminDemoNav.map(({ label, ...link }) => (
+                  <DropdownMenuItem key={link.to} className="p-0">
+                    <Link
+                      {...link}
+                      preload="intent"
+                      className="flex w-full items-center rounded-xl px-2 py-1.5 text-sm no-underline"
+                    >
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

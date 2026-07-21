@@ -84,17 +84,19 @@ export function DataTableToolbar<TData>({
 
             return (
               <DropdownMenu key={filter.column}>
-                <DropdownMenuTrigger asChild>
-                  <Button type="button" variant="outline" size="sm" className="h-8 border-dashed">
-                    <Funnel className="mr-2 h-4 w-4" aria-hidden="true" />
-                    {filter.title}
-                    {selectedValues.size > 0 ? (
-                      <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-medium">
-                        {selectedValues.size}
-                      </span>
-                    ) : null}
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button type="button" variant="outline" size="sm" className="h-8 border-dashed">
+                      <Funnel className="mr-2" aria-hidden="true" />
+                      {filter.title}
+                      {selectedValues.size > 0 ? (
+                        <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs font-medium">
+                          {selectedValues.size}
+                        </span>
+                      ) : null}
+                    </Button>
+                  }
+                />
                 <DropdownMenuContent align="start" className="w-[200px]">
                   <DropdownMenuLabel>{filter.title}</DropdownMenuLabel>
                   <DropdownMenuSeparator />

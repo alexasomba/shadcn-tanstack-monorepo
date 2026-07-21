@@ -53,7 +53,7 @@ function UserDashboardPage() {
   const { user } = Route.useRouteContext();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto flex max-w-4xl flex-col gap-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
           Welcome{user.name ? `, ${user.name}` : ""}

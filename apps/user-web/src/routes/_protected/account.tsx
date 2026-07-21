@@ -33,7 +33,7 @@ function AccountPage() {
   const [banner, setBanner] = useState<string | null>(null);
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="mx-auto flex max-w-lg flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -46,7 +46,7 @@ function AccountPage() {
           <CardTitle className="text-base">Profile</CardTitle>
           <CardDescription>Signed in with Better Auth</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           <div className="flex items-center gap-3 rounded-2xl border border-border/70 bg-muted/30 p-4">
             <div className="size-12 shrink-0 overflow-hidden rounded-full border border-border/70 bg-background">
               {imageUrl ? (

@@ -63,11 +63,13 @@ export default function SiteHeader() {
           </div>
 
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden" aria-label="Open menu">
-                <ListIcon className="size-4" />
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="icon" className="md:hidden" aria-label="Open menu">
+                  <ListIcon />
+                </Button>
+              }
+            />
             <SheetContent side="right" className="w-[min(100%,20rem)]">
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>

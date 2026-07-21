@@ -17,12 +17,14 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="ml-auto hidden h-8 lg:flex">
-          <Sliders className="mr-2 h-4 w-4" aria-hidden="true" />
-          View
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <Button type="button" variant="outline" size="sm" className="ml-auto hidden h-8 lg:flex">
+            <Sliders className="mr-2" aria-hidden="true" />
+            View
+          </Button>
+        }
+      />
       <DropdownMenuContent align="end" className="w-[150px]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
