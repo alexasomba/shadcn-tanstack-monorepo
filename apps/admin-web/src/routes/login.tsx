@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -113,7 +113,7 @@ function LoginPage() {
         </div>
 
         <Card className="border-border/70 shadow-xl shadow-primary/5">
-          <CardHeader className="space-y-1">
+          <CardHeader className="flex flex-col gap-1">
             <CardTitle className="text-2xl tracking-tight">
               {isSignUp ? "Create account" : "Operator sign in"}
             </CardTitle>
@@ -122,45 +122,47 @@ function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              {isSignUp ? (
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <FieldGroup>
+                {isSignUp ? (
+                  <Field>
+                    <FieldLabel htmlFor="name">Name</FieldLabel>
+                    <Input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      autoComplete="name"
+                    />
+                  </Field>
+                ) : null}
+
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="name"
+                    autoComplete="email"
                   />
-                </div>
-              ) : null}
+                </Field>
 
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                />
-              </div>
+                <Field>
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    autoComplete={isSignUp ? "new-password" : "current-password"}
+                  />
+                </Field>
+              </FieldGroup>
 
               {error ? (
                 <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">

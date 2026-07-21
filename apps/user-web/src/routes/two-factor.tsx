@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -145,28 +145,30 @@ function TwoFactorChallengePage() {
               ))}
             </div>
 
-            <form onSubmit={submit} className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="2fa-code">
-                  {mode === "backup" ? "Backup code" : "Verification code"}
-                </Label>
-                <Input
-                  id="2fa-code"
-                  value={code}
-                  onChange={(e) =>
-                    setCode(
-                      mode === "backup"
-                        ? e.target.value.trim()
-                        : e.target.value.replace(/\D/g, "").slice(0, 8),
-                    )
-                  }
-                  autoComplete="one-time-code"
-                  inputMode={mode === "backup" ? "text" : "numeric"}
-                  className="font-mono tracking-wider"
-                  placeholder={mode === "backup" ? "xxxx-xxxx" : "000000"}
-                  required
-                />
-              </div>
+            <form onSubmit={submit} className="flex flex-col gap-4">
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="2fa-code">
+                    {mode === "backup" ? "Backup code" : "Verification code"}
+                  </FieldLabel>
+                  <Input
+                    id="2fa-code"
+                    value={code}
+                    onChange={(e) =>
+                      setCode(
+                        mode === "backup"
+                          ? e.target.value.trim()
+                          : e.target.value.replace(/\D/g, "").slice(0, 8),
+                      )
+                    }
+                    autoComplete="one-time-code"
+                    inputMode={mode === "backup" ? "text" : "numeric"}
+                    className="font-mono tracking-wider"
+                    placeholder={mode === "backup" ? "xxxx-xxxx" : "000000"}
+                    required
+                  />
+                </Field>
+              </FieldGroup>
 
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <input

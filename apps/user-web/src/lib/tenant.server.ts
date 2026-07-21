@@ -110,7 +110,7 @@ async function readTenantCache(host: string): Promise<TenantContext | null | und
     if (!cache) return undefined;
     const hit = await cache.match(tenantCacheRequest(host));
     if (!hit) return undefined;
-    const body = (await hit.json()) as { miss?: boolean; tenant?: TenantContext };
+    const body: { miss?: boolean; tenant?: TenantContext } = await hit.json();
     if (body.miss === true) return null;
     if (body.tenant && typeof body.tenant.organizationId === "string") {
       return body.tenant;
