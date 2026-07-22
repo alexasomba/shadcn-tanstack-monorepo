@@ -53,7 +53,8 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 
 ## UI & Component Architecture
 
-- **UI Guidelines**: See [packages/ui/AGENTS.md](file:///Users/alexasomba/Documents/GitHub/alexasomba/shadcn-tanstack-monorepo/packages/ui/AGENTS.md) for component layer composition rules (`primitives` vs `Watermelon` compositions vs `blocks`), Base UI conventions (`render` prop over `asChild`, `items` prop on `Select`), icon weight guidelines, and styling standards.
+- **Shadcn Primitives**: `packages/ui/src/components/*` contains **shadcn/ui primitives** (Button, Card, Dialog, Sidebar). Respect and preserve their default implementations (they should hardly be changed). Instead, adjust components, compositions, and call-sites using the primitives.
+- **UI Guidelines**: See [packages/ui/AGENTS.md](file:///Users/alexasomba/Documents/GitHub/alexasomba/shadcn-tanstack-monorepo/packages/ui/AGENTS.md) for full component layer rules, Base UI conventions (`render` prop over `asChild`, `items` prop on `Select`), icon selection guidelines, and styling standards.
 
 ## Result Pattern
 
