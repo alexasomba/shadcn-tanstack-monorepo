@@ -24,6 +24,7 @@
     "@dnd-kit/sortable": "catalog:",
     "@dnd-kit/utilities": "catalog:",
     "@fontsource-variable/dm-sans": "catalog:",
+    "@fontsource-variable/inter": "catalog:",
     "@number-flow/react": "catalog:",
     "@phosphor-icons/react": "catalog:",
     "@shadcn/react": "catalog:",
