@@ -259,15 +259,17 @@ export function Navigation1() {
 
         <div className="lg:hidden">
           <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-10 w-10 px-0 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
-              >
-                <List className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  className="h-10 w-10 px-0 text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
+                >
+                  <List className="h-6 w-6" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              }
+            />
             <SheetContent
               side="right"
               className="flex w-[300px] flex-col gap-6 border-l border-neutral-200 bg-white p-6 text-neutral-900 sm:w-[400px] dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50"
@@ -312,7 +314,7 @@ export function Navigation1() {
                   </Badge>
                 </a>
 
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion className="w-full">
                   <AccordionItem value="solutions" className="border-none">
                     <AccordionTrigger className="justify-between py-2 text-base font-medium text-neutral-900 no-underline transition-colors hover:text-orange-600 hover:no-underline dark:text-neutral-50 dark:hover:text-orange-400">
                       Solutions

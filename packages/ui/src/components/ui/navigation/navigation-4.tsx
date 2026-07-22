@@ -271,20 +271,22 @@ export function Navigation4() {
 
           {/* Avatar Section */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-auto rounded-xl p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
-              >
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8 rounded-full border border-neutral-200 dark:border-neutral-800">
-                    <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <CaretDown className="h-4 w-4 text-neutral-400" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  className="h-auto rounded-xl p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
+                >
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8 rounded-full border border-neutral-200 dark:border-neutral-800">
+                      <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <CaretDown className="h-4 w-4 text-neutral-400" />
+                  </div>
+                </Button>
+              }
+            />
             <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5 shadow-xl">
               <DropdownMenuLabel className="px-2 py-1.5 text-xs text-neutral-400 uppercase">
                 Account
@@ -307,14 +309,16 @@ export function Navigation4() {
 
           <div className="text-neutral-700 lg:hidden">
             <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-10 w-10 rounded-xl p-0 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
-                >
-                  <List className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
+              <SheetTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    className="h-10 w-10 rounded-xl p-0 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                  >
+                    <List className="h-6 w-6" />
+                  </Button>
+                }
+              />
               <SheetContent side="right" className="w-full sm:max-w-xs">
                 <div className="flex h-full flex-col overflow-y-auto px-6 py-8">
                   <div className="mb-6 flex items-center justify-between">
@@ -365,7 +369,7 @@ export function Navigation4() {
                       </Badge>
                     </a>
 
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion className="w-full">
                       <AccordionItem value="solutions" className="border-none">
                         <AccordionTrigger className="justify-between py-2 text-base font-medium text-neutral-900 no-underline transition-colors hover:text-orange-600 hover:no-underline dark:text-neutral-50 dark:hover:text-orange-400">
                           Solutions

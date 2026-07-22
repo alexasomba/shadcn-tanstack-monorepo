@@ -82,15 +82,15 @@ export function Cta1({
           <div className="mt-2 flex w-full shrink-0 justify-center md:mt-0 md:w-auto">
             {buttonLink ? (
               <Button
-                asChild
                 size="lg"
                 className="h-12 w-full px-8 text-base shadow-[inset_0_2px_4px_rgba(255,255,255,0.5),inset_0_-2px_5px_rgba(0,0,0,0.1),0_8px_20px_rgba(0,0,0,0.1)] md:w-auto dark:border-white/20 dark:bg-white/10 dark:shadow-[inset_0_2px_4px_rgba(255,255,255,0.1),inset_0_-2px_4px_rgba(0,0,0,0.3),0_8px_20px_rgba(0,0,0,0.25)]"
-              >
-                <a href={buttonLink}>
-                  {buttonText}
-                  {buttonIcon && <span className="ml-2 flex items-center">{buttonIcon}</span>}
-                </a>
-              </Button>
+                render={
+                  <a href={buttonLink}>
+                    {buttonText}
+                    {buttonIcon && <span className="ml-2 flex items-center">{buttonIcon}</span>}
+                  </a>
+                }
+              />
             ) : (
               <Button
                 size="lg"

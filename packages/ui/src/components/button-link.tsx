@@ -22,10 +22,16 @@ export function ButtonLink({
   ...linkProps
 }: ButtonLinkProps) {
   return (
-    <Button variant={variant} size={size} className={className} disabled={disabled} asChild>
-      <Link preload="intent" {...linkProps}>
-        {children}
-      </Link>
-    </Button>
+    <Button
+      variant={variant}
+      size={size}
+      className={className}
+      disabled={disabled}
+      render={(props) => (
+        <Link preload="intent" {...linkProps} {...props}>
+          {children}
+        </Link>
+      )}
+    />
   );
 }

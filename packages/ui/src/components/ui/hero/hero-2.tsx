@@ -165,10 +165,8 @@ export function Hero2({
             <Button
               variant="outline"
               className="h-10 rounded-full border-0 bg-white/60 px-7 text-sm font-medium text-slate-900 shadow-[0_0_0_1px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.02)] backdrop-blur-md transition-all hover:text-black"
-              asChild
-            >
-              <a href={signInHref}>{signInLabel}</a>
-            </Button>
+              render={<a href={signInHref}>{signInLabel}</a>}
+            />
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -231,10 +229,8 @@ export function Hero2({
             <div className="mt-auto">
               <Button
                 className="h-12 w-full rounded-full bg-[oklch(0.6378_0.1051_172.72)] text-base text-white hover:opacity-90"
-                asChild
-              >
-                <a href={signInHref}>{signInLabel}</a>
-              </Button>
+                render={<a href={signInHref}>{signInLabel}</a>}
+              />
             </div>
           </motion.div>
         )}
@@ -268,24 +264,24 @@ export function Hero2({
           >
             <Button
               className="group h-12 rounded-full border-0 bg-[oklch(0.6378_0.1051_172.72)] px-8 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_16px_rgba(0,0,0,0.1)] transition-all hover:brightness-105 md:text-base"
-              asChild
-            >
-              <a href={primaryCtaHref}>
-                {primaryCtaLabel}
-                <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </a>
-            </Button>
+              render={
+                <a href={primaryCtaHref}>
+                  {primaryCtaLabel}
+                  <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </a>
+              }
+            />
 
             <Button
               variant="secondary"
               className="h-12 rounded-full border-0 bg-[#eaeff1]/80 px-8 text-sm font-medium text-slate-900 shadow-[0_0_0_1px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_4px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-all hover:bg-[#eaeff1] md:text-base"
-              asChild
-            >
-              <a href={secondaryCtaHref}>
-                {secondaryCtaLabel}
-                <Play className="ml-2 h-3.5 w-3.5 fill-slate-900" />
-              </a>
-            </Button>
+              render={
+                <a href={secondaryCtaHref}>
+                  {secondaryCtaLabel}
+                  <Play className="ml-2 h-3.5 w-3.5 fill-slate-900" />
+                </a>
+              }
+            />
           </motion.div>
         </div>
       </motion.div>

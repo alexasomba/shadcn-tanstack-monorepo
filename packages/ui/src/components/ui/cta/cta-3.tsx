@@ -80,18 +80,20 @@ export default function Cta3({
             <Button
               className="text-md h-12 rounded-none border-dashed border-primary/80 bg-primary/60 px-6 font-semibold text-white shadow-[inset_0_0px_4px_2px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_0px_4px_2px_rgba(0,0,0,0.4)]"
               onClick={primaryCta.onClick}
-              asChild={!!primaryCta.href}
+              render={
+                primaryCta.href ? (
+                  <a href={primaryCta.href} className="flex items-center justify-center gap-2">
+                    {primaryCta.label}
+                    <MdArrowOutward className="h-4 w-4" />
+                  </a>
+                ) : undefined
+              }
             >
-              {primaryCta.href ? (
-                <a href={primaryCta.href} className="flex items-center justify-center gap-2">
+              {primaryCta.href ? undefined : (
+                <span className="flex items-center justify-center gap-2">
                   {primaryCta.label}
                   <MdArrowOutward className="h-4 w-4" />
-                </a>
-              ) : (
-                <button className="flex items-center justify-center gap-2">
-                  {primaryCta.label}
-                  <MdArrowOutward className="h-4 w-4" />
-                </button>
+                </span>
               )}
             </Button>
 
@@ -99,18 +101,20 @@ export default function Cta3({
               variant="secondary"
               className="h-12 gap-2 rounded-none border-dashed border-black/50 bg-muted/60 px-6 text-[15px] font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-zinc-400"
               onClick={secondaryCta.onClick}
-              asChild={!!secondaryCta.href}
+              render={
+                secondaryCta.href ? (
+                  <a href={secondaryCta.href} className="flex items-center justify-center gap-2">
+                    <MdPlayArrow className="size-5 text-muted-foreground" />
+                    {secondaryCta.label}
+                  </a>
+                ) : undefined
+              }
             >
-              {secondaryCta.href ? (
-                <a href={secondaryCta.href} className="flex items-center justify-center gap-2">
+              {secondaryCta.href ? undefined : (
+                <span className="flex items-center justify-center gap-2">
                   <MdPlayArrow className="size-5 text-muted-foreground" />
                   {secondaryCta.label}
-                </a>
-              ) : (
-                <button className="flex items-center justify-center gap-2">
-                  <MdPlayArrow className="size-5 text-muted-foreground" />
-                  {secondaryCta.label}
-                </button>
+                </span>
               )}
             </Button>
           </div>

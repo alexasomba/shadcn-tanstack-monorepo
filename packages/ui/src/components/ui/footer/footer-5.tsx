@@ -70,18 +70,18 @@ export function Footer5({
                     key={index}
                     size="icon"
                     variant="outline"
-                    asChild
+                    render={
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={link.label}
+                      >
+                        {link.icon}
+                      </a>
+                    }
                     className="h-9 w-9 bg-muted text-foreground shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.5)] transition-colors outline-none hover:text-foreground dark:shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.1)]"
-                  >
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={link.label}
-                    >
-                      {link.icon}
-                    </a>
-                  </Button>
+                  />
                 ))}
               </div>
             )}

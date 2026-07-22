@@ -278,15 +278,17 @@ export function Navigation5() {
             {/* Mobile List Trigger */}
             <div className="lg:hidden">
               <Sheet>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-lg"
-                    className="rounded-full text-neutral-700 dark:text-neutral-300"
-                  >
-                    <List className="size-5" />
-                  </Button>
-                </SheetTrigger>
+                <SheetTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-lg"
+                      className="rounded-full text-neutral-700 dark:text-neutral-300"
+                    >
+                      <List className="size-5" />
+                    </Button>
+                  }
+                />
                 <SheetContent
                   side="right"
                   className="flex w-[300px] flex-col gap-6 p-6 dark:bg-neutral-950"
@@ -333,7 +335,7 @@ export function Navigation5() {
                       </Badge>
                     </div>
 
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion className="w-full">
                       <AccordionItem value="solutions" className="border-none">
                         <AccordionTrigger className="justify-between py-0 text-base font-medium text-neutral-900 hover:no-underline dark:text-neutral-50">
                           Solutions

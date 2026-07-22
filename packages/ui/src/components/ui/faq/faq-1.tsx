@@ -45,7 +45,7 @@ export function Faq1({
         </h2>
       </div>
 
-      <Accordion type="single" collapsible className="w-full gap-2">
+      <Accordion className="w-full gap-2">
         {faqs.map((faq) => (
           <AccordionItem
             key={faq.id}

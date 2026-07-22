@@ -98,7 +98,7 @@ export default function FAQ2({
 
       <div className="mx-auto w-full max-w-2xl">
         {currentItems.length > 0 ? (
-          <Accordion type="single" collapsible className="flex w-full flex-col gap-2.5">
+          <Accordion className="flex w-full flex-col gap-2.5">
             {currentItems.map((item, index) => (
               <AccordionItem
                 key={`${activeCategory}-${index}`}

@@ -45,7 +45,7 @@
     "react-icons": "catalog:",
     "react-resizable-panels": "catalog:",
     "react-use-measure": "catalog:",
-    "recharts": "catalog:",
+    "recharts": "3.8.0",
     "shadcn": "catalog:",
     "sonner": "catalog:",
     "tailwind-merge": "catalog:",

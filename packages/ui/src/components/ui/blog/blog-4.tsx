@@ -120,7 +120,6 @@ export default function Blog4({
 }: Blog4Props) {
   const viewAll = (
     <Button
-      asChild
       variant="ghost"
       className="h-auto rounded-none border-b px-0 pb-3 text-lg font-semibold text-foreground hover:bg-transparent"
     >

@@ -87,10 +87,8 @@ export default function ContactBlock({
                 <div className="mt-auto">
                   <Button
                     className="w-full py-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),inset_0_-1px_0_0_rgba(0,0,0,0.2)]"
-                    asChild
-                  >
-                    <a href={method.actionUrl}>{method.actionLabel}</a>
-                  </Button>
+                    render={<a href={method.actionUrl}>{method.actionLabel}</a>}
+                  />
                 </div>
               </CardContent>
             </Card>

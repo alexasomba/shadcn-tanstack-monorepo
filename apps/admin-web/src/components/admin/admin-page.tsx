@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
-import type { BadgeProps } from "@workspace/ui/components/badge";
+type BadgeProps = ComponentProps<typeof Badge>;
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,

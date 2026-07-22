@@ -109,14 +109,16 @@ export default function CTASection({
             size="lg"
             className="group w-full gap-2 rounded-md text-sm font-semibold shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.5),inset_0_-0.5px_0px_rgba(0,0,0,0.3),inset_0_0.5px_10px_rgba(255,255,255,0.5),inset_0_-0.5px_4px_rgba(0,0,0,0.3)] text-shadow-2xs sm:w-auto"
             onClick={primaryCTA.onClick}
-            asChild={!!primaryCTA.href}
+            render={
+              primaryCTA.href ? (
+                <a href={primaryCTA.href}>
+                  {primaryCTA.label}
+                  <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
+                </a>
+              ) : undefined
+            }
           >
-            {primaryCTA.href ? (
-              <a href={primaryCTA.href}>
-                {primaryCTA.label}
-                <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
-              </a>
-            ) : (
+            {primaryCTA.href ? undefined : (
               <>
                 {primaryCTA.label}
                 <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
@@ -130,13 +132,11 @@ export default function CTASection({
               variant="outline"
               className="w-full rounded-md border-none bg-linear-to-b from-zinc-100 to-zinc-50 text-sm font-medium text-muted-foreground shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.2),inset_0_-0.5px_0px_rgba(0,0,0,0.1),inset_0_0.5px_4px_rgba(255,255,255,0.2),inset_0_-0.5px_4px_rgba(0,0,0,0.1)] transition-all text-shadow-2xs hover:text-foreground sm:w-auto dark:text-muted"
               onClick={secondaryCTA.onClick}
-              asChild={!!secondaryCTA.href}
+              render={
+                secondaryCTA.href ? <a href={secondaryCTA.href}>{secondaryCTA.label}</a> : undefined
+              }
             >
-              {secondaryCTA.href ? (
-                <a href={secondaryCTA.href}>{secondaryCTA.label}</a>
-              ) : (
-                <>{secondaryCTA.label}</>
-              )}
+              {secondaryCTA.href ? undefined : <>{secondaryCTA.label}</>}
             </Button>
           )}
         </div>
