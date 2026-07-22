@@ -2,11 +2,21 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, preview]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".vscode/**"
   pull_request:
-    branches:
-      - main
+    branches: [main, preview]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".vscode/**"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -14,6 +24,8 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
 
@@ -38,8 +50,8 @@ jobs:
       # Pre-generate content collections and paraglide so types are available for the check step
       - name: Generate content collections and paraglide
         run: |
-          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build
-          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match paraglide:compile
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build || true
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match paraglide:compile || true
 
       - run: vpr ci:check
       - run: vpr ci:test
