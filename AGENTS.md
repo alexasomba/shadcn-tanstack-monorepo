@@ -6,38 +6,44 @@ This project uses Vite+, a unified toolchain (Vite, Rolldown, Vitest, tsdown, Ox
 
 <!--VITE PLUS END-->
 
+## Critical Rules
+
+- **No push = not done.** Never leave a feature in a worktree without pushing.
+- **Push hooks must pass.** Manual gates only on skip/disabled.
+- **Never stop before pushing.** Push fail → fix + retry. No user ask.
+
 ## Commands
 
-| Task | Command |
-|---|---|
-| Install deps | `vp install` |
-| Dev server | `vp dev` |
-| Build | `vp build` |
-| Format + lint + typecheck | `vp check` |
-| Run tests | `vp test` |
-| Run a script | `vp run <script>` |
-| Diagnose env | `vp env doctor` |
-| Auth codegen | `vp run auth:generate` |
-| DB schema gen | `vp run db:generate` |
-| DB migrate (local) | `vp run db:migrate:local` |
-| Build data-ops | `vp run --filter data-ops build` |
+| Task                      | Command                          |
+| ------------------------- | -------------------------------- |
+| Install deps              | `vp install`                     |
+| Dev server                | `vp dev`                         |
+| Build                     | `vp build`                       |
+| Format + lint + typecheck | `vp check`                       |
+| Run tests                 | `vp test`                        |
+| Run a script              | `vp run <script>`                |
+| Diagnose env              | `vp env doctor`                  |
+| Auth codegen              | `vp run auth:generate`           |
+| DB schema gen             | `vp run db:generate`             |
+| DB migrate (local)        | `vp run db:migrate:local`        |
+| Build data-ops            | `vp run --filter data-ops build` |
 
 Run `vp check` and `vp test` before every commit. After wrangler binding changes run `wrangler types`.
 
 ## Agent Permissions
 
-| Action | Autonomous | Requires confirmation |
-|---|---|---|
-| Read files, grep, list dirs | ✅ | |
-| Edit source files | ✅ | |
-| Format, lint, typecheck | ✅ | |
-| Run unit/integration tests | ✅ | |
-| `git add` + `git commit` | ✅ | |
-| `git push` | ✅ (after hooks pass) | |
-| Install packages (`vp add`) | | ✅ |
-| Delete files | | ✅ |
-| Schema migrations (prod) | | ✅ |
-| Secrets / env changes | | ✅ |
+| Action                      | Autonomous            | Requires confirmation |
+| --------------------------- | --------------------- | --------------------- |
+| Read files, grep, list dirs | ✅                    |                       |
+| Edit source files           | ✅                    |                       |
+| Format, lint, typecheck     | ✅                    |                       |
+| Run unit/integration tests  | ✅                    |                       |
+| `git add` + `git commit`    | ✅                    |                       |
+| `git push`                  | ✅ (after hooks pass) |                       |
+| Install packages (`vp add`) |                       | ✅                    |
+| Delete files                |                       | ✅                    |
+| Schema migrations (prod)    |                       | ✅                    |
+| Secrets / env changes       |                       | ✅                    |
 
 ## Package Source Inspection
 
@@ -48,22 +54,9 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 
 ## Cloudflare D1 + data-service
 
-Core rules — full detail in [docs/architecture.md](./docs/architecture.md).
+See [docs/architecture.md](./docs/architecture.md) for D1 bindings, service bindings, queries, notifications, and custom domains.
 
-- **Shared D1** binding `DATABASE` on `app-db`. Schema/migrations only in `packages/data-ops`.
-- **Inter-app calls**: user-web / admin-web → data-service via service binding `DATA_SERVICE` only. No public HTTP.
-- **Bindings**: `import { env } from "cloudflare:workers"`. Never `vinxi/http` `getEvent()`.
-- **Queries**: `createDatabase(env.DATABASE)` from `data-ops`. Queries under `data-ops/queries/*`.
 - **Auth plugins** (after changes): `vp run auth:generate` → `vp run db:generate` → `vp run db:migrate:local`.
-- **Notifications**: OneSignal primary (`ONESIGNAL_APP_ID` + `ONESIGNAL_API_KEY`). Missing keys → dry-run.
-- **Custom domains**: tenant identity = `organization.slug`. Local: `DOMAIN_SDK_MODE=memory`.
-
-## Workers Best Practices
-
-- **No Global Request State**: Never store request-scoped data in module-level globals.
-- **`ctx.waitUntil()` only**: Never destructure `ctx` — `const { waitUntil } = ctx` throws "Illegal invocation". Always pass promises to `ctx.waitUntil()` for background work.
-- **Crypto**: Use `crypto.randomUUID()` / `crypto.getRandomValues()` (never `Math.random()`), and `crypto.subtle.timingSafeEqual` for secret comparisons.
-- **Payload Streaming**: Stream large payloads; never `await response.text()` on unbounded data.
 
 ## TanStack Start Core & Auth Boundaries
 
@@ -73,8 +66,7 @@ Core rules — full detail in [docs/architecture.md](./docs/architecture.md).
 
 ## UI & Component Architecture
 
-- **Shadcn Primitives**: `packages/ui/src/components/*` contains shadcn/ui primitives (Button, Card, Dialog, Sidebar). Respect and preserve their default implementations (they should hardly be changed). Instead, adjust components, compositions, and call-sites using the primitives.
-- **UI Guidelines**: See [packages/ui/AGENTS.md](./packages/ui/AGENTS.md) for full component layer rules, Base UI conventions (`render` prop over `asChild`, `items` prop on `Select`), icon selection guidelines, and styling standards.
+See [packages/ui/AGENTS.md](./packages/ui/AGENTS.md) for component layers, Base UI conventions, icon guidelines, and styling standards.
 
 ## Result Pattern
 
@@ -88,7 +80,4 @@ Core rules — full detail in [docs/architecture.md](./docs/architecture.md).
 
 ## Drizzle ORM & Hono OpenAPI Type Safety
 
-- **OpenAPI Schema**: Compose with `.shape` — `z.object(DbSchemaFromOps.shape).openapi("Name")`. Do not directly cast Drizzle-Zod schemas.
-- **DRY Types**: Always use `z.infer<typeof Schema>`. Never duplicate schema structures into TS interfaces.
-- **Response Signatures**: Avoid status code unions. Use explicit conditional blocks with `success: false as const` for `ErrorSchema`.
-- **Centralized DB Types**: Define `DbTodo`, `DbDomain`, etc. in `schema.ts` using `InferSelectModel`/`InferInsertModel`. Import and reuse — do not repeat `typeof table.$inferSelect` casts.
+See [packages/data-ops/AGENTS.md](./packages/data-ops/AGENTS.md) for schema composition, DRY types, and response signature rules.
