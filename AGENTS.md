@@ -43,7 +43,10 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
   - **Floating Promises & `waitUntil`**: Every promise must be `await`ed, `return`ed, `void`ed, or passed to `ctx.waitUntil()`. Do not destructure `ctx` (e.g. `const { waitUntil } = ctx` throws "Illegal invocation").
   - **Crypto & Security**: Use `crypto.randomUUID()` / `crypto.getRandomValues()` (never `Math.random()`) for UUIDs/tokens, and `crypto.subtle.timingSafeEqual` for secret comparisons.
   - **Payload Streaming**: Stream large or unknown payloads instead of calling `await response.text()` on unbounded data (prevents 128 MB memory limit exhaustion).
-- **Start auth boundary**: private `createServerFn` must use `requireAuthMiddleware` (RPC security). Route `beforeLoad` is UX only. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
+- **TanStack Start Core & Auth Boundaries**:
+  - **Isomorphic Loaders**: Route loaders run on BOTH server and client. Server-only logic (DB/D1 queries, secrets, private APIs) MUST be in `createServerFn` or `@tanstack/react-start/server`. Do not use Next.js/Remix patterns (`getServerSideProps`, `"use server"`).
+  - **Server Utilities Scope**: `@tanstack/react-start/server` utilities (`getRequest`, `getCookie`, `setCookie`) depend on AsyncLocalStorage—import/call them only inside `createServerFn` or server routes, never inside client component renders.
+  - **RPC Security Boundary**: Private `createServerFn` MUST use `requireAuthMiddleware` for RPC security. Route `beforeLoad` checks are UX-only redirects. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
 - **Result (`@workspace/result`)**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus` (early return for Hono typed responses). Prefer `@workspace/result` over direct `better-result` imports.
 
 ## Testing & TDD
