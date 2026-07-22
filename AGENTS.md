@@ -6,12 +6,6 @@ This project uses Vite+, a unified toolchain (Vite, Rolldown, Vitest, tsdown, Ox
 
 <!--VITE PLUS END-->
 
-## Critical Rules
-
-- **No push = not done.** Never leave a feature in a worktree without pushing.
-- **Push hooks must pass.** Manual gates only on skip/disabled.
-- **Never stop before pushing.** Push fail → fix + retry. No user ask.
-
 ## Commands
 
 | Task | Command |
@@ -67,7 +61,7 @@ Core rules — full detail in [docs/architecture.md](./docs/architecture.md).
 ## Workers Best Practices
 
 - **No Global Request State**: Never store request-scoped data in module-level globals.
-- **Floating Promises**: Every promise must be `await`ed, `return`ed, `void`ed, or passed to `ctx.waitUntil()`. Do not destructure `ctx` (`const { waitUntil } = ctx` throws "Illegal invocation").
+- **`ctx.waitUntil()` only**: Never destructure `ctx` — `const { waitUntil } = ctx` throws "Illegal invocation". Always pass promises to `ctx.waitUntil()` for background work.
 - **Crypto**: Use `crypto.randomUUID()` / `crypto.getRandomValues()` (never `Math.random()`), and `crypto.subtle.timingSafeEqual` for secret comparisons.
 - **Payload Streaming**: Stream large payloads; never `await response.text()` on unbounded data.
 
