@@ -1,18 +1,118 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { betterAuth } from "better-auth";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { getDB } from "data-ops";
+import { env, waitUntil } from "cloudflare:workers";
+import { createAuth, createDatabase, getNotifyClient } from "data-ops";
 
-export const getAuth = (d1: D1Database) => {
-  const db = getDB(d1);
-  return betterAuth({
-    database: drizzleAdapter(db, {
-      provider: "sqlite",
-    }),
-    emailAndPassword: {
-      enabled: true,
-    },
-    secret: process.env.BETTER_AUTH_SECRET || "development-secret-12345678901234567890",
+function readEnv(name: string): string | undefined {
+  try {
+    const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
+    const value = proc?.env?.[name];
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Per-request Better Auth instance bound to this Worker's D1.
+ * `tanstackStartCookies` must be last so Set-Cookie works with Start server fns.
+ */
+export function getAuth(d1: D1Database) {
+  const db = createDatabase(d1);
+  const notify = getNotifyClient(env as unknown as Record<string, string | undefined>);
+
+  return createAuth(db, {
+    appName: "Admin Web",
+    baseURL: readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8301",
+    secret: readEnv("BETTER_AUTH_SECRET"),
     plugins: [tanstackStartCookies()],
+    onUserSignup: async (user) => {
+      const envObj = env as unknown as Record<string, unknown>;
+      const userWorkflow = envObj.USER_ONBOARDING_WORKFLOW as
+        | {
+            create: (options: {
+              id: string;
+              params: { userId: string };
+            }) => Promise<{ id: string }>;
+          }
+        | undefined;
+      if (userWorkflow) {
+        try {
+          await userWorkflow.create({
+            id: `wf-user-${user.id}-${Date.now()}`,
+            params: { userId: user.id },
+          });
+        } catch (err) {
+          console.error(
+            "Failed to automatically trigger UserOnboardingWorkflow from admin-web:",
+            err,
+          );
+        }
+      }
+    },
+    onOrgCreate: async (org) => {
+      const envObj = env as unknown as Record<string, unknown>;
+      const orgWorkflow = envObj.ORG_ONBOARDING_WORKFLOW as
+        | {
+            create: (options: { id: string; params: { orgId: string } }) => Promise<{ id: string }>;
+          }
+        | undefined;
+      if (orgWorkflow) {
+        try {
+          await orgWorkflow.create({
+            id: `wf-org-${org.id}-${Date.now()}`,
+            params: { orgId: org.id },
+          });
+        } catch (err) {
+          console.error(
+            "Failed to automatically trigger OrgOnboardingWorkflow from admin-web:",
+            err,
+          );
+        }
+      }
+    },
+    advanced: {
+      backgroundTasks: {
+        handler: (promise: Promise<unknown>) => {
+          try {
+            waitUntil(promise);
+            return;
+          } catch {
+            // Ignore
+          }
+          promise.catch(console.error);
+        },
+      },
+    },
+    sendVerificationEmail: async ({ user, url }) => {
+      await notify.verifyEmail.send({
+        to: user.email,
+        input: { name: "User", url },
+      });
+    },
+    sendResetPassword: async ({ user, url }) => {
+      await notify.resetPassword.send({
+        to: user.email,
+        input: { name: "User", url },
+      });
+    },
+    sendInvitationEmail: async ({ email, organization, inviter, invitation }) => {
+      const acceptUrl = `${readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8301"}/accept-invite?id=${invitation.id}`;
+      await notify.orgInvitation.send({
+        to: email,
+        input: {
+          inviterName: inviter.user.name || "Admin",
+          organizationName: organization.name,
+          url: acceptUrl,
+        },
+      });
+    },
+    sendOTP: async ({ user, otp }) => {
+      await notify.twoFactorOtp.send({
+        to: user.email,
+        input: { otp },
+      });
+    },
   });
-};
+}
+
+export type AppAuth = ReturnType<typeof getAuth>;

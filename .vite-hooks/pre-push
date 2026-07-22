@@ -1,5 +1,57 @@
-vp install
-vp check
-vp test
-vpr build
-vpr repo:deploy:dry-run
+#!/usr/bin/env sh
+# Policy: multi-agent worktrees (AGENTS.md + setup-git-workflow.mjs)
+# Allow push: preview | main | tags. Block: feature-branch refs.
+
+blocked=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$local_ref" ] && continue
+  if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+  case "$remote_ref" in
+    refs/heads/preview | refs/heads/main | refs/tags/*) ;;
+    *)
+      echo "ERROR: Refusing to push '$remote_ref' (multi-agent safety)."
+      echo "  Integrate via: pnpm worktree:merge <name> --message \"feat: …\""
+      echo "  Docs: AGENTS.md → Multi-agent–safe Git"
+      blocked=1
+      ;;
+  esac
+done
+
+if [ $blocked -ne 0 ]; then
+  exit $blocked
+fi
+
+# Unset Git environment variables to avoid polluting subprocesses/compilers
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_QUARANTINE_PATH
+
+# Ensure Vite+ global bin is in PATH so shims and global vp are found first
+export PATH="$HOME/.vite-plus/bin:$PATH"
+
+# Use the repository-pinned Node runtime for workspace validation
+if [ -f .node-version ]; then
+  NODE_VERSION=$(tr -d '\r\n' < .node-version)
+  eval "$(VP_ENV_USE_EVAL_ENABLE=1 VP_SHELL=sh vp env use "$NODE_VERSION" 2>/dev/null || true)"
+  unset NODE_VERSION
+fi
+
+echo "Running pre-push quality checks..."
+
+EXIT_CODE=0
+vp check > .vp_check.log 2>&1 || EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  cat .vp_check.log
+  rm -f .vp_check.log
+  exit $EXIT_CODE
+fi
+rm -f .vp_check.log
+
+TEST_EXIT_CODE=0
+vp test > .vp_test.log 2>&1 || TEST_EXIT_CODE=$?
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+  cat .vp_test.log
+  rm -f .vp_test.log
+  exit $TEST_EXIT_CODE
+fi
+rm -f .vp_test.log

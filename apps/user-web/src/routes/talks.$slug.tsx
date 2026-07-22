@@ -30,7 +30,7 @@ function TalkDetailPage() {
           to="/talks"
           className="text-cream/60 hover:text-gold inline-flex items-center gap-2 transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft size={16} />
           <span>All Sessions</span>
         </Link>
       </div>
@@ -52,7 +52,7 @@ function TalkDetailPage() {
               key={topic}
               className="bg-gold/15 text-gold border-gold/30 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium tracking-wide uppercase"
             >
-              <Tag className="h-3 w-3" />
+              <Tag size={12} />
               {topic}
             </span>
           ))}
@@ -63,8 +63,8 @@ function TalkDetailPage() {
           {talk.title}
         </h1>
 
-        {/* Meta info */}
-        <div className="mb-10 flex flex-wrap items-center gap-6 border-b border-border/50 pb-10">
+        {/* Presenter & details */}
+        <div className="mb-8 flex flex-wrap items-center gap-6 border-b border-border/40 pb-6 text-sm font-medium">
           {/* Speaker link */}
           {speaker ? (
             <Link
@@ -88,14 +88,14 @@ function TalkDetailPage() {
             </Link>
           ) : (
             <div className="text-cream/70 flex items-center gap-2">
-              <User className="text-copper h-5 w-5" />
+              <User size={20} className="text-copper" />
               <span>{talk.speaker}</span>
             </div>
           )}
 
           {/* Duration */}
           <div className="text-cream/60 flex items-center gap-2">
-            <Clock className="text-copper h-5 w-5" />
+            <Clock size={20} className="text-copper" />
             <span className="text-lg">{talk.duration}</span>
           </div>
         </div>

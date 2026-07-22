@@ -11,6 +11,9 @@ dist-ssr
 __unconfig*
 todos.json
 
+# Ephemeral worktrees (git ltp-setup / pnpm worktree:create)
+.worktrees/
+
 # turbo
 .turbo
 
@@ -19,3 +22,6 @@ todos.json
 
 # content-collections
 .content-collections
+
+# Reference clones (not part of the kit)
+templates/

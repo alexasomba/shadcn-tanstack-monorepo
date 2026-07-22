@@ -4,18 +4,66 @@
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Local D1 state lives under apps/user-web/.wrangler/state.
+  // Other apps persist to this path so the monorepo shares one local DB.
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8300,
+    "inspector_port": 9230,
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      // Lower in high-traffic prod if cost matters
+      "head_sampling_rate": 1,
+    },
+  },
   "ai": {
     "binding": "AI",
     "remote": true,
   },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "data-service-db",
+      "binding": "DATABASE",
+      "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "migrations_dir": "../../packages/data-ops/src/drizzle/migrations",
+      "migrations_pattern": "../../packages/data-ops/src/drizzle/migrations/*/migration.sql",
     },
   ],
-  "dev": {
-    "inspector_port": 9232,
+  // Frontends talk to data-service only via this Worker service binding
+  // (never public HTTP between Workers in production).
+  "services": [
+    {
+      "binding": "DATA_SERVICE",
+      "service": "data-service",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "app-bucket",
+    },
+  ],
+  "workflows": [
+    {
+      "name": "user-onboarding-workflow",
+      "binding": "USER_ONBOARDING_WORKFLOW",
+      "class_name": "UserOnboardingWorkflow",
+    },
+    {
+      "name": "org-onboarding-workflow",
+      "binding": "ORG_ONBOARDING_WORKFLOW",
+      "class_name": "OrgOnboardingWorkflow",
+    },
+  ],
+  // Non-secret config only. Secrets: .dev.vars or `wrangler secret put`
+  // (ONESIGNAL_API_KEY, BETTER_AUTH_SECRET, CLOUDFLARE_API_TOKEN if needed).
+  // Production CF for SaaS: see docs/cloudflare-for-saas.md (routes / fallback origin).
+  "vars": {
+    // Vanity hosts: {slug}.PLATFORM_BASE_DOMAIN → organization.slug
+    // "PLATFORM_BASE_DOMAIN": "app.example.com",
+    // Host→tenant Cache API TTL seconds (default 60 in code if unset)
+    "TENANT_CACHE_TTL_SECONDS": "60",
   },
 }

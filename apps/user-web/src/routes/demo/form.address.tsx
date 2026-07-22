@@ -54,7 +54,7 @@ function AddressForm() {
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-6"
+          className="flex flex-col gap-6"
         >
           <form.AppField name="fullName">
             {(field) => <field.TextField label="Full Name" />}

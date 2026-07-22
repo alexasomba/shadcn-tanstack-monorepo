@@ -3,12 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "vp run repo:build",
-    "dev": "vp run repo:dev",
-    "lint": "vp run repo:lint",
-    "format": "vp run repo:format",
-    "typecheck": "vp run repo:typecheck",
-    "prepare": "vp config"
+    "setup": "vp install && vp run --filter data-ops build && node scripts/setup-git-workflow.mjs",
+    "prepare": "vp config && node scripts/setup-git-workflow.mjs",
+    "git:setup": "node scripts/setup-git-workflow.mjs",
+    "worktree:create": "node scripts/worktree.mjs create",
+    "worktree:merge": "node scripts/worktree.mjs merge",
+    "worktree:cleanup": "node scripts/worktree.mjs cleanup",
+    "worktree:list": "node scripts/worktree.mjs list",
+    "cache:clean": "vp cache clean"
+  },
+  "dependencies": {
+    "@opencoredev/domain-sdk": "catalog:"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "catalog:",
@@ -19,21 +24,21 @@
     "eslint-plugin-no-instanceof": "catalog:",
     "eslint-plugin-react": "catalog:",
     "eslint-plugin-sonarjs": "catalog:",
-    "eslint-plugin-zod": "^4.7.1",
-    "eslint-plugin-zod-openapi": "^2.0.0",
+    "eslint-plugin-zod": "catalog:",
+    "eslint-plugin-zod-openapi": "catalog:",
     "typescript": "6.0.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.4",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.5",
     "vite-plus": "catalog:"
   },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "11.11.0",
+      "version": "11.15.1",
       "onFail": "download"
     }
   },
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.11.0"
+  "packageManager": "pnpm@11.15.1"
 }

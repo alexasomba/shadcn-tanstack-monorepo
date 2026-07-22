@@ -1,10 +1,11 @@
 import { AIChatAgent } from "@cloudflare/ai-chat";
 import type { OnChatMessageOptions } from "@cloudflare/ai-chat";
+import { withSentry } from "@sentry/cloudflare";
+import { Result } from "@workspace/result";
 import { callable, routeAgentRequest } from "agents";
 import type { Schedule } from "agents";
 import { getSchedulePrompt, scheduleSchema } from "agents/schedule";
 import { convertToModelMessages, pruneMessages, stepCountIs, streamText, tool } from "ai";
-import { Result } from "better-result";
 import { createWorkersAI } from "workers-ai-provider";
 import { z } from "zod";
 
@@ -71,11 +72,12 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
           execute: async ({ city }) => {
             // Replace with a real weather API in production
             const conditions = ["sunny", "cloudy", "rainy", "snowy"];
-            const temp = Math.floor(Math.random() * 30) + 5;
+            const randomBytes = crypto.getRandomValues(new Uint8Array(2));
+            const temp = (randomBytes[0] % 30) + 5;
             return {
               city,
               temperature: temp,
-              condition: conditions[Math.floor(Math.random() * conditions.length)],
+              condition: conditions[randomBytes[1] % conditions.length],
               unit: "celsius",
             };
           },
@@ -198,8 +200,24 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
   }
 }
 
-export default {
+const agentHandler = {
   async fetch(request: Request, env: Env) {
+    const url = new URL(request.url);
+    if (url.pathname === "/api/debug/sentry-test") {
+      throw new Error("Sentry test exception");
+    }
     return (await routeAgentRequest(request, env)) || new Response("Not found", { status: 404 });
   },
 } satisfies ExportedHandler<Env>;
+
+/** Sentry only when a real DSN is set (no mock-dsn fallback). */
+export default withSentry((env: Env) => {
+  const raw = env.SENTRY_DSN || env.VITE_SENTRY_DSN;
+  const dsn =
+    typeof raw === "string" && raw.length > 0 && !raw.includes("mock-dsn") ? raw : undefined;
+  return {
+    dsn,
+    enabled: Boolean(dsn),
+    tracesSampleRate: 1.0,
+  };
+}, agentHandler);

@@ -10,13 +10,24 @@
     }
   },
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false"
+    "dev": "wrangler dev --persist-to ../user-web/.wrangler/state --ip 127.0.0.1 --port 8302",
+    "cf-typegen": "wrangler types worker-configuration.d.ts --env-interface CloudflareBindings --include-runtime false",
+    "build": "pnpm run cf-typegen",
+    "deploy": "vp run build && wrangler deploy --minify",
+    "deploy:preview": "vp run build && wrangler versions upload",
+    "test": "vp test run"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
-    "@hono/zod-openapi": "^1.4.0",
+    "@betternotify/core": "catalog:",
+    "@betternotify/discord": "catalog:",
+    "@betternotify/email": "catalog:",
+    "@betternotify/onesignal": "catalog:",
+    "@betternotify/push": "catalog:",
+    "@hono/zod-openapi": "catalog:",
+    "@opencoredev/domain-sdk": "catalog:",
+    "@sentry/cloudflare": "^10.65.0",
+    "@workspace/result": "workspace:*",
     "better-auth": "catalog:",
     "data-ops": "workspace:*",
     "hono": "catalog:",
@@ -24,6 +35,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "@types/better-sqlite3": "catalog:",
+    "better-sqlite3": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "catalog:"
   }
 }

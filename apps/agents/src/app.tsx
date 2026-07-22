@@ -44,7 +44,7 @@ interface Attachment {
 
 function createAttachment(file: File): Attachment {
   return {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: crypto.randomUUID(),
     file,
     preview: URL.createObjectURL(file),
     mediaType: file.type || "application/octet-stream",

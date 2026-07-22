@@ -3,39 +3,73 @@
   "name": "data-service",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-09",
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "MY_KV_NAMESPACE",
-  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
-  // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+  },
+  // When run via wrangler dev alone, always persist to user-web so D1 is shared:
+  //   wrangler dev --persist-to ../user-web/.wrangler/state
+  // Prefer starting user-web (auxiliaryWorkers) so the service binding is live.
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8302,
+    "inspector_port": 9232,
+  },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "data-service-db",
+      "binding": "DATABASE",
+      "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "migrations_dir": "../../packages/data-ops/src/drizzle/migrations",
+      "migrations_pattern": "../../packages/data-ops/src/drizzle/migrations/*/migration.sql",
     },
   ],
-  // "ai": {
-  //   "binding": "AI"
-  // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
-  "dev": {
-    "inspector_port": 9233,
+  // Background jobs stub — create the queue once:
+  //   wrangler queues create app-jobs
+  "queues": {
+    "producers": [
+      {
+        "binding": "JOBS_QUEUE",
+        "queue": "app-jobs",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "app-jobs",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+      },
+    ],
   },
+  // Outbox drain / housekeeping — adjust cadence for your product.
+  "triggers": {
+    "crons": ["*/15 * * * *"],
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "app-bucket",
+    },
+  ],
+  // Secrets: .dev.vars or `wrangler secret put`
+  //   ONESIGNAL_API_KEY, CLOUDFLARE_API_TOKEN, DISCORD_WEBHOOK_URL, BETTER_AUTH_SECRET
+  // Non-secret vars (set in dashboard / env-specific wrangler env, not empty secrets):
+  //   ONESIGNAL_APP_ID, PLATFORM_BASE_DOMAIN, CLOUDFLARE_ZONE_ID, CLOUDFLARE_CNAME_TARGET
+  // Local only: DOMAIN_SDK_MODE=memory  — never production
+  // Full list: env.example — deploy: docs/cloudflare-for-saas.md
+  "workflows": [
+    {
+      "name": "user-onboarding-workflow",
+      "binding": "USER_ONBOARDING_WORKFLOW",
+      "class_name": "UserOnboardingWorkflow",
+    },
+    {
+      "name": "org-onboarding-workflow",
+      "binding": "ORG_ONBOARDING_WORKFLOW",
+      "class_name": "OrgOnboardingWorkflow",
+    },
+  ],
 }

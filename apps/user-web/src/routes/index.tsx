@@ -1,193 +1,156 @@
-import { ArrowRight, Calendar, MapPin, Users } from "@phosphor-icons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { allSpeakers, allTalks } from "content-collections";
+import { ArrowRightIcon } from "@phosphor-icons/react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Badge } from "@workspace/ui/components/badge";
+import { ButtonLink } from "@workspace/ui/components/button-link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Faq1 } from "@workspace/ui/components/ui/faq/faq-1";
+import Features1 from "@workspace/ui/components/ui/features/feature-1";
+import Features3 from "@workspace/ui/components/ui/features/feature-3";
+import Pricing2 from "@workspace/ui/components/ui/pricing/pricing-2";
+import Stats3 from "@workspace/ui/components/ui/stats/stats-3";
 
-import HeroCarousel from "#/components/HeroCarousel";
-import RemyAssistant from "#/components/RemyAssistant";
-import SpeakerCard from "#/components/SpeakerCard";
-import TalkCard from "#/components/TalkCard";
+import SiteFooter from "#/components/marketing/SiteFooter";
+import SiteHeader from "#/components/marketing/SiteHeader";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
+  head: () => ({
+    meta: [{ title: "Starter — Premium Cloudflare monorepo kit" }],
+  }),
 });
 
 function HomePage() {
-  const featuredSpeakers = allSpeakers.slice(0, 3);
-  const featuredTalks = allTalks.slice(0, 4);
-
   return (
-    <>
-      <RemyAssistant />
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
 
-      {/* Hero Section */}
-      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden px-6">
-        {/* Background carousel */}
-        <HeroCarousel />
-
-        <div className="relative z-10 mx-auto max-w-5xl text-center">
-          {/* Event date badge */}
-          <div className="bg-copper/10 border-copper/30 text-copper-light mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
-            <Calendar className="h-4 w-4" />
-            <span>March 15-17, 2026</span>
-            <span className="text-copper/40 mx-2">•</span>
-            <MapPin className="h-4 w-4" />
-            <span>Paris, France</span>
-          </div>
-
-          {/* Main title */}
-          <h1 className="font-display text-cream mb-6 text-6xl leading-tight font-bold md:text-8xl">
-            Haute
-            <span className="text-gold block italic">Pâtisserie</span>
-          </h1>
-
-          <p className="text-cream/70 font-body mx-auto mb-10 max-w-3xl text-xl leading-relaxed md:text-2xl">
-            Join the world's most celebrated pastry chefs and master bakers for three extraordinary
-            days of masterclasses, demonstrations, and culinary inspiration.
-          </p>
-
-          {/* Stats */}
-          <div className="mb-12 flex flex-wrap justify-center gap-8">
-            <div className="text-center">
-              <div className="font-display text-gold text-4xl font-bold">{allSpeakers.length}</div>
-              <div className="text-cream/50 text-sm tracking-wider uppercase">Master Chefs</div>
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,oklch(0.7_0.08_180_/_0.18),transparent_55%)]"
+        />
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:items-center lg:gap-16">
+          <div className="space-y-7">
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              TanStack Start · Cloudflare · Watermelon
+            </Badge>
+            <h1 className="max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
+              Ship multi-app SaaS with a{" "}
+              <span className="bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
+                premium UI system
+              </span>
+            </h1>
+            <p className="max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Shared D1 + Better Auth, service-bound data-service, and type-safe routing. Interfaces
+              compose shadcn primitives and Watermelon blocks from{" "}
+              <code className="text-foreground">@workspace/ui</code>.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink to="/dashboard" size="lg" className="rounded-full px-6">
+                Open dashboard
+                <ArrowRightIcon className="size-4" />
+              </ButtonLink>
+              <ButtonLink to="/pricing" size="lg" variant="outline" className="rounded-full px-6">
+                View pricing
+              </ButtonLink>
             </div>
-            <div className="text-center">
-              <div className="font-display text-gold text-4xl font-bold">{allTalks.length}</div>
-              <div className="text-cream/50 text-sm tracking-wider uppercase">Sessions</div>
-            </div>
-            <div className="text-center">
-              <div className="font-display text-gold text-4xl font-bold">3</div>
-              <div className="text-cream/50 text-sm tracking-wider uppercase">Days</div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span>Type-safe Link navigation</span>
+              <span>Auth-gated portfolio</span>
+              <span>Admin Web3 desk</span>
             </div>
           </div>
 
-          {/* CTA buttons */}
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              to="/speakers"
-              className="from-copper to-copper-dark text-charcoal hover:shadow-copper/30 inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-8 py-4 text-lg font-semibold transition-all hover:scale-[1.02] hover:shadow-lg"
-            >
-              <Users className="h-5 w-5" />
-              Meet Our Speakers
-            </Link>
-            <Link
-              to="/talks"
-              className="border-gold/50 text-gold hover:bg-gold/10 hover:border-gold inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-lg font-semibold transition-all"
-            >
-              View Sessions
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
+          <Card className="border-border/70 shadow-xl ring-1 shadow-primary/5 ring-primary/10">
+            <CardHeader>
+              <CardTitle className="text-xl">What ships in the kit</CardTitle>
+              <CardDescription>
+                Opinionated defaults, production-shaped architecture.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 text-sm">
+              {[
+                ["user-web · 8300", "Marketing, auth, portfolio dashboard"],
+                ["admin-web · 8301", "Operator console with Web3 metrics"],
+                ["data-service · 8302", "Hono OpenAPI + jobs stubs"],
+                ["data-ops", "D1 schema, auth plugins, queries"],
+              ].map(([title, body]) => (
+                <div
+                  key={title}
+                  className="flex flex-col gap-0.5 rounded-2xl border border-border/70 bg-muted/30 px-4 py-3"
+                >
+                  <p className="font-medium">{title}</p>
+                  <p className="text-muted-foreground">{body}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* Featured Speakers Section */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex items-end justify-between">
-            <div>
-              <h2 className="font-display text-cream mb-3 text-4xl font-bold md:text-5xl">
-                Featured <span className="text-gold italic">Speakers</span>
-              </h2>
-              <p className="text-cream/60 font-body text-lg">
-                Learn from award-winning pastry chefs and master bakers
+      <Features1 />
+      <Stats3 />
+      <Features3 />
+
+      <Pricing2
+        title="Simple plans for product teams"
+        subtitle="Start free. Scale into orgs, agents, and ops when you are ready."
+      />
+
+      <Faq1
+        badge="FAQ"
+        title={
+          <>
+            Built for agents & humans{" "}
+            <span className="text-muted-foreground">shipping in parallel</span>
+          </>
+        }
+        faqs={[
+          {
+            id: "nav",
+            question: "How are internal links handled?",
+            answer:
+              "TanStack Router Link and linkOptions — fully type-checked paths, intent preloading, no raw internal hrefs.",
+          },
+          {
+            id: "ui",
+            question: "What is the UI stack?",
+            answer:
+              "shadcn primitives in packages/ui/src/components and Watermelon compositions in components/ui. Apps compose both.",
+          },
+          {
+            id: "auth",
+            question: "How does auth work?",
+            answer:
+              "Better Auth via data-ops. Protected routes redirect to /login with a typed redirect search param.",
+          },
+        ]}
+      />
+
+      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+        <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background shadow-none">
+          <CardContent className="flex flex-col items-start justify-between gap-6 p-8 sm:flex-row sm:items-center sm:p-10">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold tracking-tight">Open your portfolio</h2>
+              <p className="max-w-md text-sm text-muted-foreground sm:text-base">
+                Sign in for the Watermelon portfolio dashboard — holdings, P&amp;L, and 7-day chart.
               </p>
             </div>
-            <Link
-              to="/speakers"
-              className="text-gold hover:text-gold/80 hidden items-center gap-2 font-medium transition-colors md:inline-flex"
-            >
-              View all speakers
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {featuredSpeakers.map((speaker) => (
-              <SpeakerCard key={speaker.slug} speaker={speaker} featured />
-            ))}
-          </div>
-
-          <div className="mt-8 text-center md:hidden">
-            <Link
-              to="/speakers"
-              className="text-gold hover:text-gold/80 inline-flex items-center gap-2 font-medium transition-colors"
-            >
-              View all speakers
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
+            <ButtonLink to="/dashboard" size="lg" className="rounded-full px-6">
+              Go to dashboard
+              <ArrowRightIcon className="size-4" />
+            </ButtonLink>
+          </CardContent>
+        </Card>
       </section>
 
-      {/* Divider */}
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      </div>
-
-      {/* Featured Sessions Section */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex items-end justify-between">
-            <div>
-              <h2 className="font-display text-cream mb-3 text-4xl font-bold md:text-5xl">
-                Featured <span className="text-gold italic">Sessions</span>
-              </h2>
-              <p className="text-cream/60 font-body text-lg">
-                Masterclasses and demonstrations to elevate your craft
-              </p>
-            </div>
-            <Link
-              to="/talks"
-              className="text-gold hover:text-gold/80 hidden items-center gap-2 font-medium transition-colors md:inline-flex"
-            >
-              View all sessions
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {featuredTalks.map((talk) => (
-              <TalkCard key={talk.slug} talk={talk} featured />
-            ))}
-          </div>
-
-          <div className="mt-8 text-center md:hidden">
-            <Link
-              to="/talks"
-              className="text-gold hover:text-gold/80 inline-flex items-center gap-2 font-medium transition-colors"
-            >
-              View all sessions
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="to-charcoal relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card p-12">
-            {/* Decorative elements */}
-            <div className="bg-copper/5 absolute top-0 right-0 h-64 w-64 rounded-full blur-3xl" />
-            <div className="bg-gold/5 absolute bottom-0 left-0 h-48 w-48 rounded-full blur-3xl" />
-
-            <div className="relative">
-              <h2 className="font-display text-cream mb-4 text-3xl font-bold md:text-4xl">
-                Ready to Elevate Your Craft?
-              </h2>
-              <p className="text-cream/60 font-body mx-auto mb-8 max-w-2xl text-lg">
-                Join us in Paris for an unforgettable experience with the world's finest pastry
-                artisans.
-              </p>
-              <div className="bg-gold/10 border-gold/30 text-gold inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
-                <span>🥐</span>
-                <span>Registration opens January 2026</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+      <SiteFooter />
+    </div>
   );
 }

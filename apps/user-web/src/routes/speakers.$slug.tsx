@@ -31,7 +31,7 @@ function SpeakerDetailPage() {
           to="/speakers"
           className="text-cream/60 hover:text-gold inline-flex items-center gap-2 transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft size={16} />
           <span>All Speakers</span>
         </Link>
       </div>
@@ -65,7 +65,7 @@ function SpeakerDetailPage() {
               <p className="text-gold font-display mb-4 text-2xl italic">{speaker.title}</p>
 
               <div className="text-cream/60 mb-8 flex items-center gap-2 text-lg">
-                <MapPin className="text-copper h-5 w-5" />
+                <MapPin size={20} className="text-copper" />
                 <span>
                   {speaker.restaurant}, {speaker.location}
                 </span>
@@ -83,7 +83,7 @@ function SpeakerDetailPage() {
                         key={award}
                         className="bg-gold/10 text-gold/90 border-gold/20 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm"
                       >
-                        <Trophy className="h-3.5 w-3.5" />
+                        <Trophy size={14} />
                         {award}
                       </span>
                     ))}

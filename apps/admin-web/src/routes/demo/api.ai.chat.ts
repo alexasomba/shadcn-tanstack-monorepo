@@ -3,6 +3,8 @@ import { createWorkersAiChat } from "@cloudflare/tanstack-ai";
 import { ollamaText } from "@tanstack/ai-ollama";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { getAiBinding } from "#/lib/cloudflare-env";
+
 import { getGuitars, recommendGuitarToolDef } from "#/lib/demo-guitar-tools";
 
 const SYSTEM_PROMPT = `You are a helpful assistant for a store that sells guitars.
@@ -40,21 +42,7 @@ export const Route = createFileRoute("/demo/api/ai/chat")({
           const body = await request.json();
           const { messages } = body;
 
-          let binding: any = undefined;
-          try {
-            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
-            const { getEvent } = await import("vinxi/http");
-            const event = getEvent();
-            binding = event?.context?.cloudflare?.env?.AI;
-          } catch {
-            // Fallback
-          }
-
-          if (!binding) {
-            binding =
-              (process.env as Record<string, unknown>).AI ||
-              (globalThis as Record<string, unknown>).AI;
-          }
+          const binding = getAiBinding();
 
           const adapter = binding
             ? createWorkersAiChat("@cf/meta/llama-3-8b-instruct", {
