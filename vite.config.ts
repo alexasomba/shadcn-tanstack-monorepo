@@ -177,7 +177,7 @@ export default defineConfig({
           "typescript/no-non-null-asserted-optional-chain": "error",
           "typescript/no-unnecessary-condition": "error",
           "typescript/unbound-method": "off",
-          "typescript/no-floating-promises": "warn",
+          "typescript/no-floating-promises": "error",
           "typescript/no-base-to-string": "warn",
           "typescript/no-unnecessary-type-assertion": "error",
           "typescript/no-unsafe-function-type": "error",
