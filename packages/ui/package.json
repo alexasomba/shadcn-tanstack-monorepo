@@ -40,7 +40,7 @@
     "next-themes": "catalog:",
     "qrcode.react": "catalog:",
     "react": "catalog:",
-    "react-day-picker": "catalog:",
+    "react-day-picker": "^10.0.1",
     "react-dom": "catalog:",
     "react-icons": "catalog:",
     "react-resizable-panels": "catalog:",
