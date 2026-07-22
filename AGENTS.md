@@ -37,16 +37,26 @@ No local vendoring. Use `opensrc path <package>` + `rg`/`sed`.
 - **data-ops pack**: `vp run --filter data-ops build` → `vp pack` (tsdown `dist/`); workspace still resolves `src/` for DX.
 - **data-service** endpoints: `@hono/zod-openapi` under `src/endpoints/<resource>/`. Prefer data-ops queries. **Queues/cron stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
 - **SEO discovery (user-web)**: `/sitemap.xml`, `/robots.txt`, `/llms.txt` server routes (`src/lib/discovery.ts`).
-- **UI**: `packages/ui/src/components` = shadcn **primitives**; `packages/ui/src/components/ui` = **Watermelon** marketing/dashboard compositions (use them); `packages/ui/src/blocks/*` = larger page compositions/modules (e.g. `blocks/preview`). Apps compose these. Respect and keep the default implementations of shadcn primitives in `packages/ui/src/components` (hardly change them); instead, adjust the components, compositions, and call-sites that use those primitives. This project uses **shadcn/ui** with **Base UI** (style: `base-rhea`). Follow Base UI conventions: use `render` instead of `asChild` for triggers/closes (e.g. `<DialogTrigger render={<Button />} />`), use the `items` prop on `Select`, and see [packages/ui/AGENTS.md](file:///Users/alexasomba/Documents/GitHub/alexasomba/shadcn-tanstack-monorepo/packages/ui/AGENTS.md) for full guidelines.
-- **Workers Best Practices**:
-  - **No Global Request State**: Never store request-scoped data in module-level global variables (isolate re-use causes cross-request data leaks).
-  - **Floating Promises & `waitUntil`**: Every promise must be `await`ed, `return`ed, `void`ed, or passed to `ctx.waitUntil()`. Do not destructure `ctx` (e.g. `const { waitUntil } = ctx` throws "Illegal invocation").
-  - **Crypto & Security**: Use `crypto.randomUUID()` / `crypto.getRandomValues()` (never `Math.random()`) for UUIDs/tokens, and `crypto.subtle.timingSafeEqual` for secret comparisons.
-  - **Payload Streaming**: Stream large or unknown payloads instead of calling `await response.text()` on unbounded data (prevents 128 MB memory limit exhaustion).
-- **TanStack Start Core & Auth Boundaries**:
-  - **Isomorphic Loaders**: Route loaders run on BOTH server and client. Server-only logic (DB/D1 queries, secrets, private APIs) MUST be in `createServerFn` or `@tanstack/react-start/server`. Do not use Next.js/Remix patterns (`getServerSideProps`, `"use server"`).
-  - **Server Utilities Scope**: `@tanstack/react-start/server` utilities (`getRequest`, `getCookie`, `setCookie`) depend on AsyncLocalStorage—import/call them only inside `createServerFn` or server routes, never inside client component renders.
-  - **RPC Security Boundary**: Private `createServerFn` MUST use `requireAuthMiddleware` for RPC security. Route `beforeLoad` checks are UX-only redirects. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
+
+## Workers Best Practices
+
+- **No Global Request State**: Never store request-scoped data in module-level global variables (isolate re-use causes cross-request data leaks).
+- **Floating Promises & `waitUntil`**: Every promise must be `await`ed, `return`ed, `void`ed, or passed to `ctx.waitUntil()`. Do not destructure `ctx` (e.g. `const { waitUntil } = ctx` throws "Illegal invocation").
+- **Crypto & Security**: Use `crypto.randomUUID()` / `crypto.getRandomValues()` (never `Math.random()`) for UUIDs/tokens, and `crypto.subtle.timingSafeEqual` for secret comparisons.
+- **Payload Streaming**: Stream large or unknown payloads instead of calling `await response.text()` on unbounded data (prevents 128 MB memory limit exhaustion).
+
+## TanStack Start Core & Auth Boundaries
+
+- **Isomorphic Loaders**: Route loaders run on BOTH server and client. Server-only logic (DB/D1 queries, secrets, private APIs) MUST be in `createServerFn` or `@tanstack/react-start/server`. Do not use Next.js/Remix patterns (`getServerSideProps`, `"use server"`).
+- **Server Utilities Scope**: `@tanstack/react-start/server` utilities (`getRequest`, `getCookie`, `setCookie`) depend on AsyncLocalStorage—import/call them only inside `createServerFn` or server routes, never inside client component renders.
+- **RPC Security Boundary**: Private `createServerFn` MUST use `requireAuthMiddleware` for RPC security. Route `beforeLoad` checks are UX-only redirects. See `src/lib/auth.middleware.ts` + `*.functions.ts`.
+
+## UI & Component Architecture
+
+- **UI Guidelines**: See [packages/ui/AGENTS.md](file:///Users/alexasomba/Documents/GitHub/alexasomba/shadcn-tanstack-monorepo/packages/ui/AGENTS.md) for component layer composition rules (`primitives` vs `Watermelon` compositions vs `blocks`), Base UI conventions (`render` prop over `asChild`, `items` prop on `Select`), icon weight guidelines, and styling standards.
+
+## Result Pattern
+
 - **Result (`@workspace/result`)**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus` (early return for Hono typed responses). Prefer `@workspace/result` over direct `better-result` imports.
 
 ## Testing & TDD
