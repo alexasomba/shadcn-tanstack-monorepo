@@ -82,10 +82,10 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
   return [
     organization({
       // Verified email required to create orgs (kit best practice; tighten further in M14).
-      allowUserToCreateOrganization: async (user) => Boolean(user.emailVerified),
+      allowUserToCreateOrganization: (user) => Boolean(user.emailVerified),
       // Free tier default; plan-based limits belong in M14 entitlements.
       organizationLimit: 5,
-      membershipLimit: async (_user, org) => {
+      membershipLimit: (_user, org) => {
         const plan =
           org.metadata &&
           typeof org.metadata === "object" &&
