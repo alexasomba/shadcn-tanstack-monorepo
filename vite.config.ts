@@ -277,12 +277,24 @@ export default defineConfig({
           "@tanstack/query/mutation-property-order": "error",
         },
       },
+      // 3. Backend & Data Services Security Layer
       {
-        files: ["apps/data-service/**/*.{js,mjs,cjs,ts,tsx}"],
+        files: [
+          "apps/data-service/**/*.{js,mjs,cjs,ts,tsx}",
+          "apps/agents/**/*.{js,mjs,cjs,ts,tsx}",
+          "packages/data-ops/**/*.{js,mjs,cjs,ts,tsx}",
+        ],
         rules: {
           "typescript/no-floating-promises": "error",
-          // "zod-openapi/require-meta": "error",
-          // "zod-openapi/require-comment": "warn",
+          "no-restricted-properties": [
+            "error",
+            {
+              object: "Math",
+              property: "random",
+              message:
+                "Use crypto.randomUUID() or crypto.getRandomValues() for cryptographic security and token generation.",
+            },
+          ],
         },
         env: {
           browser: false,

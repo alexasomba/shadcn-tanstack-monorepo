@@ -77,7 +77,7 @@ export const triggerUserSignupHandler: RouteHandler<typeof triggerUserSignupRout
     );
   }
 
-  const id = instanceId || `wf-user-${userId}-${Math.random().toString(36).substring(2, 8)}`;
+  const id = instanceId || `wf-user-${userId}-${crypto.randomUUID().slice(0, 8)}`;
 
   try {
     const existing = await workflow.get(id);
@@ -178,7 +178,7 @@ export const triggerOrgCreationHandler: RouteHandler<
     );
   }
 
-  const id = instanceId || `wf-org-${orgId}-${Math.random().toString(36).substring(2, 8)}`;
+  const id = instanceId || `wf-org-${orgId}-${crypto.randomUUID().slice(0, 8)}`;
 
   try {
     const existing = await workflow.get(id);

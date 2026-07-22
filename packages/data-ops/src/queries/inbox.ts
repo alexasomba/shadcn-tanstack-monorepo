@@ -24,11 +24,7 @@ export type CreateInboxNotificationResult = {
 };
 
 function newId(): string {
-  try {
-    return crypto.randomUUID();
-  } catch {
-    return `ntf_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
-  }
+  return crypto.randomUUID();
 }
 
 /** Insert one in-app notification for a user. Cheap D1 write; never blocks on HTTP. */
