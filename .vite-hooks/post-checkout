@@ -28,6 +28,7 @@ fi
 echo "ERROR: Feature branch '$branch' is not allowed (multi-agent safety)."
 echo "  Agents use detached .worktrees/*, not long-lived branches."
 echo "  pnpm worktree:create <type>-<topic>_<purpose>"
+echo "  Override: LTP_ALLOW_BRANCH=1 git checkout <branch>"
 echo "  Docs: AGENTS.md → Multi-agent–safe Git"
 echo "Returning to preview…"
 git checkout preview --quiet 2>/dev/null || git switch preview --quiet 2>/dev/null || true
