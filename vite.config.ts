@@ -218,8 +218,24 @@ export default defineConfig({
         },
       },
       {
-        files: ["packages/ui/src/**/*.{js,ts,tsx}"],
+        files: [
+          "packages/ui/src/**/*.{js,ts,tsx}",
+          "apps/user-web/src/components/**/*.{js,ts,tsx}",
+          "apps/admin-web/src/components/**/*.{js,ts,tsx}",
+        ],
         rules: {
+          "no-restricted-imports": [
+            "error",
+            {
+              paths: [
+                {
+                  name: "@tanstack/react-start/server",
+                  message:
+                    "Server utilities (getCookie, getRequest, etc.) are server-only. Use inside createServerFn or server routes.",
+                },
+              ],
+            },
+          ],
           "no-shadow": "off",
           "jsx-a11y/label-has-associated-control": "off",
           "jsx-a11y/no-noninteractive-element-interactions": "off",
