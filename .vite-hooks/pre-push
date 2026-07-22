@@ -19,4 +19,10 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   esac
 done
 
-exit $blocked
+if [ $blocked -ne 0 ]; then
+  exit $blocked
+fi
+
+echo "Running pre-push quality checks (vp check & vp test)..."
+vp check && vp test
+

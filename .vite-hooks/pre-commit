@@ -4,15 +4,6 @@
 
 branch=$(git branch --show-current 2>/dev/null || true)
 
-if [ -z "$branch" ]; then
-  # Detached HEAD — expected in .worktrees/*
-  exit 0
-fi
-
-if [ "$branch" = "preview" ]; then
-  exit 0
-fi
-
 if [ "$branch" = "main" ]; then
   echo "ERROR: Do not commit on main (multi-agent integration is preview)."
   echo "  Work:  pnpm worktree:create <type>-<topic>_<purpose>"
@@ -20,9 +11,14 @@ if [ "$branch" = "main" ]; then
   exit 1
 fi
 
-echo "ERROR: Feature branch '$branch' is not allowed (multi-agent safety)."
-echo "  Use a detached worktree so agents do not share a branch tip:"
-echo "  pnpm worktree:create <type>-<topic>_<purpose>"
-echo "  Docs: AGENTS.md → Multi-agent–safe Git"
-exit 1
+if [ -n "$branch" ] && [ "$branch" != "preview" ]; then
+  echo "ERROR: Feature branch '$branch' is not allowed (multi-agent safety)."
+  echo "  Use a detached worktree so agents do not share a branch tip:"
+  echo "  pnpm worktree:create <type>-<topic>_<purpose>"
+  echo "  Docs: AGENTS.md → Multi-agent–safe Git"
+  exit 1
+fi
+
+# Run staged file checks (vp check --fix on staged files)
 vp staged
+
