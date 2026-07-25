@@ -77,6 +77,8 @@ See [docs/architecture.md](./docs/architecture.md) for D1 bindings, service bind
 
 See [packages/ui/AGENTS.md](./packages/ui/AGENTS.md) for component layers, Base UI conventions, icon guidelines, and styling standards.
 
+- **Data Fetching & State**: Do NOT use `useEffect` for async data fetching or state synchronization. Use TanStack Query (`useQuery` for reads, `useMutation` for writes) to manage async operations, caching, and state transitions.
+
 ## Result Pattern
 
 - **`@workspace/result`**: thin wrapper on `better-result`. Domain queries return `Result`; Start server fns `unwrapResult`; data-service handlers use `Result.isError` + `appErrorBody`/`appErrorStatus`. Prefer `@workspace/result` over direct `better-result` imports.
