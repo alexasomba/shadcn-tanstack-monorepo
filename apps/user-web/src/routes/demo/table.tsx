@@ -240,9 +240,11 @@ function TableDemo() {
           </strong>
         </span>
         <span className="flex items-center gap-1">
-          | Go to page:
+          <label htmlFor="go-to-page-input">Go to page:</label>
           <input
+            id="go-to-page-input"
             type="number"
+            aria-label="Go to page"
             defaultValue={table.getState().pagination.pageIndex + 1}
             onChange={(e) => {
               const page = e.target.value ? Number(e.target.value) - 1 : 0;
@@ -252,6 +254,8 @@ function TableDemo() {
           />
         </span>
         <select
+          id="page-size-select"
+          aria-label="Page size"
           value={table.getState().pagination.pageSize}
           onChange={(e) => {
             table.setPageSize(Number(e.target.value));
@@ -327,5 +331,12 @@ function DebouncedInput({
     return () => clearTimeout(timeout);
   }, [value]);
 
-  return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />;
+  return (
+    <input
+      aria-label="Search table"
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
 }

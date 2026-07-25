@@ -10,24 +10,42 @@ export const Route = createFileRoute("/demo/store")({
 function FirstName() {
   const firstName = useStore(store, (state) => state.firstName);
   return (
-    <input
-      type="text"
-      value={firstName}
-      onChange={(e) => store.setState((state) => ({ ...state, firstName: e.target.value }))}
-      className="demo-input"
-    />
+    <div>
+      <label htmlFor="first-name" className="mb-1 block text-xs font-medium text-[var(--sea-ink)]">
+        First Name
+      </label>
+      <input
+        id="first-name"
+        name="firstName"
+        type="text"
+        autoComplete="given-name"
+        aria-label="First Name"
+        value={firstName}
+        onChange={(e) => store.setState((state) => ({ ...state, firstName: e.target.value }))}
+        className="demo-input"
+      />
+    </div>
   );
 }
 
 function LastName() {
   const lastName = useStore(store, (state) => state.lastName);
   return (
-    <input
-      type="text"
-      value={lastName}
-      onChange={(e) => store.setState((state) => ({ ...state, lastName: e.target.value }))}
-      className="demo-input"
-    />
+    <div>
+      <label htmlFor="last-name" className="mb-1 block text-xs font-medium text-[var(--sea-ink)]">
+        Last Name
+      </label>
+      <input
+        id="last-name"
+        name="lastName"
+        type="text"
+        autoComplete="family-name"
+        aria-label="Last Name"
+        value={lastName}
+        onChange={(e) => store.setState((state) => ({ ...state, lastName: e.target.value }))}
+        className="demo-input"
+      />
+    </div>
   );
 }
 

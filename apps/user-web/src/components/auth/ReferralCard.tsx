@@ -97,10 +97,20 @@ export function ReferralCard() {
         <CardDescription>Share your invite code. Track who signed up with it.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isLoading ? <p className="text-sm text-muted-foreground">Loading referral code…</p> : null}
+        {isLoading ? (
+          <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+            Loading referral code…
+          </p>
+        ) : null}
 
         {error ? (
-          <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            {error}
+          </p>
         ) : null}
 
         {dashboard ? (

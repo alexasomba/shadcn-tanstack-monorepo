@@ -22,13 +22,19 @@ function TanStackQueryDemo() {
       <section className="demo-panel w-full max-w-2xl">
         <p className="island-kicker mb-2">TanStack Query</p>
         <h1 className="demo-title mb-6">TanStack Query Simple Promise Handling</h1>
-        <ul className="mb-4 space-y-2">
-          {data.map((todo) => (
-            <li key={todo.id} className="demo-list-item">
-              <span className="text-base font-medium">{todo.name}</span>
-            </li>
-          ))}
-        </ul>
+        {data.length === 0 ? (
+          <div className="demo-muted py-6 text-center text-sm">
+            No items found in collection.
+          </div>
+        ) : (
+          <ul className="mb-4 space-y-2">
+            {data.map((todo) => (
+              <li key={todo.id} className="demo-list-item">
+                <span className="text-base font-medium">{todo.name}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   );

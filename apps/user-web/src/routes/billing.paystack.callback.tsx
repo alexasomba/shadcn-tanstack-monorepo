@@ -135,7 +135,7 @@ function PaystackCallbackPage() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center p-6">
       <Card className="w-full max-w-md border-border/70 shadow-none">
-        <CardHeader>
+        <CardHeader role="status" aria-live="polite">
           <CardTitle className="text-center text-lg">
             {status === "verifying" && "Verifying payment…"}
             {status === "success" && successTitle}

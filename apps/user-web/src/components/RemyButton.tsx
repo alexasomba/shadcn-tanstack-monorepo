@@ -5,6 +5,7 @@ import { showRemyAssistant } from "./RemyAssistant";
 export default function RemyButton() {
   return (
     <button
+      type="button"
       onClick={() => showRemyAssistant.setState(() => true)}
       className="flex w-full items-center justify-between rounded-lg bg-linear-to-r from-orange-500 to-red-600 px-4 py-2.5 text-white transition-opacity hover:opacity-90"
       aria-label="Open Remy Assistant"

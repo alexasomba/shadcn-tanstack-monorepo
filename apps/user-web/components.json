@@ -12,10 +12,10 @@
   "iconLibrary": "phosphor",
   "aliases": {
     "components": "@/components",
-    "hooks": "@workspace/ui/hooks",
-    "lib": "@workspace/ui/lib",
-    "utils": "@workspace/ui/lib/utils",
-    "ui": "@workspace/ui/components"
+    "hooks": "@/hooks",
+    "lib": "@/lib",
+    "utils": "@/lib/utils",
+    "ui": "@/components"
   },
   "rtl": false,
   "menuColor": "default",

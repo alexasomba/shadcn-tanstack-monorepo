@@ -74,8 +74,13 @@ function TwoFactorChallengePage() {
     await navigate({ to: dest });
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formEl = e.currentTarget;
+    if (!formEl.checkValidity()) {
+      formEl.reportValidity();
+      return;
+    }
     setError("");
     setLoading(true);
     try {
@@ -166,6 +171,7 @@ function TwoFactorChallengePage() {
                     className="font-mono tracking-wider"
                     placeholder={mode === "backup" ? "xxxx-xxxx" : "000000"}
                     required
+                    minLength={6}
                   />
                 </Field>
               </FieldGroup>

@@ -3,8 +3,11 @@ import type { QueryClient } from "@tanstack/react-query";
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "@workspace/ui/components/theme-provider";
+import { Toaster } from "sonner";
 
-import { tenantDocumentTitle } from "#/lib/tenant";
+import { AppErrorBoundary } from "#/components/app-error-boundary";
+import { CommandMenu } from "#/components/app-shell/command-menu";
+import { useThemeHotkey } from "#/hooks/use-theme-hotkey";
 import { getTenant } from "#/lib/tenant.functions";
 import type { TenantContext } from "#/lib/tenant.functions";
 import { getLocale } from "#/paraglide/runtime";
@@ -38,8 +41,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     return { tenant };
   },
 
-  head: ({ match }) => {
-    const tenant = match.context.tenant ?? null;
+  head: () => {
     return {
       meta: [
         {
@@ -50,7 +52,46 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           content: "width=device-width, initial-scale=1",
         },
         {
-          title: tenantDocumentTitle(tenant, "Starter"),
+          title: "Starter Application",
+        },
+        {
+          name: "title",
+          content: "Starter Application",
+        },
+        {
+          name: "description",
+          content:
+            "A modern React web application built with TanStack Start, Tailwind, and shadcn UI components.",
+        },
+        {
+          property: "og:title",
+          content: "Starter Application",
+        },
+        {
+          property: "og:description",
+          content:
+            "A modern React web application built with TanStack Start, Tailwind, and shadcn UI components.",
+        },
+        {
+          property: "og:image",
+          content: "https://user-web.app/og-image.png",
+        },
+        {
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          name: "twitter:title",
+          content: "Starter Application",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "A modern React web application built with TanStack Start, Tailwind, and shadcn UI components.",
+        },
+        {
+          name: "twitter:image",
+          content: "https://user-web.app/og-image.png",
         },
       ],
       links: [
@@ -61,8 +102,46 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       ],
     };
   },
+  errorComponent: ({ error }: { error: Error }) => (
+    <div className="flex min-h-[400px] flex-col items-center justify-center p-6 text-center">
+      <h2 className="text-xl font-bold">Something went wrong</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {error.message || "An unexpected error occurred."}
+      </p>
+      <button
+        type="button"
+        onClick={() => window.location.reload()}
+        className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+      >
+        Try again
+      </button>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="flex min-h-[400px] flex-col items-center justify-center p-6 text-center">
+      <h1 className="text-4xl font-extrabold">404</h1>
+      <p className="mt-2 text-lg font-medium text-muted-foreground">Page Not Found</p>
+      <a
+        href="/"
+        className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+      >
+        Return Home
+      </a>
+    </div>
+  ),
   shellComponent: RootDocument,
 });
+
+function AppShellContent({ children }: { children: React.ReactNode }) {
+  useThemeHotkey();
+  return (
+    <>
+      {children}
+      <CommandMenu />
+      <Toaster />
+    </>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -71,9 +150,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-background font-sans [overflow-wrap:anywhere] text-foreground antialiased selection:bg-[rgba(79,184,178,0.24)]">
-        <ThemeProvider defaultTheme="system" storageKey="theme">
-          {children}
-        </ThemeProvider>
+        <AppErrorBoundary>
+          <ThemeProvider defaultTheme="system" storageKey="theme">
+            <AppShellContent>{children}</AppShellContent>
+          </ThemeProvider>
+        </AppErrorBoundary>
         <TanStackDevtools
           config={{
             position: "bottom-right",

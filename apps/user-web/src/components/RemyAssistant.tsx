@@ -36,6 +36,9 @@ function Messages({ messages }: { messages: ConferenceChatMessages }) {
 
   return (
     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
+      <div role="status" aria-live="polite" className="sr-only">
+        {messages.length} message{messages.length === 1 ? "" : "s"} in assistant conversation
+      </div>
       {messages.map(({ id, role, parts }) => (
         <div
           key={id}
@@ -119,7 +122,9 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
           </div>
         </div>
         <button
+          type="button"
           onClick={handleToggle}
+          aria-label="Close assistant"
           className="text-cream/50 hover:text-cream rounded-xl p-2 transition-colors hover:bg-white/5"
         >
           <X className="h-5 w-5" />
@@ -131,7 +136,7 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
 
       {/* Loading indicator */}
       {isLoading && (
-        <div className="border-copper/10 border-t px-4 py-3">
+        <div role="status" aria-live="polite" className="border-copper/10 border-t px-4 py-3">
           <div className="text-copper/80 flex items-center gap-2 text-xs">
             <div className="flex gap-1">
               <span className="bg-copper h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]"></span>
@@ -148,7 +153,9 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSend();
+            if (input.trim() && !isLoading) {
+              handleSend();
+            }
           }}
         >
           <div className="relative">
@@ -156,6 +163,9 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about speakers, sessions, techniques..."
+              aria-label="Ask assistant a question"
+              required
+              minLength={1}
               disabled={isLoading}
               className="border-copper/20 bg-charcoal-light/50 text-cream placeholder-cream/30 focus:ring-copper/40 w-full resize-none overflow-hidden rounded-xl border py-3 pr-12 pl-4 text-sm transition-all focus:border-transparent focus:ring-2 focus:outline-none disabled:opacity-50"
               rows={1}
@@ -174,10 +184,15 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
             />
             <button
               type="submit"
+              aria-label="Send message"
               disabled={!input.trim() || isLoading}
-              className="from-copper to-copper-dark text-charcoal hover:shadow-copper/20 absolute top-1/2 right-3 -translate-y-1/2 rounded-lg bg-gradient-to-r p-2 transition-all hover:shadow-lg disabled:bg-gray-600 disabled:from-gray-600 disabled:to-gray-600 disabled:opacity-30"
+              className="from-copper to-copper-dark text-charcoal hover:shadow-copper/20 absolute top-1/2 right-3 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-gradient-to-r p-2 transition-all hover:shadow-lg disabled:bg-gray-600 disabled:from-gray-600 disabled:to-gray-600 disabled:opacity-30"
             >
-              <PaperPlaneRight className="h-4 w-4" />
+              {isLoading ? (
+                <span className="border-charcoal size-4 animate-spin rounded-full border-2 border-t-transparent" />
+              ) : (
+                <PaperPlaneRight className="h-4 w-4" />
+              )}
             </button>
           </div>
         </form>

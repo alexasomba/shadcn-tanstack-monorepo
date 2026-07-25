@@ -131,6 +131,7 @@ function BetterAuthDemo() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
                 className="demo-input"
                 required
               />
@@ -146,6 +147,7 @@ function BetterAuthDemo() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               className="demo-input"
               required
             />
@@ -160,6 +162,7 @@ function BetterAuthDemo() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
               className="demo-input"
               required
               minLength={8}

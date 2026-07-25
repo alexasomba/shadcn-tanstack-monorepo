@@ -113,6 +113,7 @@ export function ImageUploadField({
             ref={inputRef}
             type="file"
             accept={accept}
+            aria-label={label || "Upload image"}
             className="sr-only"
             disabled={disabled || busy}
             onChange={(e) => {

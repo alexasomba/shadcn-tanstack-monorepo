@@ -102,7 +102,10 @@ export function OrgSwitcher() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="gap-2 p-2" render={<Link to="/settings/organization" />}>
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                render={<Link to="/settings/organization" aria-label="Manage organizations" />}
+              >
                 <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                   <PlusIcon className="size-4" />
                 </div>

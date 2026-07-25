@@ -13,7 +13,7 @@ import {
   Lightning,
   Sparkle,
   TextAa,
-  ArrowLineLeftRight,
+  ArrowsLeftRight,
   Shield,
   Eye,
   CursorClick
@@ -117,54 +117,60 @@ function DemoTypesetPage() {
             <Card className="border-border/50 bg-card/60 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-200">
               <CardHeader>
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <ArrowLineLeftRight size={18} />
+                  <ArrowsLeftRight size={18} />
                   Fine-Tuning Controls
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs font-medium">
-                    <span>Base Size</span>
+                    <label htmlFor="base-size-input">Base Size</label>
                     <span className="text-primary font-mono">{size}px</span>
                   </div>
                   <input
+                    id="base-size-input"
                     type="range"
                     min="12"
                     max="24"
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
+                    aria-label="Base Size"
                     className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs font-medium">
-                    <span>Line Spacing (Leading)</span>
+                    <label htmlFor="line-spacing-input">Line Spacing (Leading)</label>
                     <span className="text-primary font-mono">{leading}</span>
                   </div>
                   <input
+                    id="line-spacing-input"
                     type="range"
                     min="1.4"
                     max="2.2"
                     step="0.05"
                     value={leading}
                     onChange={(e) => setLeading(e.target.value)}
+                    aria-label="Line Spacing (Leading)"
                     className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs font-medium">
-                    <span>Paragraph Flow (Flow)</span>
+                    <label htmlFor="paragraph-flow-input">Paragraph Flow (Flow)</label>
                     <span className="text-primary font-mono">{flow}em</span>
                   </div>
                   <input
+                    id="paragraph-flow-input"
                     type="range"
                     min="0.8"
                     max="2.5"
                     step="0.05"
                     value={flow}
                     onChange={(e) => setFlow(e.target.value)}
+                    aria-label="Paragraph Flow (Flow)"
                     className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>

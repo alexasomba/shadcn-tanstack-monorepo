@@ -6,26 +6,35 @@ import { createTodo, getTodos } from "#/lib/todos.functions";
 export const Route = createFileRoute("/demo/drizzle")({
   component: DemoDrizzle,
   loader: async () => await getTodos(),
+  pendingComponent: () => (
+    <div className="flex items-center justify-center p-6 text-sm text-muted-foreground">
+      Loading todos...
+    </div>
+  ),
 });
 
 function DemoDrizzle() {
   const router = useRouter();
   const todosList = Route.useLoaderData();
   const createTodoFn = useServerFn(createTodo);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const title = formData.get("title") as string;
 
-    if (!title) return;
+    if (!title || isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await createTodoFn({ data: { title } });
       await router.invalidate();
       (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error("Failed to create todo:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -67,15 +76,30 @@ function DemoDrizzle() {
           )}
         </ul>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formEl = e.currentTarget;
+            if (!formEl.checkValidity()) {
+              formEl.reportValidity();
+              return;
+            }
+            void handleSubmit(e);
+          }}
+          className="flex flex-col gap-2 sm:flex-row"
+        >
           <input
             type="text"
             name="title"
+            aria-label="Add a new todo"
             placeholder="Add a new todo..."
+            disabled={isSubmitting}
+            required
+            minLength={1}
             className="demo-input min-w-0 flex-1"
           />
-          <button type="submit" className="demo-button whitespace-nowrap">
-            Add Todo
+          <button type="submit" disabled={isSubmitting} className="demo-button whitespace-nowrap">
+            {isSubmitting ? "Adding..." : "Add Todo"}
           </button>
         </form>
 

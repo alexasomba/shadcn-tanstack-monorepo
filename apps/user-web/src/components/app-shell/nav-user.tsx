@@ -85,11 +85,15 @@ export function AppNavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem render={<Link to="/account" preload="intent" />}>
+              <DropdownMenuItem
+                render={<Link to="/account" preload="intent" aria-label="Account" />}
+              >
                 <GearSixIcon className="size-4" />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem render={<Link to="/" preload="intent" />}>
+              <DropdownMenuItem
+                render={<Link to="/" preload="intent" aria-label="Marketing site" />}
+              >
                 <StorefrontIcon className="size-4" />
                 Marketing site
               </DropdownMenuItem>

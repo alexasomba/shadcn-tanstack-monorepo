@@ -21,6 +21,7 @@ export default function ParaglideLocaleSwitcher() {
       <div style={{ display: "flex", gap: "0.25rem" }}>
         {locales.map((locale) => (
           <button
+            type="button"
             key={locale}
             onClick={() => setLocale(locale)}
             aria-pressed={locale === currentLocale}

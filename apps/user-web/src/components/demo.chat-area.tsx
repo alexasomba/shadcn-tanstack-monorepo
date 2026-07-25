@@ -27,6 +27,9 @@ export default function ChatArea() {
 
   return (
     <>
+      <div role="status" aria-live="polite" className="sr-only">
+        {messages.length} message{messages.length === 1 ? "" : "s"} in conversation
+      </div>
       <div className="flex-1 space-y-4 overflow-auto px-4 py-6">
         <Messages messages={messages} user={user} />
       </div>
@@ -36,6 +39,7 @@ export default function ChatArea() {
           <select
             value={user}
             onChange={(e) => setUser(e.target.value)}
+            aria-label="Select user"
             className="demo-select demo-input-fit text-sm"
           >
             <option value="Alice">Alice</option>
@@ -49,6 +53,7 @@ export default function ChatArea() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type a message..."
+              aria-label="Type a message"
               className="demo-input"
             />
           </div>

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Image, Spinner, DownloadSimple } from "@phosphor-icons/react";
+import { ImageIcon, Spinner, DownloadSimple } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
 
 const SIZES = ["1024x1024", "1536x1024", "1024x1536", "auto"];
@@ -76,7 +76,7 @@ function ImagePage() {
     <main className="demo-page demo-page-wide">
       <div>
         <div className="mb-6 flex items-center gap-3">
-          <Image className="h-8 w-8 text-[var(--lagoon-deep)]" />
+          <ImageIcon aria-hidden="true" className="h-8 w-8 text-[var(--lagoon-deep)]" />
           <h1 className="demo-title">Image Generation</h1>
         </div>
 
@@ -84,10 +84,12 @@ function ImagePage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Size</label>
+                <label htmlFor="image-size" className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Size</label>
                 <select
+                  id="image-size"
                   value={size}
                   onChange={(e) => setSize(e.target.value)}
+                  aria-label="Image size"
                   disabled={isLoading}
                   className="demo-select text-sm"
                 >
@@ -99,10 +101,11 @@ function ImagePage() {
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
+                <label htmlFor="image-count" className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
                   Count
                 </label>
                 <input
+                  id="image-count"
                   type="number"
                   value={numberOfImages}
                   onChange={(e) =>
@@ -110,6 +113,7 @@ function ImagePage() {
                   }
                   min={1}
                   max={4}
+                  aria-label="Image count"
                   disabled={isLoading}
                   className="demo-input text-sm"
                 />
@@ -117,10 +121,12 @@ function ImagePage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Prompt</label>
+              <label htmlFor="image-prompt" className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Prompt</label>
               <textarea
+                id="image-prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
+                aria-label="Image prompt"
                 disabled={isLoading}
                 rows={6}
                 className="demo-textarea text-sm"
@@ -134,10 +140,10 @@ function ImagePage() {
               className="demo-button w-full"
             >
               {isLoading ? (
-                <>
+                <span role="status" aria-live="polite" className="flex items-center justify-center gap-2">
                   <Spinner className="h-5 w-5 animate-spin" />
                   Generating...
-                </>
+                </span>
               ) : (
                 "Generate Image"
               )}
@@ -156,7 +162,7 @@ function ImagePage() {
                     <div key={index} className="group relative">
                       <img
                         src={getImageSrc(image)}
-                        alt={`Generated image ${index + 1}`}
+                        alt={image.revisedPrompt || prompt || `Generated image ${index + 1}`}
                         className="w-full rounded-lg border border-[var(--line)]"
                       />
                       <button
@@ -177,7 +183,7 @@ function ImagePage() {
               </div>
             ) : !error && !isLoading ? (
               <div className="demo-muted flex h-64 flex-col items-center justify-center">
-                <Image className="mb-4 h-16 w-16 opacity-50" />
+                <ImageIcon aria-hidden="true" className="mb-4 h-16 w-16 opacity-50" />
                 <p>Enter a prompt and click "Generate Image" to create an image.</p>
               </div>
             ) : null}

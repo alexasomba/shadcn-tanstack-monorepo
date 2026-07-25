@@ -184,11 +184,13 @@ function StructuredPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
+            <label htmlFor="recipe-name" className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
               Recipe Name
             </label>
             <input
+              id="recipe-name"
               type="text"
+              aria-label="Recipe Name"
               value={recipeName}
               onChange={(e) => setRecipeName(e.target.value)}
               disabled={isLoading}
@@ -245,7 +247,13 @@ function StructuredPage() {
             )}
           </div>
 
-          {error && <div className="demo-alert demo-alert-danger mb-4">{error}</div>}
+          {isLoading && (
+            <div role="status" aria-live="polite" className="sr-only">
+              Generating recipe...
+            </div>
+          )}
+
+          {error && <div role="alert" className="demo-alert demo-alert-danger mb-4">{error}</div>}
 
           {result ? (
             <div className="space-y-4">

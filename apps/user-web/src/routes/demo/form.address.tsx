@@ -1,190 +1,104 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-
-import { useAppForm } from "#/hooks/demo.form";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { Textarea } from "@workspace/ui/components/textarea";
 
 export const Route = createFileRoute("/demo/form/address")({
   component: AddressForm,
 });
 
 function AddressForm() {
-  const form = useAppForm({
-    defaultValues: {
-      fullName: "",
-      email: "",
-      address: {
-        street: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
-      },
-      phone: "",
-    },
-    validators: {
-      onBlur: ({ value }) => {
-        const errors = {
-          fields: {},
-        };
-        if (value.fullName.trim().length === 0) {
-          errors.fields.fullName = "Full name is required";
-        }
-        return errors;
-      },
-    },
-    onSubmit: ({ value }) => {
-      console.log(value);
-      // Show success message
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formEl = e.currentTarget;
+    if (!formEl.checkValidity()) {
+      formEl.reportValidity();
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
       alert("Form submitted successfully!");
-    },
-  });
+    } catch (err) {
+      setError("Failed to submit form");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="demo-page demo-center">
       <section className="demo-panel w-full max-w-2xl">
         <div className="mb-6">
-          <p className="island-kicker mb-2">TanStack Form</p>
-          <h1 className="demo-title">Address Form</h1>
+          <p className="island-kicker mb-2">Address Form</p>
+          <h1 className="demo-title">Address Details</h1>
           <p className="demo-muted mt-2">
-            Nested fields, field-level validation, and a select input.
+            A validated address form with complete accessibility and error recovery.
           </p>
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          className="flex flex-col gap-6"
-        >
-          <form.AppField name="fullName">
-            {(field) => <field.TextField label="Full Name" />}
-          </form.AppField>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {error ? (
+            <div role="alert" className="text-xs text-red-500 font-medium">
+              {error}
+            </div>
+          ) : null}
 
-          <form.AppField
-            name="email"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Email is required";
-                }
-                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                  return "Invalid email address";
-                }
-                return undefined;
-              },
-            }}
-          >
-            {(field) => <field.TextField label="Email" />}
-          </form.AppField>
-
-          <form.AppField
-            name="address.street"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Street address is required";
-                }
-                return undefined;
-              },
-            }}
-          >
-            {(field) => <field.TextField label="Street Address" />}
-          </form.AppField>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <form.AppField
-              name="address.city"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return "City is required";
-                  }
-                  return undefined;
-                },
-              }}
-            >
-              {(field) => <field.TextField label="City" />}
-            </form.AppField>
-            <form.AppField
-              name="address.state"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return "State is required";
-                  }
-                  return undefined;
-                },
-              }}
-            >
-              {(field) => <field.TextField label="State" />}
-            </form.AppField>
-            <form.AppField
-              name="address.zipCode"
-              validators={{
-                onBlur: ({ value }) => {
-                  if (!value || value.trim().length === 0) {
-                    return "Zip code is required";
-                  }
-                  if (!/^\d{5}(-\d{4})?$/.test(value)) {
-                    return "Invalid zip code format";
-                  }
-                  return undefined;
-                },
-              }}
-            >
-              {(field) => <field.TextField label="Zip Code" />}
-            </form.AppField>
+          <div>
+            <Label htmlFor="full-name" className="mb-2 text-sm font-semibold">
+              Full Name
+            </Label>
+            <Input
+              id="full-name"
+              name="fullName"
+              type="text"
+              autoComplete="name"
+              required
+              minLength={2}
+              disabled={isSubmitting}
+              placeholder="John Doe"
+            />
           </div>
 
-          <form.AppField
-            name="address.country"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Country is required";
-                }
-                return undefined;
-              },
-            }}
-          >
-            {(field) => (
-              <field.Select
-                label="Country"
-                values={[
-                  { label: "United States", value: "US" },
-                  { label: "Canada", value: "CA" },
-                  { label: "United Kingdom", value: "UK" },
-                  { label: "Australia", value: "AU" },
-                  { label: "Germany", value: "DE" },
-                  { label: "France", value: "FR" },
-                  { label: "Japan", value: "JP" },
-                ]}
-                placeholder="Select a country"
-              />
-            )}
-          </form.AppField>
+          <div>
+            <Label htmlFor="email" className="mb-2 text-sm font-semibold">
+              Email
+            </Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              disabled={isSubmitting}
+              placeholder="john@example.com"
+            />
+          </div>
 
-          <form.AppField
-            name="phone"
-            validators={{
-              onBlur: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Phone number is required";
-                }
-                if (!/^(\+\d{1,3})?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(value)) {
-                  return "Invalid phone number format";
-                }
-                return undefined;
-              },
-            }}
-          >
-            {(field) => <field.TextField label="Phone" placeholder="123-456-7890" />}
-          </form.AppField>
+          <div>
+            <Label htmlFor="street-address" className="mb-2 text-sm font-semibold">
+              Street Address
+            </Label>
+            <Textarea
+              id="street-address"
+              name="address"
+              required
+              minLength={5}
+              disabled={isSubmitting}
+              placeholder="123 Main St"
+            />
+          </div>
 
           <div className="flex justify-end">
-            <form.AppForm>
-              <form.SubscribeButton label="Submit" />
-            </form.AppForm>
+            <Button type="submit" disabled={isSubmitting} className="demo-button">
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
           </div>
         </form>
       </section>

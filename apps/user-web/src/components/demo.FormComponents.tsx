@@ -12,10 +12,10 @@ import { useFieldContext, useFormContext } from "#/hooks/demo.form-context";
 export function SubscribeButton({ label }: { label: string }) {
   const form = useFormContext();
   return (
-    <form.Subscribe selector={(state) => state.isSubmitting}>
-      {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting}>
-          {label}
+    <form.Subscribe selector={(state) => [state.isSubmitting, state.canSubmit]}>
+      {([isSubmitting, canSubmit]) => (
+        <Button type="submit" disabled={isSubmitting || !canSubmit}>
+          {isSubmitting ? "Submitting..." : label}
         </Button>
       )}
     </form.Subscribe>
@@ -23,36 +23,42 @@ export function SubscribeButton({ label }: { label: string }) {
 }
 
 function ErrorMessages({ errors }: { errors: Array<string | { message: string }> }) {
+  if (!errors || errors.length === 0) return null;
   return (
-    <>
+    <div role="alert" className="mt-1 flex flex-col gap-1">
       {errors.map((error) => (
         <div
           key={typeof error === "string" ? error : error.message}
-          className="mt-1 text-sm font-semibold text-red-600"
+          className="text-sm font-semibold text-red-600 dark:text-red-400"
         >
           {typeof error === "string" ? error : error.message}
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
 export function TextField({ label, placeholder }: { label: string; placeholder?: string }) {
   const field = useFieldContext<string>();
   const errors = useStore(field.store, (state) => state.meta.errors);
+  const fieldId = field.name || label;
 
   return (
     <div>
-      <Label htmlFor={label} className="mb-2 text-sm font-semibold text-[var(--sea-ink)]">
+      <Label htmlFor={fieldId} className="mb-2 text-sm font-semibold text-[var(--sea-ink)]">
         {label}
       </Label>
       <Input
+        id={fieldId}
+        name={field.name}
+        aria-label={label}
+        required
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+      <ErrorMessages errors={errors} />
     </div>
   );
 }
@@ -68,12 +74,14 @@ export function TextArea({ label, rows = 3 }: { label: string; rows?: number }) 
       </Label>
       <ShadcnTextarea
         id={label}
+        name={field.name}
+        required
         value={field.state.value}
         onBlur={field.handleBlur}
         rows={rows}
         onChange={(e) => field.handleChange(e.target.value)}
       />
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+      <ErrorMessages errors={errors} />
     </div>
   );
 }
@@ -92,6 +100,9 @@ export function Select({
 
   return (
     <div>
+      <Label htmlFor={field.name} className="mb-2 text-sm font-semibold text-[var(--sea-ink)]">
+        {label}
+      </Label>
       <ShadcnSelect.Select
         name={field.name}
         value={field.state.value}
@@ -115,7 +126,7 @@ export function Select({
           </ShadcnSelect.SelectGroup>
         </ShadcnSelect.SelectContent>
       </ShadcnSelect.Select>
-      {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
+      <ErrorMessages errors={errors} />
     </div>
   );
 }

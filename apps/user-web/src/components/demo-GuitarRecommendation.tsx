@@ -21,6 +21,7 @@ export default function GuitarRecommendation({ id }: { id: string }) {
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold text-[var(--lagoon-deep)]">${guitar.price}</div>
           <button
+            type="button"
             onClick={() => {
               navigate({
                 to: "/demo/guitars/$guitarId",

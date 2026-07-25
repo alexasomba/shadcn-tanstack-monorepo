@@ -27,7 +27,7 @@ export function AppNavMain({ label, items }: { label: string; items: AppNavItem[
               <SidebarMenuButton
                 isActive={isActive}
                 tooltip={item.label}
-                render={<Link to={item.to} preload="intent" />}
+                render={<Link to={item.to} preload="intent" aria-label={item.label} />}
               >
                 <Icon className="size-4" weight={isActive ? "fill" : "regular"} />
                 <span>{item.label}</span>

@@ -19,7 +19,8 @@
     "check": "vp check",
     "deploy": "vp run build && wrangler deploy",
     "deploy:preview": "vp run build && wrangler versions upload",
-    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
+    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@alexasomba/better-auth-paystack": "^3.0.0",
@@ -72,6 +73,7 @@
     "react-dom": "catalog:",
     "react-icons": "catalog:",
     "recharts": "catalog:",
+    "sonner": "catalog:",
     "streamdown": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",

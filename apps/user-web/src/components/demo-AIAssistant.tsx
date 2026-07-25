@@ -92,54 +92,60 @@ export default function AIAssistant() {
             <h3 className="font-semibold text-[var(--sea-ink)]">AI Assistant</h3>
             <button
               onClick={() => showAIAssistant.setState((state) => !state)}
+              aria-label="Close assistant"
               className="demo-muted transition-colors hover:text-[var(--sea-ink)]"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
-
+          <div role="status" aria-live="polite" className="sr-only">
+            {messages.length} message{messages.length === 1 ? "" : "s"} in conversation
+          </div>
           <Messages messages={messages} />
 
           <div className="border-t border-[var(--line)] p-3">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (input.trim()) {
-                  sendMessage(input);
-                  setInput("");
-                }
-              }}
-            >
-              <div className="relative">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message..."
-                  className="demo-textarea pr-10 text-sm"
-                  rows={1}
-                  style={{ minHeight: "36px", maxHeight: "120px" }}
-                  onInput={(e) => {
-                    const target = e.target as HTMLTextAreaElement;
-                    target.style.height = "auto";
-                    target.style.height = Math.min(target.scrollHeight, 120) + "px";
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && input.trim()) {
-                      e.preventDefault();
-                      sendMessage(input);
-                      setInput("");
-                    }
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={!input.trim()}
-                  className="absolute top-1/2 right-2 -translate-y-1/2 p-1.5 text-[var(--lagoon-deep)] transition-colors hover:text-[var(--sea-ink)] disabled:text-[var(--sea-ink-soft)]"
-                >
+            <div className="relative">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                aria-label="Type your message"
+                disabled={isLoading}
+                className="demo-textarea pr-10 text-sm"
+                rows={1}
+                style={{ minHeight: "36px", maxHeight: "120px" }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = "auto";
+                  target.style.height = Math.min(target.scrollHeight, 120) + "px";
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && input.trim() && !isLoading) {
+                    e.preventDefault();
+                    sendMessage(input);
+                    setInput("");
+                  }
+                }}
+              />
+              <button
+                type="button"
+                aria-label="Send message"
+                disabled={!input.trim() || isLoading}
+                onClick={() => {
+                  if (input.trim() && !isLoading) {
+                    sendMessage(input);
+                    setInput("");
+                  }
+                }}
+                className="absolute top-1/2 right-2 flex h-7 w-7 -translate-y-1/2 items-center justify-center p-1.5 text-[var(--lagoon-deep)] transition-colors hover:text-[var(--sea-ink)] disabled:text-[var(--sea-ink-soft)]"
+              >
+                {isLoading ? (
+                  <Spinner className="h-4 w-4 animate-spin" />
+                ) : (
                   <PaperPlaneRight className="h-4 w-4" />
-                </button>
-              </div>
-            </form>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -173,7 +173,12 @@ function ChatPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (input.trim()) {
+                const formEl = e.currentTarget;
+                if (!formEl.checkValidity()) {
+                  formEl.reportValidity();
+                  return;
+                }
+                if (input.trim() && !isLoading) {
                   sendMessage(input);
                   setInput("");
                 }
@@ -185,7 +190,7 @@ function ChatPage() {
                   onClick={handleMicClick}
                   disabled={isLoading || isTranscribing}
                   className={`demo-button p-3 ${
-                    isRecording ? "demo-button-danger" : "demo-button-secondary"
+                    isRecording ? "demo-button-danger animate-pulse" : "demo-button-secondary"
                   } disabled:opacity-50`}
                   title={isRecording ? "Stop recording" : "Start recording"}
                 >
@@ -203,6 +208,9 @@ function ChatPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type something clever..."
+                    aria-label="Chat message input"
+                    required
+                    minLength={1}
                     className="demo-textarea pr-12 text-sm"
                     rows={1}
                     style={{ minHeight: "44px", maxHeight: "200px" }}
@@ -222,6 +230,7 @@ function ChatPage() {
                   />
                   <button
                     type="submit"
+                    aria-label="Send message"
                     disabled={!input.trim() || isLoading}
                     className="absolute top-1/2 right-2 -translate-y-1/2 p-2 text-[var(--lagoon-deep)] transition-colors hover:text-[var(--sea-ink)] disabled:text-[var(--sea-ink-soft)]"
                   >

@@ -181,6 +181,7 @@ function LoginPage() {
                     id="password"
                     type="password"
                     required
+                    autoComplete={isSignUp ? "new-password" : "current-password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

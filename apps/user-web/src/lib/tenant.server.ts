@@ -27,7 +27,7 @@ export type TenantContext = {
 
 const DEFAULT_TENANT_CACHE_TTL_SECONDS = 60;
 
-function errorMessage(err: unknown): string {
+function extractErrorMessage(err: unknown): string {
   if (err && typeof err === "object" && "message" in err) {
     const msg = err.message;
     if (typeof msg === "string") return msg;
@@ -142,7 +142,7 @@ async function writeTenantCache(host: string, tenant: TenantContext | null): Pro
       JSON.stringify({
         message: "tenant cache put failed",
         host,
-        error: errorMessage(err),
+        error: extractErrorMessage(err),
       }),
     );
   }
@@ -193,7 +193,7 @@ export async function resolveTenantFromRequest(): Promise<TenantContext | null> 
       JSON.stringify({
         message: "tenant resolve failed",
         host,
-        error: errorMessage(err),
+        error: extractErrorMessage(err),
       }),
     );
     return null;
@@ -244,7 +244,7 @@ export async function syncActiveOrganizationFromTenant(
       JSON.stringify({
         message: "setActiveOrganization failed",
         organizationId: tenant.organizationId,
-        error: errorMessage(err),
+        error: extractErrorMessage(err),
       }),
     );
     return { switched: false, reason: "set_active_failed" };
