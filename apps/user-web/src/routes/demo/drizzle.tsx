@@ -1,5 +1,9 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { useState } from "react";
 
 import { createTodo, getTodos } from "#/lib/todos.functions";
 
@@ -42,8 +46,8 @@ function DemoDrizzle() {
     <main className="demo-page demo-center">
       <section className="demo-panel w-full max-w-2xl">
         <header className="mb-8 flex items-center gap-4">
-          <span className="demo-card flex h-14 w-14 items-center justify-center p-3">
-            <img src="/drizzle.svg" alt="Drizzle Logo" className="h-8 w-8" />
+          <span className="demo-card flex size-14 items-center justify-center p-3">
+            <img src="/drizzle.svg" alt="Drizzle Logo" className="size-8" />
           </span>
           <div>
             <p className="island-kicker mb-2">Database</p>
@@ -60,7 +64,7 @@ function DemoDrizzle() {
 
         <h2 className="demo-section-title mb-4">Todos</h2>
 
-        <ul className="mb-6 space-y-3">
+        <ul className="mb-6 flex flex-col gap-3">
           {todosList.map((todo) => (
             <li key={todo.id} className="demo-list-item">
               <div className="flex items-center justify-between">
@@ -88,7 +92,7 @@ function DemoDrizzle() {
           }}
           className="flex flex-col gap-2 sm:flex-row"
         >
-          <input
+          <Input
             type="text"
             name="title"
             aria-label="Add a new todo"
@@ -96,21 +100,24 @@ function DemoDrizzle() {
             disabled={isSubmitting}
             required
             minLength={1}
-            className="demo-input min-w-0 flex-1"
+            className="min-w-0 flex-1"
           />
-          <button type="submit" disabled={isSubmitting} className="demo-button whitespace-nowrap">
+          <Button type="submit" disabled={isSubmitting} className="whitespace-nowrap">
             {isSubmitting ? "Adding..." : "Add Todo"}
-          </button>
+          </Button>
         </form>
 
-        <div className="demo-card mt-8">
-          <h3 className="demo-section-title mb-2">Security note</h3>
-          <p className="demo-muted text-sm">
-            <code>getTodos</code> / <code>createTodo</code> enforce session on the server function
-            itself — route guards alone are not enough for RPCs.
-          </p>
-        </div>
+        <Card className="mt-8 border-border/70 shadow-none">
+          <CardContent className="pt-6">
+            <h3 className="demo-section-title mb-2">Security note</h3>
+            <p className="demo-muted text-sm">
+              <code>getTodos</code> / <code>createTodo</code> enforce session on the server function
+              itself — route guards alone are not enough for RPCs.
+            </p>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );
 }
+

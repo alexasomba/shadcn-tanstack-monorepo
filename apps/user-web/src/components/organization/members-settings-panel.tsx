@@ -68,7 +68,17 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
   };
 
   useEffect(() => {
-    void refreshInbound();
+    let cancelled = false;
+    listUserInvitations()
+      .then((data) => {
+        if (!cancelled) setInbound(data as OrgInvitation[]);
+      })
+      .catch(() => {
+        if (!cancelled) setInbound([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [active?.id]);
 
   const run = async (fn: () => Promise<void>, ok: string) => {
@@ -281,25 +291,40 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
                 value={role}
                 onChange={(e) => setRole(e.target.value as OrgRole)}
               >
-                {ORG_ROLE_OPTIONS.filter((r) => r.value !== "owner").map((opt) => (
-                  <NativeSelectOption key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </NativeSelectOption>
-                ))}
+                {ORG_ROLE_OPTIONS.flatMap((opt) =>
+                  opt.value !== "owner"
+                    ? [
+                        <NativeSelectOption key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </NativeSelectOption>,
+                      ]
+                    : [],
+                )}
               </NativeSelect>
             </div>
             <Button
               disabled={busy || !email.trim()}
-              onClick={() =>
-                void run(async () => {
+              onClick={async () => {
+                setBusy(true);
+                setBanner(null);
+                try {
                   await inviteMember({
                     email: email.trim().toLowerCase(),
                     role,
                     organizationId: active.id,
                   });
                   setEmail("");
-                }, "Invitation sent")
-              }
+                  setBanner({ type: "ok", text: "Invitation sent" });
+                  await refreshInbound();
+                } catch (e) {
+                  setBanner({
+                    type: "err",
+                    text: unknownErrorMessage(e, "Something went wrong"),
+                  });
+                } finally {
+                  setBusy(false);
+                }
+              }}
             >
               Send invite
             </Button>
@@ -387,32 +412,34 @@ function InboundInvitations({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        {invitations
-          .filter((i) => !i.status || i.status === "pending")
-          .map((inv) => (
-            <div
-              key={inv.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2"
-            >
-              <div>
-                <p className="text-sm font-medium">Invitation</p>
-                <p className="text-xs text-muted-foreground">Role: {inv.role}</p>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" disabled={busy} onClick={() => onAccept(inv.id)}>
-                  Accept
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => onReject(inv.id)}
+        {invitations.flatMap((inv) =>
+          !inv.status || inv.status === "pending"
+            ? [
+                <div
+                  key={inv.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2"
                 >
-                  Decline
-                </Button>
-              </div>
-            </div>
-          ))}
+                  <div>
+                    <p className="text-sm font-medium">Invitation</p>
+                    <p className="text-xs text-muted-foreground">Role: {inv.role}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" disabled={busy} onClick={() => onAccept(inv.id)}>
+                      Accept
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => onReject(inv.id)}
+                    >
+                      Decline
+                    </Button>
+                  </div>
+                </div>,
+              ]
+            : [],
+        )}
       </CardContent>
     </Card>
   );

@@ -1,4 +1,5 @@
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -41,7 +42,9 @@ export function ApiKeysSettingsPanel() {
   const activeOrg = useActiveOrganization();
   const org = activeOrg.data;
 
-  const [scope, setScope] = useState<ApiKeyConfigId>("organization");
+  const [userScopeOverride, setUserScopeOverride] = useState<ApiKeyConfigId | null>(null);
+  const scope: ApiKeyConfigId = userScopeOverride ?? (org?.id ? "organization" : "user");
+  const setScope = (newScope: ApiKeyConfigId) => setUserScopeOverride(newScope);
   const [name, setName] = useState("");
   const [expiresIn, setExpiresIn] = useState<string>("null");
   const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
@@ -51,15 +54,6 @@ export function ApiKeysSettingsPanel() {
   const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
   const [copied, setCopied] = useState<"key" | "curl" | null>(null);
-
-  // Prefer org keys when an active org exists; fall back to personal.
-  useEffect(() => {
-    if (org?.id) {
-      setScope("organization");
-    } else {
-      setScope("user");
-    }
-  }, [org?.id]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -76,6 +70,7 @@ export function ApiKeysSettingsPanel() {
       });
       setKeys(result.apiKeys);
       setTotal(result.total);
+      setLoading(false);
     } catch (e) {
       setBanner({
         type: "err",
@@ -83,7 +78,6 @@ export function ApiKeysSettingsPanel() {
       });
       setKeys([]);
       setTotal(0);
-    } finally {
       setLoading(false);
     }
   }, [scope, org]);
@@ -91,22 +85,6 @@ export function ApiKeysSettingsPanel() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
-
-  const run = async (fn: () => Promise<void>, ok: string) => {
-    setBusy(true);
-    setBanner(null);
-    try {
-      await fn();
-      setBanner({ type: "ok", text: ok });
-    } catch (e) {
-      setBanner({
-        type: "err",
-        text: unknownErrorMessage(e, "Something went wrong"),
-      });
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const copyText = async (text: string, which: "key" | "curl") => {
     try {
@@ -118,8 +96,10 @@ export function ApiKeysSettingsPanel() {
     }
   };
 
-  const onCreate = () => {
-    void run(async () => {
+  const handleCreate = async () => {
+    setBusy(true);
+    setBanner(null);
+    try {
       if (scope === "organization" && !org?.id) {
         throw new Error("Select or create an organization first");
       }
@@ -137,11 +117,22 @@ export function ApiKeysSettingsPanel() {
       setCreatedSecret(created.key);
       setName("");
       await refresh();
-    }, "API key created — copy the secret now; it will not be shown again");
+      setBanner({
+        type: "ok",
+        text: "API key created — copy the secret now; it will not be shown again",
+      });
+      setBusy(false);
+    } catch (e) {
+      setBanner({
+        type: "err",
+        text: unknownErrorMessage(e, "Something went wrong"),
+      });
+      setBusy(false);
+    }
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">API Keys</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -152,16 +143,9 @@ export function ApiKeysSettingsPanel() {
       </div>
 
       {banner ? (
-        <p
-          className={
-            banner.type === "ok"
-              ? "rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-sm"
-              : "rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-          }
-          role="status"
-        >
-          {banner.text}
-        </p>
+        <Alert variant={banner.type === "err" ? "destructive" : "default"}>
+          <AlertDescription>{banner.text}</AlertDescription>
+        </Alert>
       ) : null}
 
       {createdSecret ? (
@@ -272,7 +256,7 @@ export function ApiKeysSettingsPanel() {
 
           <Button
             disabled={busy || !name.trim() || (scope === "organization" && !org?.id)}
-            onClick={onCreate}
+            onClick={handleCreate}
           >
             Create API key
           </Button>
@@ -293,45 +277,16 @@ export function ApiKeysSettingsPanel() {
             <p className="text-sm text-muted-foreground">No API keys yet.</p>
           ) : null}
           {keys.map((k) => (
-            <div
+            <ApiKeyItem
               key={k.id}
-              className="flex flex-col gap-2 rounded-xl border border-border/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">{k.name || "Unnamed"}</p>
-                <p className="truncate font-mono text-xs text-muted-foreground">
-                  {formatKeyPreview(k)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Expires {formatExpires(k.expiresAt)}
-                  {k.enabled === false ? " · disabled" : ""}
-                  {typeof k.requestCount === "number" ? ` · ${k.requestCount} requests` : ""}
-                </p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={busy}
-                onClick={() => {
-                  const ok = window.confirm(
-                    `Revoke key “${k.name || k.id}”? Clients using it will fail immediately.`,
-                  );
-                  if (!ok) return;
-                  void run(async () => {
-                    const configId: ApiKeyConfigId =
-                      k.configId === "user" || k.configId === "organization" ? k.configId : scope;
-                    await deleteApiKey({
-                      keyId: k.id,
-                      configId,
-                    });
-                    setCreatedSecret(null);
-                    await refresh();
-                  }, "API key revoked");
-                }}
-              >
-                Revoke
-              </Button>
-            </div>
+              apiKey={k}
+              scope={scope}
+              busy={busy}
+              setBusy={setBusy}
+              setBanner={setBanner}
+              setCreatedSecret={setCreatedSecret}
+              refresh={refresh}
+            />
           ))}
           <Separator />
           <p className="text-xs text-muted-foreground">
@@ -342,6 +297,72 @@ export function ApiKeysSettingsPanel() {
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function ApiKeyItem({
+  apiKey,
+  scope,
+  busy,
+  setBusy,
+  setBanner,
+  setCreatedSecret,
+  refresh,
+}: {
+  apiKey: ApiKeyRecord;
+  scope: ApiKeyConfigId;
+  busy: boolean;
+  setBusy: (b: boolean) => void;
+  setBanner: (b: { type: "ok" | "err"; text: string } | null) => void;
+  setCreatedSecret: (s: string | null) => void;
+  refresh: () => Promise<void>;
+}) {
+  const k = apiKey;
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-border/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="truncate font-medium">{k.name || "Unnamed"}</p>
+        <p className="truncate font-mono text-xs text-muted-foreground">{formatKeyPreview(k)}</p>
+        <p className="text-xs text-muted-foreground">
+          Expires {formatExpires(k.expiresAt)}
+          {k.enabled === false ? " · disabled" : ""}
+          {typeof k.requestCount === "number" ? ` · ${k.requestCount} requests` : ""}
+        </p>
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={busy}
+        onClick={async () => {
+          const ok = window.confirm(
+            `Revoke key “${k.name || k.id}”? Clients using it will fail immediately.`,
+          );
+          if (!ok) return;
+          setBusy(true);
+          setBanner(null);
+          try {
+            const configId: ApiKeyConfigId =
+              k.configId === "user" || k.configId === "organization" ? k.configId : scope;
+            await deleteApiKey({
+              keyId: k.id,
+              configId,
+            });
+            setCreatedSecret(null);
+            await refresh();
+            setBanner({ type: "ok", text: "API key revoked" });
+            setBusy(false);
+          } catch (e) {
+            setBanner({
+              type: "err",
+              text: unknownErrorMessage(e, "Something went wrong"),
+            });
+            setBusy(false);
+          }
+        }}
+      >
+        Revoke
+      </Button>
     </div>
   );
 }

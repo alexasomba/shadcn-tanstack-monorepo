@@ -1,4 +1,6 @@
 import { useServerFn } from "@tanstack/react-start";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -7,6 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Checkbox } from "@workspace/ui/components/checkbox";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
@@ -71,6 +81,7 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
   const canDelete = myRole ? canDeleteOrganization(myRole) : false;
   const canUseR2 = entitlements ? clientHasFeature(entitlements, "r2") : false;
 
+  // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
   useEffect(() => {
     if (active) {
       setEditName(active.name);
@@ -82,19 +93,25 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
       setLogoUrl(null);
       setEntitlements(null);
     }
-    // active object identity changes often; key fields are enough.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync form from active org fields
-  }, [active?.id, active?.name, active?.slug, active?.logo]);
+  }, [active]);
 
   useEffect(() => {
+    let cancelled = false;
     if (!active?.id) return;
-    void listSubscriptions(active.id)
-      .then((subs) => setEntitlements(resolveClientEntitlements(subs)))
-      .catch(() => setEntitlements(resolveClientEntitlements([])));
+    listSubscriptions(active.id)
+      .then((subs) => {
+        if (!cancelled) setEntitlements(resolveClientEntitlements(subs));
+      })
+      .catch(() => {
+        if (!cancelled) setEntitlements(resolveClientEntitlements([]));
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [active?.id]);
 
   useEffect(() => {
-    if (!slugTouched) {
+    if (!slugTouched && createName.trim()) {
       setCreateSlug(slugifyOrgName(createName));
     }
   }, [createName, slugTouched]);
@@ -104,12 +121,14 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
       setSlugStatus(null);
       return;
     }
-    const handle = window.setTimeout(() => {
-      void checkSlugAvailable(createSlug).then((r) => {
-        setSlugStatus(r.available ? "Available" : (r.message ?? "Unavailable"));
-      });
-    }, 350);
-    return () => window.clearTimeout(handle);
+    const timer = setTimeout(() => {
+      checkSlugAvailable(createSlug)
+        .then((res) => {
+          setSlugStatus(res.available ? "Available" : (res.message ?? "Unavailable"));
+        })
+        .catch(() => setSlugStatus(null));
+    }, 300);
+    return () => clearTimeout(timer);
   }, [createSlug]);
 
   const run = async (fn: () => Promise<void>, ok: string) => {
@@ -129,7 +148,7 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Organization</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -139,16 +158,9 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
       </div>
 
       {banner ? (
-        <p
-          className={
-            banner.type === "ok"
-              ? "rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-sm"
-              : "rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-          }
-          role="status"
-        >
-          {banner.text}
-        </p>
+        <Alert variant={banner.type === "err" ? "destructive" : "default"}>
+          <AlertDescription>{banner.text}</AlertDescription>
+        </Alert>
       ) : null}
 
       <Card className="border-border/70 shadow-none">
@@ -162,7 +174,7 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
                 : `${orgs.length} organization${orgs.length === 1 ? "" : "s"}`}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="flex flex-col gap-2">
           {listState.error ? (
             <p className="text-sm text-destructive">
               {listState.error.message || "Failed to load organizations"}
@@ -175,14 +187,18 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
                 key={org.id}
                 className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2"
               >
-                <div className="min-w-0">
-                  <p className="truncate font-medium">
-                    {org.name}
-                    {isActive ? (
-                      <span className="ml-2 text-xs font-normal text-muted-foreground">Active</span>
-                    ) : null}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">/{org.slug}</p>
+                <div className="flex min-w-0 items-center gap-2">
+                  <div>
+                    <p className="flex items-center gap-2 truncate font-medium">
+                      {org.name}
+                      {isActive ? (
+                        <Badge variant="secondary" className="text-[10px]">
+                          Active
+                        </Badge>
+                      ) : null}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">/{org.slug}</p>
+                  </div>
                 </div>
                 <Button
                   size="sm"
@@ -210,204 +226,272 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
             orgs / free plan.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="org-name">Name</Label>
-            <Input
-              id="org-name"
-              value={createName}
-              onChange={(e) => setCreateName(e.target.value)}
-              placeholder="Acme Inc"
-              autoComplete="organization"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="org-slug">Slug</Label>
-            <Input
-              id="org-slug"
-              value={createSlug}
-              onChange={(e) => {
-                setSlugTouched(true);
-                setCreateSlug(e.target.value);
-              }}
-              placeholder="acme-inc"
-            />
-            {slugStatus ? (
-              <p
-                className={
-                  slugStatus === "Available"
-                    ? "text-xs text-muted-foreground"
-                    : "text-xs text-destructive"
+        <CardContent>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="org-name">Name</FieldLabel>
+              <Input
+                id="org-name"
+                value={createName}
+                onChange={(e) => setCreateName(e.target.value)}
+                placeholder="Acme Inc"
+                autoComplete="organization"
+              />
+            </Field>
+            <Field data-invalid={Boolean(slugStatus && slugStatus !== "Available")}>
+              <FieldLabel htmlFor="org-slug">Slug</FieldLabel>
+              <Input
+                id="org-slug"
+                value={createSlug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setCreateSlug(e.target.value);
+                }}
+                placeholder="acme-inc"
+              />
+              {slugStatus ? (
+                slugStatus === "Available" ? (
+                  <FieldDescription>Slug is available</FieldDescription>
+                ) : (
+                  <FieldError>{slugStatus}</FieldError>
+                )
+              ) : null}
+            </Field>
+            <Field orientation="horizontal">
+              <Checkbox
+                id="keep-current-org"
+                checked={keepCurrent}
+                onCheckedChange={(checked) => setKeepCurrent(Boolean(checked))}
+              />
+              <FieldLabel htmlFor="keep-current-org" className="font-normal text-muted-foreground">
+                Keep current organization active after create
+              </FieldLabel>
+            </Field>
+            <div>
+              <Button
+                disabled={
+                  busy ||
+                  !createName.trim() ||
+                  !createSlug.trim() ||
+                  (slugStatus !== null && slugStatus !== "Available")
                 }
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
+                    const check = await checkSlugAvailable(createSlug);
+                    if (!check.available) {
+                      throw new Error(check.message ?? "Slug unavailable");
+                    }
+                    await createOrganization({
+                      name: createName.trim(),
+                      slug: createSlug.trim(),
+                      keepCurrentActiveOrganization: keepCurrent,
+                      metadata: { plan: "free" },
+                    });
+                    setCreateName("");
+                    setCreateSlug("");
+                    setSlugTouched(false);
+                    setSlugStatus(null);
+                    setBanner({ type: "ok", text: "Organization created" });
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
-                {slugStatus === "Available" ? "Slug is available" : slugStatus}
-              </p>
-            ) : null}
-          </div>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={keepCurrent}
-              onChange={(e) => setKeepCurrent(e.target.checked)}
-              className="size-4 rounded border"
-            />
-            Keep current organization active after create
-          </label>
-          <Button
-            disabled={
-              busy ||
-              !createName.trim() ||
-              !createSlug.trim() ||
-              (slugStatus !== null && slugStatus !== "Available")
-            }
-            onClick={() =>
-              void run(async () => {
-                const check = await checkSlugAvailable(createSlug);
-                if (!check.available) {
-                  throw new Error(check.message ?? "Slug unavailable");
-                }
-                await createOrganization({
-                  name: createName.trim(),
-                  slug: createSlug.trim(),
-                  keepCurrentActiveOrganization: keepCurrent,
-                  metadata: { plan: "free" },
-                });
-                setCreateName("");
-                setCreateSlug("");
-                setSlugTouched(false);
-                setKeepCurrent(false);
-              }, "Organization created")
-            }
-          >
-            Create
-          </Button>
+                Create organization
+              </Button>
+            </div>
+          </FieldGroup>
         </CardContent>
       </Card>
 
       {active ? (
-        <Card className="border-border/70 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-base">Active organization</CardTitle>
-            <CardDescription>
-              {active.name} · /{active.slug}
-              {myRole ? ` · your role: ${myRole}` : null}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Name</Label>
-              <Input
-                id="edit-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                disabled={!canUpdate || busy}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-slug">Slug</Label>
-              <Input
-                id="edit-slug"
-                value={editSlug}
-                onChange={(e) => setEditSlug(e.target.value)}
-                disabled={!canUpdate || busy}
-              />
-            </div>
-            {canUpdate ? (
-              <Button
-                disabled={
-                  busy ||
-                  (!editName.trim() && !editSlug.trim()) ||
-                  (editName === active.name && editSlug === active.slug)
-                }
-                onClick={() =>
-                  void run(async () => {
-                    if (editSlug.trim() !== active.slug) {
-                      const check = await checkSlugAvailable(editSlug);
-                      if (!check.available) {
-                        throw new Error(check.message ?? "Slug unavailable");
-                      }
-                    }
-                    await updateOrganization({
-                      organizationId: active.id,
-                      name: editName.trim(),
-                      slug: editSlug.trim(),
-                    });
-                  }, "Organization updated")
-                }
-              >
-                Save changes
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                You need organization:update permission to rename this organization.
-              </p>
-            )}
-
-            <Separator />
-
-            <div className="space-y-3">
-              <p className="text-sm font-medium">Organization logo</p>
-              {entitlements && !canUseR2 ? (
-                <UpgradeGate
-                  featureLabel="Organization logos (R2 storage)"
-                  entitlements={entitlements}
-                />
-              ) : canUpdate ? (
-                <ImageUploadField
-                  kind="org-logo"
-                  label="Logo"
-                  description="Pro+ plan. Uploaded to R2 and served from /api/media."
-                  currentUrl={logoUrl}
-                  disabled={busy}
-                  onUpload={async (payload) => {
-                    const result = await uploadLogo({
-                      data: {
-                        ...payload,
-                        organizationId: active.id,
-                      },
-                    });
-                    await updateOrganization({
-                      organizationId: active.id,
-                      logo: result.url,
-                    });
-                    setLogoUrl(result.url);
-                    setBanner({ type: "ok", text: "Logo updated" });
-                  }}
-                />
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Owners and admins can update the organization logo.
-                </p>
-              )}
-            </div>
-
-            <Separator />
-
-            {canDelete ? (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Deleting removes the organization, members, invitations, and teams.
-                </p>
-                <Button
-                  variant="destructive"
-                  disabled={busy}
-                  onClick={() => {
-                    const ok = window.confirm(
-                      `Delete organization “${active.name}”? This cannot be undone.`,
-                    );
-                    if (!ok) return;
-                    void run(async () => {
-                      await deleteOrganization(active.id);
-                    }, "Organization deleted");
-                  }}
-                >
-                  Delete organization
-                </Button>
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
+        <ActiveOrganizationCard
+          active={active}
+          myRole={myRole}
+          canUpdate={canUpdate}
+          canDelete={canDelete}
+          canUseR2={canUseR2}
+          editName={editName}
+          setEditName={setEditName}
+          editSlug={editSlug}
+          setEditSlug={setEditSlug}
+          logoUrl={logoUrl}
+          setLogoUrl={setLogoUrl}
+          entitlements={entitlements}
+          busy={busy}
+          setBanner={setBanner}
+          uploadLogo={uploadLogo}
+          run={run}
+        />
       ) : null}
     </div>
+  );
+}
+
+function ActiveOrganizationCard({
+  active,
+  myRole,
+  canUpdate,
+  canDelete,
+  canUseR2,
+  editName,
+  setEditName,
+  editSlug,
+  setEditSlug,
+  logoUrl,
+  setLogoUrl,
+  entitlements,
+  busy,
+  setBanner,
+  uploadLogo,
+  run,
+}: {
+  active: { id: string; name: string; slug: string };
+  myRole: string;
+  canUpdate: boolean;
+  canDelete: boolean;
+  canUseR2: boolean;
+  editName: string;
+  setEditName: (s: string) => void;
+  editSlug: string;
+  setEditSlug: (s: string) => void;
+  logoUrl: string | null;
+  setLogoUrl: (s: string | null) => void;
+  entitlements: ClientEntitlements | null;
+  busy: boolean;
+  setBanner: (b: { type: "ok" | "err"; text: string } | null) => void;
+  uploadLogo: ReturnType<typeof useServerFn<typeof uploadOrgLogo>>;
+  run: (fn: () => Promise<void>, ok: string) => Promise<void>;
+}) {
+  return (
+    <Card className="border-border/70 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-base">Active organization</CardTitle>
+        <CardDescription>
+          {active.name} · /{active.slug}
+          {myRole ? ` · your role: ${myRole}` : null}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="edit-name">Name</Label>
+          <Input
+            id="edit-name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            disabled={!canUpdate || busy}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-slug">Slug</Label>
+          <Input
+            id="edit-slug"
+            value={editSlug}
+            onChange={(e) => setEditSlug(e.target.value)}
+            disabled={!canUpdate || busy}
+          />
+        </div>
+        {canUpdate ? (
+          <Button
+            disabled={
+              busy ||
+              (!editName.trim() && !editSlug.trim()) ||
+              (editName === active.name && editSlug === active.slug)
+            }
+            onClick={() =>
+              void run(async () => {
+                if (editSlug.trim() !== active.slug) {
+                  const check = await checkSlugAvailable(editSlug);
+                  if (!check.available) {
+                    throw new Error(check.message ?? "Slug unavailable");
+                  }
+                }
+                await updateOrganization({
+                  organizationId: active.id,
+                  name: editName.trim(),
+                  slug: editSlug.trim(),
+                });
+              }, "Organization updated")
+            }
+          >
+            Save changes
+          </Button>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            You need organization:update permission to rename this organization.
+          </p>
+        )}
+
+        <Separator />
+
+        <div className="space-y-3">
+          <p className="text-sm font-medium">Organization logo</p>
+          {entitlements && !canUseR2 ? (
+            <UpgradeGate
+              featureLabel="Organization logos (R2 storage)"
+              entitlements={entitlements}
+            />
+          ) : canUpdate ? (
+            <ImageUploadField
+              kind="org-logo"
+              label="Logo"
+              description="Pro+ plan. Uploaded to R2 and served from /api/media."
+              currentUrl={logoUrl}
+              disabled={busy}
+              onUpload={async (payload) => {
+                const result = await uploadLogo({
+                  data: {
+                    ...payload,
+                    organizationId: active.id,
+                  },
+                });
+                await updateOrganization({
+                  organizationId: active.id,
+                  logo: result.url,
+                });
+                setLogoUrl(result.url);
+                setBanner({ type: "ok", text: "Logo updated" });
+              }}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Owners and admins can update the organization logo.
+            </p>
+          )}
+        </div>
+
+        <Separator />
+
+        {canDelete ? (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Deleting removes the organization, members, invitations, and teams.
+            </p>
+            <Button
+              variant="destructive"
+              disabled={busy}
+              onClick={() => {
+                const ok = window.confirm(
+                  `Delete organization “${active.name}”? This cannot be undone.`,
+                );
+                if (!ok) return;
+                void run(async () => {
+                  await deleteOrganization(active.id);
+                }, "Organization deleted");
+              }}
+            >
+              Delete organization
+            </Button>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }

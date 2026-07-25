@@ -71,19 +71,3 @@ export async function deleteApiKey(input: {
     "Could not delete API key",
   );
 }
-
-export async function updateApiKeyName(input: {
-  keyId: string;
-  configId: ApiKeyConfigId;
-  name: string;
-}): Promise<ApiKeyRecord> {
-  const data = await unwrap(
-    authClient.apiKey.update({
-      keyId: input.keyId,
-      configId: input.configId,
-      name: input.name,
-    }),
-    "Could not update API key",
-  );
-  return data as ApiKeyRecord;
-}

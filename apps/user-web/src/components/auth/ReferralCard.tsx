@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -96,7 +97,7 @@ export function ReferralCard() {
         <CardTitle className="text-lg">Referrals</CardTitle>
         <CardDescription>Share your invite code. Track who signed up with it.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         {isLoading ? (
           <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
             Loading referral code…
@@ -104,13 +105,9 @@ export function ReferralCard() {
         ) : null}
 
         {error ? (
-          <p
-            role="alert"
-            aria-live="assertive"
-            className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
-            {error}
-          </p>
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         {dashboard ? (
@@ -148,7 +145,7 @@ export function ReferralCard() {
             ) : null}
 
             {referrals.length > 0 ? (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                   Recent signups
                 </p>
@@ -165,7 +162,7 @@ export function ReferralCard() {
                         </p>
                       </div>
                       <span className="shrink-0 text-[10px] text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleDateString()}
+                        {new Date(item.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" })}
                       </span>
                     </li>
                   ))}

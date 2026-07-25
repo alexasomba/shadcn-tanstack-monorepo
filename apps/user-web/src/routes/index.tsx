@@ -36,10 +36,11 @@ function HomePage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,oklch(0.7_0.08_180_/_0.18),transparent_55%)]"
         />
         <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:items-center lg:gap-16">
-          <div className="space-y-7">
+          <div className="flex flex-col gap-7">
             <Badge variant="secondary" className="rounded-full px-3 py-1">
               TanStack Start · Cloudflare · Watermelon
             </Badge>
+
             <h1 className="max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
               Ship multi-app SaaS with a{" "}
               <span className="bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
@@ -136,8 +137,9 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background shadow-none">
           <CardContent className="flex flex-col items-start justify-between gap-6 p-8 sm:flex-row sm:items-center sm:p-10">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-semibold tracking-tight">Open your portfolio</h2>
+
               <p className="max-w-md text-sm text-muted-foreground sm:text-base">
                 Sign in for the Watermelon portfolio dashboard — holdings, P&amp;L, and 7-day chart.
               </p>

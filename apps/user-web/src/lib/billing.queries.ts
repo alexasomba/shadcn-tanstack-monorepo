@@ -2,7 +2,7 @@
  * Thin wrappers around better-auth-paystack client APIs.
  */
 import type { SubscriptionRecord } from "#/lib/billing";
-import { paystackActions, subscriptionActions, transactionActions } from "#/lib/paystack-client";
+import { subscriptionActions, transactionActions } from "#/lib/paystack-client";
 
 /** Canonical Paystack return URL (server-verified). */
 export function paystackCallbackURL(origin?: string): string {
@@ -29,10 +29,6 @@ async function unwrap(
   const res = await promise;
   if (res.error) throw new Error(errMsg(res.error, fallback));
   return res.data;
-}
-
-export async function listBillingPlans() {
-  return unwrap(paystackActions.listPlans(), "Could not load plans");
 }
 
 export async function listSubscriptions(referenceId?: string): Promise<SubscriptionRecord[]> {

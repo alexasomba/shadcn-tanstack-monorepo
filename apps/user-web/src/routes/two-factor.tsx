@@ -1,4 +1,5 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -7,8 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
+import { ToggleGroup, ToggleGroupItem } from "@workspace/ui/components/toggle-group";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -71,6 +74,7 @@ function TwoFactorChallengePage() {
       redirectSearch && redirectSearch.startsWith("/") && !redirectSearch.startsWith("//")
         ? redirectSearch
         : takeAuthRedirect("/dashboard");
+    // react-doctor-disable-next-line react-doctor/tanstack-start-no-navigate-in-render
     await navigate({ to: dest });
   };
 
@@ -118,37 +122,31 @@ function TwoFactorChallengePage() {
       <SiteHeader />
       <main className="mx-auto flex max-w-md flex-col justify-center px-4 py-16 sm:py-24">
         <Card className="border-border/70 shadow-xl shadow-primary/5">
-          <CardHeader className="space-y-1">
+          <CardHeader className="flex flex-col gap-1">
             <CardTitle className="text-2xl tracking-tight">Two-factor verification</CardTitle>
             <CardDescription>
               Enter a code from your authenticator app, email OTP, or a backup code to finish
               signing in.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {(
-                [
-                  ["totp", "Authenticator"],
-                  ["otp", "Email OTP"],
-                  ["backup", "Backup code"],
-                ] as const
-              ).map(([id, label]) => (
-                <Button
-                  key={id}
-                  type="button"
-                  size="sm"
-                  variant={mode === id ? "default" : "outline"}
-                  onClick={() => {
-                    setMode(id);
-                    setCode("");
-                    setError("");
-                  }}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
+          <CardContent className="flex flex-col gap-4">
+            <ToggleGroup
+              value={[mode]}
+              onValueChange={(val) => {
+                const nextMode = val[val.length - 1] as Mode | undefined;
+                if (nextMode) {
+                  setMode(nextMode);
+                  setCode("");
+                  setError("");
+                }
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <ToggleGroupItem value="totp">Authenticator</ToggleGroupItem>
+              <ToggleGroupItem value="otp">Email OTP</ToggleGroupItem>
+              <ToggleGroupItem value="backup">Backup code</ToggleGroupItem>
+            </ToggleGroup>
 
             <form onSubmit={submit} className="flex flex-col gap-4">
               <FieldGroup>
@@ -174,17 +172,17 @@ function TwoFactorChallengePage() {
                     minLength={6}
                   />
                 </Field>
+                <Field orientation="horizontal">
+                  <Checkbox
+                    id="trust-device"
+                    checked={trustDevice}
+                    onCheckedChange={(checked) => setTrustDevice(Boolean(checked))}
+                  />
+                  <FieldLabel htmlFor="trust-device" className="font-normal text-muted-foreground">
+                    Trust this device for 30 days
+                  </FieldLabel>
+                </Field>
               </FieldGroup>
-
-              <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={trustDevice}
-                  onChange={(e) => setTrustDevice(e.target.checked)}
-                  className="size-4 rounded border"
-                />
-                Trust this device for 30 days
-              </label>
 
               {mode === "otp" ? (
                 <Button
@@ -198,9 +196,9 @@ function TwoFactorChallengePage() {
               ) : null}
 
               {error ? (
-                <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {error}
-                </p>
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               ) : null}
 
               <Button type="submit" disabled={loading || !code} className="w-full">

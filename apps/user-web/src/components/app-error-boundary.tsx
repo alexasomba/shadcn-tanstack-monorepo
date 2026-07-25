@@ -1,4 +1,5 @@
-import type { ReactNode, ErrorInfo } from "react";
+import { Button } from "@workspace/ui/components/button";
+import type { ErrorInfo, ReactNode } from "react";
 import { Component } from "react";
 
 interface Props {
@@ -40,13 +41,9 @@ export class AppErrorBoundary extends Component<Props, State> {
           <p className="mt-2 text-sm text-muted-foreground">
             {this.state.error?.message || "An unexpected error occurred."}
           </p>
-          <button
-            type="button"
-            onClick={this.reset}
-            className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
+          <Button type="button" onClick={this.reset} className="mt-4">
             Retry
-          </button>
+          </Button>
         </div>
       );
     }

@@ -172,35 +172,49 @@ export const searchConferenceToolDef = toolDefinition({
 export const searchConference = searchConferenceToolDef.server(({ query }) => {
   const queryLower = query.toLowerCase();
 
-  const matchingSpeakers = allSpeakers
-    .filter(
-      (speaker) =>
-        speaker.name.toLowerCase().includes(queryLower) ||
-        speaker.specialty.toLowerCase().includes(queryLower) ||
-        speaker.restaurant.toLowerCase().includes(queryLower) ||
-        speaker.content.toLowerCase().includes(queryLower),
-    )
-    .map((speaker) => ({
-      slug: speaker.slug,
-      name: speaker.name,
-      specialty: speaker.specialty,
-      restaurant: speaker.restaurant,
-    }));
+  const matchingSpeakers: Array<{
+    slug: string;
+    name: string;
+    specialty: string;
+    restaurant: string;
+  }> = [];
+  for (const speaker of allSpeakers) {
+    if (
+      speaker.name.toLowerCase().includes(queryLower) ||
+      speaker.specialty.toLowerCase().includes(queryLower) ||
+      speaker.restaurant.toLowerCase().includes(queryLower) ||
+      speaker.content.toLowerCase().includes(queryLower)
+    ) {
+      matchingSpeakers.push({
+        slug: speaker.slug,
+        name: speaker.name,
+        specialty: speaker.specialty,
+        restaurant: speaker.restaurant,
+      });
+    }
+  }
 
-  const matchingTalks = allTalks
-    .filter(
-      (talk) =>
-        talk.title.toLowerCase().includes(queryLower) ||
-        talk.speaker.toLowerCase().includes(queryLower) ||
-        talk.topics.some((topic) => topic.toLowerCase().includes(queryLower)) ||
-        talk.content.toLowerCase().includes(queryLower),
-    )
-    .map((talk) => ({
-      slug: talk.slug,
-      title: talk.title,
-      speaker: talk.speaker,
-      topics: talk.topics,
-    }));
+  const matchingTalks: Array<{
+    slug: string;
+    title: string;
+    speaker: string;
+    topics: string[];
+  }> = [];
+  for (const talk of allTalks) {
+    if (
+      talk.title.toLowerCase().includes(queryLower) ||
+      talk.speaker.toLowerCase().includes(queryLower) ||
+      talk.topics.some((topic) => topic.toLowerCase().includes(queryLower)) ||
+      talk.content.toLowerCase().includes(queryLower)
+    ) {
+      matchingTalks.push({
+        slug: talk.slug,
+        title: talk.title,
+        speaker: talk.speaker,
+        topics: talk.topics,
+      });
+    }
+  }
 
   return {
     speakers: matchingSpeakers,

@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -26,6 +27,18 @@ import {
   useActiveOrganization,
 } from "#/lib/organization.queries";
 
+function unknownErrorMessage(error: unknown, fallback: string): string {
+  if (
+    error !== null &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return (error as { message: string }).message;
+  }
+  return fallback;
+}
+
 export function TeamsSettingsPanel() {
   const activeState = useActiveOrganization();
   const memberState = useActiveMember();
@@ -42,6 +55,7 @@ export function TeamsSettingsPanel() {
   const [teamsVersion, setTeamsVersion] = useState(0);
 
   // Prefer listTeams() over active.teams — BA client atom types lag teams-enabled shape.
+  // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
   useEffect(() => {
     if (!active?.id) {
       setTeams([]);
@@ -70,10 +84,7 @@ export function TeamsSettingsPanel() {
     } catch (e) {
       setBanner({
         type: "err",
-        text:
-          e !== null && typeof e === "object" && "message" in e && typeof e.message === "string"
-            ? (e as { message: string }).message
-            : "Something went wrong",
+        text: unknownErrorMessage(e, "Something went wrong"),
       });
     } finally {
       setBusy(false);
@@ -90,35 +101,35 @@ export function TeamsSettingsPanel() {
 
   if (!active) {
     return (
-      <div className="mx-auto max-w-2xl space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Teams</h1>
-        <p className="text-sm text-muted-foreground">Select an organization first.</p>
-        <ButtonLink to="/settings/organization">Go to Organization</ButtonLink>
+      <div className="mx-auto flex max-w-2xl flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Teams</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Select or create an organization first.
+          </p>
+        </div>
+        <Card className="border-border/70 shadow-none">
+          <CardContent className="pt-6">
+            <ButtonLink to="/settings/organization">Go to Organization</ButtonLink>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Teams</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sub-groups inside {active.name}. Default team is created with the organization (Better
-          Auth teams plugin).
+          {active.name} — subdivide organization members into teams (Better Auth teams plugin).
         </p>
       </div>
 
       {banner ? (
-        <p
-          className={
-            banner.type === "ok"
-              ? "rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-sm"
-              : "rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-          }
-          role="status"
-        >
-          {banner.text}
-        </p>
+        <Alert variant={banner.type === "err" ? "destructive" : "default"}>
+          <AlertDescription>{banner.text}</AlertDescription>
+        </Alert>
       ) : null}
 
       <Card className="border-border/70 shadow-none">
@@ -216,12 +227,23 @@ export function TeamsSettingsPanel() {
               </div>
               <Button
                 disabled={busy || !name.trim()}
-                onClick={() =>
-                  void run(async () => {
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
                     await createTeam({ name: name.trim(), organizationId: active.id });
                     setName("");
-                  }, "Team created")
-                }
+                    setTeamsVersion((v) => v + 1);
+                    setBanner({ type: "ok", text: "Team created" });
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
                 Create team
               </Button>

@@ -1,7 +1,8 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
-import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import { HeadContent, Link, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Button } from "@workspace/ui/components/button";
 import { ThemeProvider } from "@workspace/ui/components/theme-provider";
 import { Toaster } from "sonner";
 
@@ -12,6 +13,7 @@ import { getTenant } from "#/lib/tenant.functions";
 import type { TenantContext } from "#/lib/tenant.functions";
 import { getLocale } from "#/paraglide/runtime";
 
+import "../../content-collections";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import StoreDevtools from "../lib/demo-store-devtools";
 
@@ -108,25 +110,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <p className="mt-2 text-sm text-muted-foreground">
         {error.message || "An unexpected error occurred."}
       </p>
-      <button
-        type="button"
-        onClick={() => window.location.reload()}
-        className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-      >
+      <Button type="button" onClick={() => window.location.reload()} className="mt-4">
         Try again
-      </button>
+      </Button>
     </div>
   ),
   notFoundComponent: () => (
     <div className="flex min-h-[400px] flex-col items-center justify-center p-6 text-center">
       <h1 className="text-4xl font-extrabold">404</h1>
       <p className="mt-2 text-lg font-medium text-muted-foreground">Page Not Found</p>
-      <a
-        href="/"
+      <Link
+        to="/"
         className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
       >
         Return Home
-      </a>
+      </Link>
     </div>
   ),
   shellComponent: RootDocument,

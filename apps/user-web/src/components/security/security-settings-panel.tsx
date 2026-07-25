@@ -262,72 +262,14 @@ export function SecuritySettingsPanel() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/70 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-base">Passkeys</CardTitle>
-          <CardDescription>
-            Passwordless sign-in with platform authenticators (Touch ID, Face ID, security keys).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            {passkeys.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No passkeys registered.</p>
-            ) : (
-              passkeys.map((pk) => (
-                <div
-                  key={pk.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2"
-                >
-                  <div>
-                    <p className="font-medium">{pk.name || "Passkey"}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {pk.deviceType ?? "authenticator"}
-                      {pk.createdAt ? ` · ${new Date(pk.createdAt).toLocaleDateString()}` : ""}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busy}
-                    onClick={() =>
-                      void run(async () => {
-                        await deletePasskey(pk.id);
-                        await refreshPasskeys();
-                      }, "Passkey removed")
-                    }
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="min-w-[12rem] flex-1 space-y-2">
-              <Label htmlFor="pk-name">Name (optional)</Label>
-              <Input
-                id="pk-name"
-                value={passkeyName}
-                onChange={(e) => setPasskeyName(e.target.value)}
-                placeholder="MacBook · iPhone"
-              />
-            </div>
-            <Button
-              disabled={busy}
-              onClick={() =>
-                void run(async () => {
-                  await addPasskey(passkeyName.trim() || undefined);
-                  setPasskeyName("");
-                  await refreshPasskeys();
-                }, "Passkey registered")
-              }
-            >
-              Add passkey
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <SecurityPasskeysSection
+        passkeys={passkeys}
+        passkeyName={passkeyName}
+        setPasskeyName={setPasskeyName}
+        busy={busy}
+        run={run}
+        refreshPasskeys={refreshPasskeys}
+      />
 
       <Card className="border-border/70 shadow-none">
         <CardHeader>
@@ -344,5 +286,90 @@ export function SecuritySettingsPanel() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function SecurityPasskeysSection({
+  passkeys,
+  passkeyName,
+  setPasskeyName,
+  busy,
+  run,
+  refreshPasskeys,
+}: {
+  passkeys: PasskeyRecord[];
+  passkeyName: string;
+  setPasskeyName: (s: string) => void;
+  busy: boolean;
+  run: (fn: () => Promise<void>, ok: string) => Promise<void>;
+  refreshPasskeys: () => Promise<void>;
+}) {
+  return (
+    <Card className="border-border/70 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-base">Passkeys</CardTitle>
+        <CardDescription>
+          Passwordless sign-in with platform authenticators (Touch ID, Face ID, security keys).
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          {passkeys.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No passkeys registered.</p>
+          ) : (
+            passkeys.map((pk) => (
+              <div
+                key={pk.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2"
+              >
+                <div>
+                  <p className="font-medium">{pk.name || "Passkey"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {pk.deviceType ?? "authenticator"}
+                    {pk.createdAt ? ` · ${new Date(pk.createdAt).toLocaleDateString()}` : ""}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() =>
+                    void run(async () => {
+                      await deletePasskey(pk.id);
+                      await refreshPasskeys();
+                    }, "Passkey removed")
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="min-w-[12rem] flex-1 space-y-2">
+            <Label htmlFor="pk-name">Name (optional)</Label>
+            <Input
+              id="pk-name"
+              value={passkeyName}
+              onChange={(e) => setPasskeyName(e.target.value)}
+              placeholder="MacBook · iPhone"
+            />
+          </div>
+          <Button
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await addPasskey(passkeyName.trim() || undefined);
+                setPasskeyName("");
+                await refreshPasskeys();
+              }, "Passkey registered")
+            }
+          >
+            Add passkey
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

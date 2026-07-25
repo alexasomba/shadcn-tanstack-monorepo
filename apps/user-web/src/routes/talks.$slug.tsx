@@ -1,6 +1,9 @@
-import { Clock, User, ArrowLeft, Tag } from "@phosphor-icons/react";
+import { ArrowLeft, Clock, Tag, User } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { allTalks, allSpeakers } from "content-collections";
+import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
+import { allSpeakers, allTalks } from "content-collections";
 import { marked } from "marked";
 
 import RemyAssistant from "#/components/RemyAssistant";
@@ -26,19 +29,22 @@ function TalkDetailPage() {
 
       {/* Back navigation */}
       <div className="mx-auto max-w-7xl px-6 py-4">
-        <Link
-          to="/talks"
-          className="text-cream/60 hover:text-gold inline-flex items-center gap-2 transition-colors"
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link to="/talks" />}
+          nativeButton={false}
+          className="text-cream/60 hover:text-gold gap-2"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft className="size-4" data-icon="inline-start" />
           <span>All Sessions</span>
-        </Link>
+        </Button>
       </div>
 
       {/* Hero image */}
       <div className="relative mx-auto mb-8 h-[40vh] max-w-7xl px-6">
-        <div className="h-full w-full overflow-hidden rounded-2xl border border-border/50">
-          <img src={`/${talk.image}`} alt={talk.title} className="h-full w-full object-cover" />
+        <div className="size-full overflow-hidden rounded-2xl border border-border/50">
+          <img src={`/${talk.image}`} alt={talk.title} className="size-full object-cover" />
         </div>
         <div className="from-charcoal/60 pointer-events-none absolute inset-6 rounded-2xl bg-gradient-to-t to-transparent" />
       </div>
@@ -48,13 +54,14 @@ function TalkDetailPage() {
         {/* Topics */}
         <div className="mb-6 flex flex-wrap gap-2">
           {talk.topics.map((topic) => (
-            <span
+            <Badge
               key={topic}
-              className="bg-gold/15 text-gold border-gold/30 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium tracking-wide uppercase"
+              variant="outline"
+              className="border-gold/30 bg-gold/15 text-gold gap-1.5 tracking-wide uppercase"
             >
-              <Tag size={12} />
+              <Tag className="size-3" data-icon="inline-start" />
               {topic}
-            </span>
+            </Badge>
           ))}
         </div>
 
@@ -72,13 +79,10 @@ function TalkDetailPage() {
               params={{ slug: speaker.slug }}
               className="group flex items-center gap-3"
             >
-              <div className="h-12 w-12 overflow-hidden rounded-full border border-border/50">
-                <img
-                  src={`/${speaker.headshot}`}
-                  alt={speaker.name}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <Avatar className="size-12 border border-border/50">
+                <AvatarImage src={`/${speaker.headshot}`} alt={speaker.name} />
+                <AvatarFallback>{speaker.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
               <div>
                 <p className="text-cream group-hover:text-gold font-medium transition-colors">
                   {talk.speaker}
@@ -88,20 +92,21 @@ function TalkDetailPage() {
             </Link>
           ) : (
             <div className="text-cream/70 flex items-center gap-2">
-              <User size={20} className="text-copper" />
+              <User className="text-copper size-5" />
               <span>{talk.speaker}</span>
             </div>
           )}
 
           {/* Duration */}
           <div className="text-cream/60 flex items-center gap-2">
-            <Clock size={20} className="text-copper" />
+            <Clock className="text-copper size-5" />
             <span className="text-lg">{talk.duration}</span>
           </div>
         </div>
 
         {/* Description content */}
         <div className="prose prose-lg prose-invert prose-p:text-cream/80 prose-headings:text-cream prose-headings:font-display prose-strong:text-cream prose-a:text-gold prose-li:text-cream/80 prose-ul:text-cream/80 font-body max-w-none pb-20 text-lg leading-relaxed">
+          {/* react-doctor-disable-next-line react-doctor/dangerous-html-sink */}
           <div dangerouslySetInnerHTML={{ __html: marked(talk.content) }} />
         </div>
       </div>

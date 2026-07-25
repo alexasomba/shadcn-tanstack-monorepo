@@ -1,5 +1,5 @@
 import { parsePaystackMetadata } from "@alexasomba/better-auth-paystack/client";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { useEffect, useRef, useState } from "react";
@@ -47,12 +47,16 @@ function PaystackCallbackPage() {
   useEffect(() => {
     if (reference === undefined || reference === "" || processedRef.current) return;
     processedRef.current = true;
+    let isCancelled = false;
+    let timerId: ReturnType<typeof setTimeout> | undefined;
 
     const run = async () => {
       try {
         const result = (await verify({
           data: { reference },
         })) as VerifyCallbackResult;
+
+        if (isCancelled) return;
 
         if (result.data.status !== "success") {
           throw new Error("Verification did not complete successfully");
@@ -101,19 +105,26 @@ function PaystackCallbackPage() {
         }
 
         setStatus("success");
-        setTimeout(() => {
+        timerId = setTimeout(() => {
           void router.navigate({
             to: "/settings/billing",
             search: { checkout: "success", reference },
           });
         }, 1800);
       } catch (e: unknown) {
-        setStatus("error");
-        setError(unknownErrorMessage(e, "Verification failed"));
+        if (!isCancelled) {
+          setStatus("error");
+          setError(unknownErrorMessage(e, "Verification failed"));
+        }
       }
     };
 
     void run();
+
+    return () => {
+      isCancelled = true;
+      if (timerId !== undefined) clearTimeout(timerId);
+    };
   }, [reference, router, verify]);
 
   if (reference === undefined || reference === "") {
@@ -122,9 +133,9 @@ function PaystackCallbackPage() {
         <Card className="w-full max-w-md border-border/70 shadow-none">
           <CardContent className="p-6 text-sm text-muted-foreground">
             No payment reference provided. Return to{" "}
-            <a className="underline" href="/settings/billing">
+            <Link className="underline" to="/settings/billing">
               billing
-            </a>
+            </Link>
             .
           </CardContent>
         </Card>
@@ -148,9 +159,9 @@ function PaystackCallbackPage() {
           {status === "error" && (
             <div className="space-y-3">
               <p className="text-destructive">{error}</p>
-              <a className="text-foreground underline" href="/settings/billing">
+              <Link className="text-foreground underline" to="/settings/billing">
                 Back to billing
-              </a>
+              </Link>
             </div>
           )}
         </CardContent>

@@ -15,6 +15,5 @@ type BillingAuthClient = {
 /** Runtime client already has these plugins; cast avoids `any & T` lint. */
 const billing = authClient as BillingAuthClient;
 
-export const paystackActions = billing.paystack;
 export const subscriptionActions = billing.subscription;
 export const transactionActions = billing.transaction;

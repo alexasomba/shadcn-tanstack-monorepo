@@ -1,4 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -65,8 +66,6 @@ function AcceptInvitePage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoadingInvite(true);
-    setLoadError("");
     void getInvitation(id)
       .then((data) => {
         if (!cancelled) {
@@ -126,15 +125,15 @@ function AcceptInvitePage() {
               {user.emailVerified ? "" : " (verify email before accepting)"}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             {loadingInvite ? (
               <p className="text-sm text-muted-foreground">Loading invitation…</p>
             ) : loadError ? (
-              <p className="text-sm text-destructive" role="alert">
-                {loadError}
-              </p>
+              <Alert variant="destructive">
+                <AlertDescription>{loadError}</AlertDescription>
+              </Alert>
             ) : details ? (
-              <div className="space-y-1 rounded-xl border border-border/70 bg-muted/30 px-3 py-3 text-sm">
+              <div className="flex flex-col gap-1 rounded-xl border border-border/70 bg-muted/30 px-3 py-3 text-sm">
                 <p className="font-medium">{details.organizationName}</p>
                 <p className="text-muted-foreground">/{details.organizationSlug}</p>
                 <p className="text-muted-foreground">
@@ -149,9 +148,9 @@ function AcceptInvitePage() {
             )}
 
             {error ? (
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             ) : null}
 
             <div className="flex flex-wrap gap-2">

@@ -74,5 +74,3 @@ export const appNavSettings: AppNavItem[] = [
     group: "settings",
   },
 ];
-
-export const appNavAll: AppNavItem[] = [...appNavMain, ...appNavSettings];

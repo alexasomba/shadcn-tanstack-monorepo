@@ -1,5 +1,12 @@
+import {
+  Attachment,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+} from "@workspace/ui/components/attachment";
 import { Button } from "@workspace/ui/components/button";
-import { Label } from "@workspace/ui/components/label";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@workspace/ui/components/field";
 import { useRef, useState } from "react";
 
 import { MEDIA_LIMITS } from "#/lib/media";
@@ -84,42 +91,53 @@ export function ImageUploadField({
         fileBase64: dataUrl,
         fileName: file.name,
       });
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
     } catch (e) {
       setError(unknownErrorMessage(e, "Upload failed"));
       setPreview(null);
-    } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
     }
   };
 
   return (
-    <div className="space-y-3">
+    <Field data-invalid={Boolean(error)}>
       <div>
-        <Label className="text-sm font-medium">{label}</Label>
-        {description ? <p className="mt-0.5 text-xs text-muted-foreground">{description}</p> : null}
+        <FieldLabel htmlFor={`image-upload-${kind}`}>{label}</FieldLabel>
+        {description ? <FieldDescription>{description}</FieldDescription> : null}
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/70 bg-muted/40">
-          {displayUrl ? (
-            <img src={displayUrl} alt="" className="size-full object-cover" />
-          ) : (
-            <span className="text-[10px] text-muted-foreground">None</span>
-          )}
-        </div>
-        <div className="flex flex-col gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={accept}
-            aria-label={label || "Upload image"}
-            className="sr-only"
-            disabled={disabled || busy}
-            onChange={(e) => {
-              void onPick(e.target.files?.[0]);
-            }}
-          />
+      <div className="flex flex-col gap-3">
+        {displayUrl ? (
+          <Attachment state={busy ? "uploading" : error ? "error" : "done"}>
+            <AttachmentMedia variant="image">
+              <img src={displayUrl} alt={label} />
+            </AttachmentMedia>
+            <AttachmentContent>
+              <AttachmentTitle>{label}</AttachmentTitle>
+              <AttachmentDescription>
+                {busy ? "Uploading…" : "Current image active"}
+              </AttachmentDescription>
+            </AttachmentContent>
+          </Attachment>
+        ) : null}
+
+        <input
+          id={`image-upload-${kind}`}
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          aria-label={label || "Upload image"}
+          aria-invalid={Boolean(error)}
+          className="sr-only"
+          disabled={disabled || busy}
+          onChange={(e) => {
+            void onPick(e.target.files?.[0]);
+          }}
+        />
+
+        <div className="flex items-center gap-3">
           <Button
             type="button"
             size="sm"
@@ -127,16 +145,16 @@ export function ImageUploadField({
             disabled={disabled || busy}
             onClick={() => inputRef.current?.click()}
           >
-            {busy ? "Uploading…" : "Choose image"}
+            {busy ? "Uploading…" : displayUrl ? "Change image" : "Choose image"}
           </Button>
-          <p className="text-[10px] text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             Max {(limits.maxBytes / 1_000_000).toFixed(1)} MB · JPEG, PNG, WebP
             {kind === "org-logo" ? ", SVG" : ""}, GIF
-          </p>
+          </span>
         </div>
       </div>
 
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
-    </div>
+      {error ? <FieldError>{error}</FieldError> : null}
+    </Field>
   );
 }

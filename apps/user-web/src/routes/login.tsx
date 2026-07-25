@@ -1,4 +1,5 @@
 import { createFileRoute, Link, redirect, useNavigate, useRouter } from "@tanstack/react-router";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -68,6 +69,7 @@ function LoginPage() {
       router.history.push(redirectTo);
       return;
     }
+    // react-doctor-disable-next-line react-doctor/tanstack-start-no-navigate-in-render
     await navigate({ to: "/dashboard" });
   };
 
@@ -202,9 +204,9 @@ function LoginPage() {
               </FieldGroup>
 
               {error ? (
-                <p className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {error}
-                </p>
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               ) : null}
 
               <Button type="submit" disabled={loading} className="w-full">
@@ -212,16 +214,17 @@ function LoginPage() {
               </Button>
             </form>
 
-            <button
+            <Button
               type="button"
-              className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+              variant="ghost"
+              className="mt-4 w-full text-muted-foreground hover:text-foreground"
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError("");
               }}
             >
               {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
-            </button>
+            </Button>
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
               <Link to="/" preload="intent" className="underline-offset-4 hover:underline">

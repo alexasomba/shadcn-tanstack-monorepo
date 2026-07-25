@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -138,7 +139,7 @@ export function BillingSettingsPanel(props: {
   const entitlements = resolveClientEntitlements(subs);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Billing</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -148,28 +149,23 @@ export function BillingSettingsPanel(props: {
       </div>
 
       {banner ? (
-        <p
-          className={
-            banner.type === "ok"
-              ? "rounded-xl border border-border/70 bg-muted/40 px-3 py-2 text-sm"
-              : "rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive"
-          }
-          role="status"
-        >
-          {banner.text}
-        </p>
+        <Alert variant={banner.type === "err" ? "destructive" : "default"}>
+          <AlertDescription>{banner.text}</AlertDescription>
+        </Alert>
       ) : null}
 
       {!org ? (
         <Card className="border-border/70 shadow-none">
-          <CardContent className="space-y-3 pt-6">
+          <CardContent className="flex flex-col gap-3 pt-6">
             <p className="text-sm text-muted-foreground">
               Select or create an organization to manage team billing. Personal checkout still works
               from Pricing.
             </p>
-            <ButtonLink to="/settings/organization" size="sm">
-              Organization settings
-            </ButtonLink>
+            <div>
+              <ButtonLink to="/settings/organization" size="sm">
+                Organization settings
+              </ButtonLink>
+            </div>
           </CardContent>
         </Card>
       ) : null}
@@ -219,8 +215,10 @@ export function BillingSettingsPanel(props: {
                   size="sm"
                   variant="outline"
                   disabled={busy}
-                  onClick={() =>
-                    void run(async () => {
+                  onClick={async () => {
+                    setBusy(true);
+                    setBanner(null);
+                    try {
                       const code = current.paystackSubscriptionCode;
                       if (!code) throw new Error("Missing subscription code");
                       const portal = await openBillingPortal(code);
@@ -228,10 +226,19 @@ export function BillingSettingsPanel(props: {
                         portal && typeof portal === "object" && "link" in portal
                           ? String((portal as { link: string }).link)
                           : null;
-                      if (link) window.location.href = link;
-                      else throw new Error("No manage link returned");
-                    }, "Opening billing portal…")
-                  }
+                      if (link) {
+                        window.location.href = link;
+                      } else {
+                        throw new Error("No manage link returned");
+                      }
+                    } catch (e) {
+                      setBanner({
+                        type: "err",
+                        text: unknownErrorMessage(e, "Something went wrong"),
+                      });
+                      setBusy(false);
+                    }
+                  }}
                 >
                   Manage payment method
                 </Button>
@@ -283,8 +290,10 @@ export function BillingSettingsPanel(props: {
               <Button
                 size="sm"
                 disabled={busy || !referenceId}
-                onClick={() =>
-                  void run(async () => {
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
                     if (!referenceId) throw new Error("Select an organization first");
                     const result = await startSubscriptionCheckout({
                       plan: "pro",
@@ -297,11 +306,15 @@ export function BillingSettingsPanel(props: {
                         return;
                       }
                     }
-                    throw new Error(
-                      "Checkout did not return a URL. Set PAYSTACK_SECRET_KEY for live Paystack.",
-                    );
-                  }, "Redirecting to Paystack…")
-                }
+                    throw new Error("Checkout did not return a valid payment link");
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                    setBusy(false);
+                  }
+                }}
               >
                 Upgrade to Pro
               </Button>
@@ -339,40 +352,46 @@ export function BillingSettingsPanel(props: {
         </CardContent>
       </Card>
 
-      <Card className="border-border/70 shadow-none">
-        <CardHeader>
-          <CardTitle className="text-base">Recent transactions</CardTitle>
-          <CardDescription>Local records from the Paystack plugin.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {txs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No transactions yet.</p>
-          ) : (
-            txs.slice(0, 10).map((tx) => (
-              <div
-                key={tx.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2 text-sm"
-              >
-                <div>
-                  <p className="font-medium">{tx.plan ?? tx.reference}</p>
-                  <p className="font-mono text-xs text-muted-foreground">{tx.reference}</p>
-                </div>
-                <div className="text-right text-xs">
-                  <p>
-                    {(tx.amount / 100).toFixed(2)} {tx.currency}
-                  </p>
-                  <p className="text-muted-foreground">{tx.status}</p>
-                </div>
-              </div>
-            ))
-          )}
-          <Separator />
-          <p className="text-xs text-muted-foreground">
-            Webhooks: <code className="text-xs">POST /api/auth/paystack/webhook</code> (set{" "}
-            <code className="text-xs">PAYSTACK_WEBHOOK_SECRET</code>).
-          </p>
-        </CardContent>
-      </Card>
+      <BillingTransactionsSection txs={txs} />
     </div>
+  );
+}
+
+function BillingTransactionsSection({ txs }: { txs: TxRow[] }) {
+  return (
+    <Card className="border-border/70 shadow-none">
+      <CardHeader>
+        <CardTitle className="text-base">Recent transactions</CardTitle>
+        <CardDescription>Local records from the Paystack plugin.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {txs.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No transactions yet.</p>
+        ) : (
+          txs.slice(0, 10).map((tx) => (
+            <div
+              key={tx.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/70 px-3 py-2 text-sm"
+            >
+              <div>
+                <p className="font-medium">{tx.plan ?? tx.reference}</p>
+                <p className="font-mono text-xs text-muted-foreground">{tx.reference}</p>
+              </div>
+              <div className="text-right text-xs">
+                <p>
+                  {(tx.amount / 100).toFixed(2)} {tx.currency}
+                </p>
+                <p className="text-muted-foreground">{tx.status}</p>
+              </div>
+            </div>
+          ))
+        )}
+        <Separator />
+        <p className="text-xs text-muted-foreground">
+          Webhooks: <code className="text-xs">POST /api/auth/paystack/webhook</code> (set{" "}
+          <code className="text-xs">PAYSTACK_WEBHOOK_SECRET</code>).
+        </p>
+      </CardContent>
+    </Card>
   );
 }

@@ -33,10 +33,6 @@ export function getDatabase(): D1Database {
   return asAppEnv().DATABASE;
 }
 
-export function getDataService(): Fetcher {
-  return asAppEnv().DATA_SERVICE;
-}
-
 /** R2 bucket for product media (avatars, org logos). */
 export function getR2Bucket(): R2Bucket | undefined {
   return asAppEnv().R2_BUCKET;

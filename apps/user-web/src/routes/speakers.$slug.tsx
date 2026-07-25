@@ -1,5 +1,7 @@
-import { MapPin, Trophy, ArrowLeft } from "@phosphor-icons/react";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { ArrowLeft, MapPin, Trophy } from "@phosphor-icons/react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
 import { allSpeakers, allTalks } from "content-collections";
 import { marked } from "marked";
 
@@ -27,13 +29,16 @@ function SpeakerDetailPage() {
 
       {/* Back navigation */}
       <div className="mx-auto max-w-7xl px-6 py-4">
-        <Link
-          to="/speakers"
-          className="text-cream/60 hover:text-gold inline-flex items-center gap-2 transition-colors"
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link to="/speakers" />}
+          nativeButton={false}
+          className="text-cream/60 hover:text-gold gap-2"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft className="size-4" data-icon="inline-start" />
           <span>All Speakers</span>
-        </Link>
+        </Button>
       </div>
 
       {/* Hero section */}
@@ -46,7 +51,7 @@ function SpeakerDetailPage() {
                 <img
                   src={`/${speaker.headshot}`}
                   alt={speaker.name}
-                  className="h-full w-full object-cover"
+                  className="size-full object-cover"
                 />
               </div>
             </div>
@@ -54,9 +59,14 @@ function SpeakerDetailPage() {
             {/* Info */}
             <div className="flex flex-col justify-center lg:col-span-2">
               {/* Specialty tag */}
-              <span className="bg-copper/20 text-copper-light border-copper/30 mb-4 inline-block w-fit rounded-full border px-4 py-1.5 text-sm font-medium tracking-wider uppercase">
-                {speaker.specialty}
-              </span>
+              <div>
+                <Badge
+                  variant="outline"
+                  className="border-copper/30 bg-copper/20 text-copper-light mb-4 tracking-wider uppercase"
+                >
+                  {speaker.specialty}
+                </Badge>
+              </div>
 
               <h1 className="font-display text-cream mb-3 text-5xl font-bold md:text-6xl">
                 {speaker.name}
@@ -65,7 +75,7 @@ function SpeakerDetailPage() {
               <p className="text-gold font-display mb-4 text-2xl italic">{speaker.title}</p>
 
               <div className="text-cream/60 mb-8 flex items-center gap-2 text-lg">
-                <MapPin size={20} className="text-copper" />
+                <MapPin className="text-copper size-5" />
                 <span>
                   {speaker.restaurant}, {speaker.location}
                 </span>
@@ -73,19 +83,20 @@ function SpeakerDetailPage() {
 
               {/* Awards */}
               {speaker.awards && speaker.awards.length > 0 && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   <h3 className="text-cream/50 text-sm font-medium tracking-wider uppercase">
                     Awards & Recognition
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {speaker.awards.map((award) => (
-                      <span
+                      <Badge
                         key={award}
-                        className="bg-gold/10 text-gold/90 border-gold/20 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm"
+                        variant="outline"
+                        className="border-gold/20 bg-gold/10 text-gold/90 gap-2 px-3 py-1.5"
                       >
-                        <Trophy size={14} />
+                        <Trophy className="size-3.5" data-icon="inline-start" />
                         {award}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
                 </div>
@@ -98,6 +109,7 @@ function SpeakerDetailPage() {
       {/* Bio section */}
       <div className="mx-auto max-w-4xl px-6 py-12">
         <div className="prose prose-lg prose-invert prose-p:text-cream/80 prose-headings:text-cream prose-headings:font-display prose-strong:text-cream prose-a:text-gold font-body max-w-none text-lg leading-relaxed">
+          {/* react-doctor-disable-next-line react-doctor/dangerous-html-sink */}
           <div dangerouslySetInnerHTML={{ __html: marked(speaker.content) }} />
         </div>
       </div>

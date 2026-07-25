@@ -88,27 +88,25 @@ function DemoTypesetPage() {
                 const Icon = p.icon;
                 const active = preset === p.id;
                 return (
-                  <button
+                  <Button
                     key={p.id}
+                    variant={active ? "secondary" : "outline"}
                     onClick={() => setPreset(p.id as PresetType)}
-                    className={`flex items-start gap-4 rounded-xl p-3.5 text-left border transition-all ${
-                      active
-                        ? "border-primary bg-primary/5 text-foreground shadow-sm"
-                        : "border-border/40 hover:border-border/80 hover:bg-muted/5 text-muted-foreground"
-                    }`}
+                    className="flex h-auto items-start justify-start gap-4 rounded-xl p-3.5 text-left font-normal"
                   >
                     <div className={`rounded-lg p-2 ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                       <Icon size={20} />
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className={`text-sm font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                      <span className="text-sm font-semibold text-foreground">
                         {p.label}
                       </span>
                       <span className="text-xs text-muted-foreground/80">{p.desc}</span>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
+
             </CardContent>
           </Card>
 

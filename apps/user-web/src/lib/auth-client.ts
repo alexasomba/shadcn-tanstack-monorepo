@@ -45,5 +45,3 @@ export const authClient: any = createAuthClient({
     inferAdditionalFields<Auth>(),
   ],
 });
-
-export const { signIn, signUp, signOut, useSession, getSession } = authClient;

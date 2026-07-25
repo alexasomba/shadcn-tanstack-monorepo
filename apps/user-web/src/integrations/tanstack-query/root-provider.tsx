@@ -11,4 +11,3 @@ export function getContext() {
     tenant: null as TenantContext | null,
   };
 }
-export default function TanstackQueryProvider() {}
