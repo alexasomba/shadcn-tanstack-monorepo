@@ -138,8 +138,10 @@ export function SecuritySettingsPanel() {
             <div className="flex flex-wrap gap-2">
               <Button
                 disabled={busy || !password}
-                onClick={() =>
-                  void run(async () => {
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
                     const data = (await enableTotp(password)) as {
                       totpURI?: string;
                       backupCodes?: Array<string>;
@@ -150,21 +152,45 @@ export function SecuritySettingsPanel() {
                     if (Array.isArray(data?.backupCodes)) {
                       setBackupCodes(data.backupCodes);
                     }
-                  }, "Scan the QR code, then verify a code to finish enabling TOTP")
-                }
+                    setBanner({
+                      type: "ok",
+                      text: "Scan the QR code, then verify a code to finish enabling TOTP",
+                    });
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
                 Enable authenticator (TOTP)
               </Button>
               <Button
                 variant="outline"
                 disabled={busy || !password}
-                onClick={() =>
-                  void run(async () => {
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
                     await enableOtpMethod(password);
                     setTotpURI(null);
                     setBackupCodes(null);
-                  }, "Email OTP 2FA enabled — codes are sent on sign-in")
-                }
+                    setBanner({
+                      type: "ok",
+                      text: "Email OTP 2FA enabled — codes are sent on sign-in",
+                    });
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
                 Enable email OTP only
               </Button>
@@ -192,13 +218,23 @@ export function SecuritySettingsPanel() {
               </div>
               <Button
                 disabled={busy || totpCode.length < 6}
-                onClick={() =>
-                  void run(async () => {
+                onClick={async () => {
+                  setBusy(true);
+                  setBanner(null);
+                  try {
                     await verifyTotpSetup(totpCode);
                     setTotpCode("");
                     setTotpURI(null);
-                  }, "2FA is now active")
-                }
+                    setBanner({ type: "ok", text: "2FA is now active" });
+                  } catch (e) {
+                    setBanner({
+                      type: "err",
+                      text: unknownErrorMessage(e, "Something went wrong"),
+                    });
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
                 Verify and activate
               </Button>
@@ -229,29 +265,52 @@ export function SecuritySettingsPanel() {
                 <Button
                   variant="outline"
                   disabled={busy || !password}
-                  onClick={() =>
-                    void run(async () => {
+                  onClick={async () => {
+                    setBusy(true);
+                    setBanner(null);
+                    try {
                       const data = (await generateBackupCodes(password)) as {
                         backupCodes?: Array<string>;
                       } | null;
                       const codes = Array.isArray(data?.backupCodes) ? data.backupCodes : null;
                       setBackupCodes(codes);
-                    }, "New backup codes generated — old codes are invalid")
-                  }
+                      setBanner({
+                        type: "ok",
+                        text: "New backup codes generated — old codes are invalid",
+                      });
+                    } catch (e) {
+                      setBanner({
+                        type: "err",
+                        text: unknownErrorMessage(e, "Something went wrong"),
+                      });
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
                 >
                   Regenerate backup codes
                 </Button>
                 <Button
                   variant="destructive"
                   disabled={busy || !password}
-                  onClick={() => {
+                  onClick={async () => {
                     const ok = window.confirm("Disable two-factor authentication?");
                     if (!ok) return;
-                    void run(async () => {
+                    setBusy(true);
+                    setBanner(null);
+                    try {
                       await disableTwoFactor(password);
                       setTotpURI(null);
                       setBackupCodes(null);
-                    }, "2FA disabled");
+                      setBanner({ type: "ok", text: "2FA disabled" });
+                    } catch (e) {
+                      setBanner({
+                        type: "err",
+                        text: unknownErrorMessage(e, "Something went wrong"),
+                      });
+                    } finally {
+                      setBusy(false);
+                    }
                   }}
                 >
                   Disable 2FA

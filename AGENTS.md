@@ -20,6 +20,7 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - **No push = not done.** Never leave a feature in a worktree without pushing.
 - **Push hooks must pass.** Manual gates only on skip/disabled.
 - **Never stop before pushing.** Push fail → fix + retry. No user ask.
+- **Prefer API over SDKs.** Prefer direct HTTP/REST/RPC APIs over client SDK packages.
 
 ## Commands
 
@@ -41,18 +42,12 @@ Run `vp check` and `vp test` before every commit. After wrangler binding changes
 
 ## Agent Permissions
 
-| Action                      | Autonomous            | Requires confirmation |
-| --------------------------- | --------------------- | --------------------- |
-| Read files, grep, list dirs | ✅                    |                       |
-| Edit source files           | ✅                    |                       |
-| Format, lint, typecheck     | ✅                    |                       |
-| Run unit/integration tests  | ✅                    |                       |
-| `git add` + `git commit`    | ✅                    |                       |
-| `git push`                  | ✅ (after hooks pass) |                       |
-| Install packages (`vp add`) |                       | ✅                    |
-| Delete files                |                       | ✅                    |
-| Schema migrations (prod)    |                       | ✅                    |
-| Secrets / env changes       |                       | ✅                    |
+| Action                      | Autonomous | Requires confirmation |
+| --------------------------- | ---------- | --------------------- |
+| Install packages (`vp add`) |            | ✅                    |
+| Delete files                |            | ✅                    |
+| Schema migrations (prod)    |            | ✅                    |
+| Secrets / env changes       |            | ✅                    |
 
 ## Package Source Inspection
 
