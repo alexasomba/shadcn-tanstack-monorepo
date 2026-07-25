@@ -187,7 +187,14 @@ export default function FamilyWallet() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Sign In</h2>
 
-        <DrawerClose render={<button className="rounded-full bg-white p-2 dark:bg-zinc-800" />}>
+        <DrawerClose
+          render={
+            <button
+              aria-label="Close drawer"
+              className="rounded-full bg-white p-2 dark:bg-zinc-800"
+            />
+          }
+        >
           <X className="h-5 w-5 text-zinc-400" />
         </DrawerClose>
       </div>
@@ -198,6 +205,7 @@ export default function FamilyWallet() {
           {[Chrome, FaDiscord, Github, FaApple, Twitter].map((Icon, i) => (
             <button
               key={i}
+              aria-label={`Sign in with social provider ${i + 1}`}
               className="flex items-center justify-center rounded-2xl bg-white px-4 py-3 dark:bg-zinc-800"
             >
               <Icon className="h-6 w-6 text-black dark:text-white" />
@@ -246,9 +254,13 @@ export default function FamilyWallet() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email@address.com"
+                  aria-label="Email address"
                   className="text-md focus-visible:ring-none ml-2 flex-1 text-zinc-900 focus:border-0 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none dark:text-white"
                 />
-                <motion.button className="flex items-center justify-center rounded-lg bg-zinc-100 px-4 py-2 dark:bg-zinc-700/50">
+                <motion.button
+                  className="flex items-center justify-center rounded-lg bg-zinc-100 px-4 py-2 dark:bg-zinc-700/50"
+                  aria-label="Submit email"
+                >
                   <ArrowRight className="size-6 text-black dark:text-white" />
                 </motion.button>
               </motion.div>
@@ -258,6 +270,7 @@ export default function FamilyWallet() {
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  aria-label="Phone number"
                   placeholder="+1 234 567 8900"
                   className="text-md focus-visible:ring-none ml-2 flex-1 text-zinc-900 focus:border-0 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none dark:text-white"
                 />
@@ -272,10 +285,12 @@ export default function FamilyWallet() {
                 <input
                   placeholder="Login with Passkey"
                   readOnly
+                  aria-label="Login with Passkey"
                   className="text-md focus-visible:ring-none ml-2 flex-1 text-zinc-900 focus:border-0 focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none dark:text-white"
                 />
                 <motion.button
                   className="flex items-center justify-center rounded-lg bg-blue-500 px-4 py-2"
+                  aria-label="Submit passkey"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{
@@ -309,6 +324,7 @@ export default function FamilyWallet() {
       <div className="flex w-full items-center justify-between">
         <button
           onClick={() => setView(View.SIGN_IN)}
+          aria-label="Go back"
           className="rounded-full bg-white p-2 dark:bg-zinc-800"
         >
           <CaretLeft className="size-6 text-zinc-400" />
@@ -316,7 +332,14 @@ export default function FamilyWallet() {
 
         <h2 className="text-xl font-medium text-zinc-900">Passkey</h2>
 
-        <DrawerClose render={<button className="rounded-full bg-white p-2 dark:bg-zinc-800" />}>
+        <DrawerClose
+          render={
+            <button
+              aria-label="Close drawer"
+              className="rounded-full bg-white p-2 dark:bg-zinc-800"
+            />
+          }
+        >
           <X className="size-6 text-zinc-400" />
         </DrawerClose>
       </div>
@@ -388,6 +411,7 @@ export default function FamilyWallet() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setView(View.SIGN_IN)}
+          aria-label="Go back"
           className="rounded-full bg-white p-2 dark:bg-zinc-800"
         >
           <CaretLeft className="size-6 text-zinc-400" />
@@ -395,7 +419,14 @@ export default function FamilyWallet() {
 
         <h2 className="text-lg font-medium text-zinc-900">Connect Wallet</h2>
 
-        <DrawerClose render={<button className="rounded-full bg-white p-2 dark:bg-zinc-800" />}>
+        <DrawerClose
+          render={
+            <button
+              aria-label="Close drawer"
+              className="rounded-full bg-white p-2 dark:bg-zinc-800"
+            />
+          }
+        >
           <X className="size-6 text-zinc-400" />
         </DrawerClose>
       </div>
@@ -429,13 +460,14 @@ export default function FamilyWallet() {
         </button>
       </div>
 
-      <div
+      <button
+        type="button"
         className="mt-2 mb-2 flex cursor-pointer items-center justify-center gap-2"
         onClick={() => setView(View.SIGN_IN)}
       >
         <BsWallet2 className="size-6" />
         <p> I don't have wallet</p>
-      </div>
+      </button>
     </div>
   );
 

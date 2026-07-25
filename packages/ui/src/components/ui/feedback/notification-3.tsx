@@ -334,7 +334,7 @@ export default function Notification3({
               className="h-8 gap-1 rounded-xl px-3 text-xs font-semibold text-primary hover:bg-primary/5"
               onClick={() => setDismissed(new Set(items.filter((i) => i.isNew).map((i) => i.id)))}
             >
-              <RiCheckFill className="h-3.5 w-3.5" />
+              <RiCheckFill data-icon="inline-start" className="h-3.5 w-3.5" />
               Clear new
             </Button>
           </div>
@@ -384,9 +384,9 @@ export default function Notification3({
               size="sm"
               className="h-7 gap-0.5 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
-              <RiSettings4Fill className="h-3.5 w-3.5" />
+              <RiSettings4Fill data-icon="inline-start" className="h-3.5 w-3.5" />
               Manage
-              <RiArrowRightSFill className="h-3.5 w-3.5" />
+              <RiArrowRightSFill data-icon="inline-end" className="h-3.5 w-3.5" />
             </Button>
           </div>
         </CardFooter>

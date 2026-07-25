@@ -40,6 +40,7 @@ const navLinks = [
 
 export default function Cta5() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   return (
     <footer className="relative w-full bg-[#111113] font-sans text-[#FAFAFA] antialiased selection:bg-[#E56A54] selection:text-white">
@@ -236,40 +237,74 @@ export default function Cta5() {
                 </p>
               </div>
 
-              <form className="flex w-full flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+              <form
+                className="flex w-full flex-col gap-6"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsPending(true);
+                  try {
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                  } finally {
+                    setIsPending(false);
+                  }
+                }}
+              >
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-medium text-zinc-200">Full name</label>
+                  <label htmlFor="cta-fullname" className="text-sm font-medium text-foreground">
+                    Full name
+                  </label>
                   <input
+                    id="cta-fullname"
                     type="text"
+                    required
+                    autoComplete="name"
                     placeholder="Your name"
-                    className="h-12 w-full rounded-lg border border-white/10 bg-[#18181B] px-4 text-sm text-white placeholder-zinc-500 transition-colors outline-none focus:border-white/30 focus:bg-[#1A1A1E]"
+                    className="h-12 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-medium text-zinc-200">Email address</label>
+                  <label htmlFor="cta-email" className="text-sm font-medium text-foreground">
+                    Email address
+                  </label>
                   <input
+                    id="cta-email"
                     type="email"
-                    placeholder="you@gmail.com"
-                    className="h-12 w-full rounded-lg border border-white/10 bg-[#18181B] px-4 text-sm text-white placeholder-zinc-500 transition-colors outline-none focus:border-white/30 focus:bg-[#1A1A1E]"
+                    required
+                    autoComplete="email"
+                    placeholder="Your email address"
+                    className="h-12 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-2.5">
-                    <label className="text-sm font-medium text-zinc-200">Password</label>
+                    <label htmlFor="cta-password" className="text-sm font-medium text-foreground">
+                      Password
+                    </label>
                     <input
+                      id="cta-password"
                       type="password"
+                      required
+                      autoComplete="new-password"
                       placeholder="Choose a password"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-[#18181B] px-4 text-sm text-white placeholder-zinc-500 transition-colors outline-none focus:border-white/30 focus:bg-[#1A1A1E]"
+                      className="h-12 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
                     />
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    <label className="text-sm font-medium text-zinc-200">Confirm password</label>
+                    <label
+                      htmlFor="cta-confirm-password"
+                      className="text-sm font-medium text-foreground"
+                    >
+                      Confirm password
+                    </label>
                     <input
+                      id="cta-confirm-password"
                       type="password"
+                      required
+                      autoComplete="new-password"
                       placeholder="Confirm password"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-[#18181B] px-4 text-sm text-white placeholder-zinc-500 transition-colors outline-none focus:border-white/30 focus:bg-[#1A1A1E]"
+                      className="h-12 w-full rounded-lg border border-input bg-background px-4 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
                     />
                   </div>
                 </div>
@@ -278,11 +313,15 @@ export default function Cta5() {
                   Password must be at least 8 characters including number and a special character.
                 </p>
 
+                <output aria-live="polite" className="sr-only">
+                  {isPending ? "Submitting request..." : ""}
+                </output>
                 <button
                   type="submit"
-                  className="mt-4 h-12 w-full rounded-lg bg-linear-to-b from-[#E56A54] to-[#C9442C] text-sm font-medium text-white shadow-[0_2px_10px_rgba(229,106,84,0.3)] transition-all hover:opacity-90 active:scale-[0.98]"
+                  disabled={isPending}
+                  className="mt-4 h-12 w-full rounded-lg bg-linear-to-b from-[#E56A54] to-[#C9442C] text-sm font-medium text-white shadow-[0_2px_10px_rgba(229,106,84,0.3)] transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
                 >
-                  Submit Message
+                  {isPending ? "Submitting..." : "Submit Message"}
                 </button>
 
                 <p className="mt-6 text-center text-sm text-zinc-400">

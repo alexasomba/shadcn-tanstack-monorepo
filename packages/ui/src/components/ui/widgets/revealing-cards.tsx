@@ -111,7 +111,7 @@ export default function SwipeableStackCards() {
 
                 <div className="flex-1" />
 
-                <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}></div>
+                <div className="pointer-events-auto" />
               </div>
               <button className="w-full cursor-pointer rounded-full border-none bg-zinc-900 py-4 text-base font-semibold tracking-wide text-white dark:bg-zinc-50 dark:text-zinc-900">
                 Pay Now

@@ -32,16 +32,20 @@ export function ShippingAddress() {
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="shipping-street">Street address</FieldLabel>
-            <Input id="shipping-street" placeholder="123 Main Street" />
+            <Input
+              id="shipping-street"
+              autoComplete="street-address"
+              placeholder="123 Main Street"
+            />
           </Field>
           <Field>
             <FieldLabel htmlFor="shipping-apt">Apt / Suite</FieldLabel>
-            <Input id="shipping-apt" placeholder="Apt 4B" />
+            <Input id="shipping-apt" autoComplete="address-line2" placeholder="Apt 4B" />
           </Field>
           <FieldGroup className="grid grid-cols-2">
             <Field>
               <FieldLabel htmlFor="shipping-city">City</FieldLabel>
-              <Input id="shipping-city" placeholder="San Francisco" />
+              <Input id="shipping-city" autoComplete="address-level2" placeholder="San Francisco" />
             </Field>
             <Field>
               <FieldLabel htmlFor="shipping-state">State</FieldLabel>
@@ -69,7 +73,7 @@ export function ShippingAddress() {
           <FieldGroup className="grid grid-cols-2">
             <Field>
               <FieldLabel htmlFor="shipping-zip">ZIP Code</FieldLabel>
-              <Input id="shipping-zip" placeholder="94102" />
+              <Input id="shipping-zip" autoComplete="postal-code" placeholder="94102" />
             </Field>
             <Field>
               <FieldLabel htmlFor="shipping-country">Country</FieldLabel>

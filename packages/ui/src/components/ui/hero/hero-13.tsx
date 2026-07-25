@@ -170,7 +170,7 @@ export default function Hero4({
             </motion.a>
 
             {/* Mobile Menu Button */}
-            <button className="p-1 text-white lg:hidden">
+            <button aria-label="Toggle mobile menu" className="p-1 text-white lg:hidden">
               <svg
                 width="24"
                 height="24"

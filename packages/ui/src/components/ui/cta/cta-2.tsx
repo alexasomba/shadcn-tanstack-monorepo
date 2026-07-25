@@ -1,5 +1,6 @@
 import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
+import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 import { FaStar, FaCircle } from "react-icons/fa";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -105,40 +106,49 @@ export default function CTASection({
         </p>
 
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          <Button
-            size="lg"
-            className="group w-full gap-2 rounded-md text-sm font-semibold shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.5),inset_0_-0.5px_0px_rgba(0,0,0,0.3),inset_0_0.5px_10px_rgba(255,255,255,0.5),inset_0_-0.5px_4px_rgba(0,0,0,0.3)] text-shadow-2xs sm:w-auto"
-            onClick={primaryCTA.onClick}
-            render={
-              primaryCTA.href ? (
-                <a href={primaryCTA.href}>
-                  {primaryCTA.label}
-                  <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
-                </a>
-              ) : undefined
-            }
-          >
-            {primaryCTA.href ? undefined : (
-              <>
-                {primaryCTA.label}
-                <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
-              </>
-            )}
-          </Button>
-
-          {secondaryCTA && (
+          {primaryCTA.href ? (
+            <a
+              href={primaryCTA.href}
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "group w-full gap-2 rounded-md text-sm font-semibold shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.5),inset_0_-0.5px_0px_rgba(0,0,0,0.3),inset_0_0.5px_10px_rgba(255,255,255,0.5),inset_0_-0.5px_4px_rgba(0,0,0,0.3)] text-shadow-2xs sm:w-auto",
+              )}
+            >
+              {primaryCTA.label}
+              <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
+            </a>
+          ) : (
             <Button
               size="lg"
-              variant="outline"
-              className="w-full rounded-md border-none bg-linear-to-b from-zinc-100 to-zinc-50 text-sm font-medium text-muted-foreground shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.2),inset_0_-0.5px_0px_rgba(0,0,0,0.1),inset_0_0.5px_4px_rgba(255,255,255,0.2),inset_0_-0.5px_4px_rgba(0,0,0,0.1)] transition-all text-shadow-2xs hover:text-foreground sm:w-auto dark:text-muted"
-              onClick={secondaryCTA.onClick}
-              render={
-                secondaryCTA.href ? <a href={secondaryCTA.href}>{secondaryCTA.label}</a> : undefined
-              }
+              className="group w-full gap-2 rounded-md text-sm font-semibold shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.5),inset_0_-0.5px_0px_rgba(0,0,0,0.3),inset_0_0.5px_10px_rgba(255,255,255,0.5),inset_0_-0.5px_4px_rgba(0,0,0,0.3)] text-shadow-2xs sm:w-auto"
+              onClick={primaryCTA.onClick}
             >
-              {secondaryCTA.href ? undefined : <>{secondaryCTA.label}</>}
+              {primaryCTA.label}
+              <FiArrowRight className="text-base transition-all duration-200 group-hover:translate-x-1" />
             </Button>
           )}
+
+          {secondaryCTA &&
+            (secondaryCTA.href ? (
+              <a
+                href={secondaryCTA.href}
+                className={cn(
+                  buttonVariants({ size: "lg", variant: "outline" }),
+                  "w-full rounded-md border-none bg-linear-to-b from-zinc-100 to-zinc-50 text-sm font-medium text-muted-foreground shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.2),inset_0_-0.5px_0px_rgba(0,0,0,0.1),inset_0_0.5px_4px_rgba(255,255,255,0.2),inset_0_-0.5px_4px_rgba(0,0,0,0.1)] transition-all text-shadow-2xs hover:text-foreground sm:w-auto dark:text-muted",
+                )}
+              >
+                {secondaryCTA.label}
+              </a>
+            ) : (
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full rounded-md border-none bg-linear-to-b from-zinc-100 to-zinc-50 text-sm font-medium text-muted-foreground shadow-[inset_0_0.5px_0px_rgba(255,255,255,0.2),inset_0_-0.5px_0px_rgba(0,0,0,0.1),inset_0_0.5px_4px_rgba(255,255,255,0.2),inset_0_-0.5px_4px_rgba(0,0,0,0.1)] transition-all text-shadow-2xs hover:text-foreground sm:w-auto dark:text-muted"
+                onClick={secondaryCTA.onClick}
+              >
+                {secondaryCTA.label}
+              </Button>
+            ))}
         </div>
 
         {socialProof && (

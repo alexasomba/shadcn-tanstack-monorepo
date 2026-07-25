@@ -27,6 +27,7 @@ export default function Announcement1() {
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Dismiss announcement"
           className="cursor-pointer rounded-lg text-primary hover:bg-transparent hover:text-primary/50 hover:dark:bg-transparent"
         >
           <X className="h-4 w-4" />

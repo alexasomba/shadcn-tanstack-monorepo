@@ -53,6 +53,150 @@ const spring: Transition = {
 };
 
 /* --- Sub-Component: EditableRow (Styling Intact) --- */
+function EditableRowView({
+  value,
+  secondaryValue,
+  type,
+  multiline,
+  isTime,
+  onClick,
+}: {
+  value: string;
+  secondaryValue?: string;
+  type?: string;
+  multiline?: boolean;
+  isTime: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <motion.div
+      key="view"
+      layout
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={spring}
+      onClick={onClick}
+      className={`flex min-h-[40px] cursor-pointer ${multiline ? "flex-col gap-2 py-2.5" : "items-center justify-between"}`}
+    >
+      <div
+        className={`text-[16px] font-medium text-gray-800 dark:text-zinc-200 ${multiline ? "w-full leading-relaxed" : "flex items-center gap-2"}`}
+      >
+        {isTime ? (
+          <div className="flex items-center gap-1.5 text-[15px] sm:text-[16px]">
+            <span>{value}</span>
+            <span className="mx-1 text-gray-300 dark:text-zinc-700">to</span>
+            <span>{secondaryValue}</span>
+          </div>
+        ) : (
+          <div
+            className={
+              multiline
+                ? "text-[15px] wrap-break-word whitespace-pre-wrap sm:text-[16px]"
+                : "max-w-[180px] truncate text-[15px] sm:max-w-[220px] sm:text-[16px]"
+            }
+          >
+            {value}
+          </div>
+        )}
+        {type === "url" && <NoteBlank size={20} color="#b3b2b7" className="ml-1 inline" />}
+      </div>
+      <div
+        className={`flex size-7 items-center justify-center rounded-lg border border-gray-200 bg-[#fefefe] opacity-0 shadow-sm group-hover/content:opacity-100 dark:border-zinc-800 dark:bg-zinc-900 ${multiline ? "mt-1 self-end" : ""}`}
+      >
+        <PencilSimple size={18} color="#B7B7B9" />
+      </div>
+    </motion.div>
+  );
+}
+
+function EditableRowEdit({
+  inputId,
+  secondaryInputId,
+  isTime,
+  multiline,
+  v1,
+  v2,
+  setV1,
+  setV2,
+  handleSave,
+}: {
+  inputId: string;
+  secondaryInputId: string;
+  isTime: boolean;
+  multiline?: boolean;
+  v1: string;
+  v2: string;
+  setV1: (val: string) => void;
+  setV2: (val: string) => void;
+  handleSave: () => void;
+}) {
+  return (
+    <motion.div
+      key="edit"
+      layout
+      initial={{ opacity: 0, scale: 0.97 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={spring}
+      className={`flex min-h-[40px] w-full gap-2 ${multiline ? "flex-col py-2.5" : "items-center"}`}
+    >
+      {isTime ? (
+        <div className="flex w-full gap-2">
+          <input
+            id={inputId}
+            autoFocus
+            type="text"
+            value={v1}
+            onChange={(e) => setV1(e.target.value)}
+            aria-label="Start time"
+            className="h-10 w-full rounded-xl border border-transparent bg-transparent px-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:px-3 dark:text-zinc-100 dark:focus:border-zinc-800"
+          />
+          <input
+            id={secondaryInputId}
+            type="text"
+            value={v2}
+            onChange={(e) => setV2(e.target.value)}
+            aria-label="End time"
+            className="h-10 w-full rounded-xl border border-transparent bg-transparent px-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:px-3 dark:text-zinc-100 dark:focus:border-zinc-800"
+          />
+        </div>
+      ) : multiline ? (
+        <textarea
+          id={inputId}
+          autoFocus
+          rows={3}
+          value={v1}
+          onChange={(e) => setV1(e.target.value)}
+          aria-label="Multiline content"
+          className="w-full resize-none rounded-xl border border-transparent bg-transparent p-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:p-3 dark:text-zinc-100 dark:focus:border-zinc-800"
+        />
+      ) : (
+        <input
+          id={inputId}
+          autoFocus
+          type="text"
+          value={v1}
+          onChange={(e) => setV1(e.target.value)}
+          aria-label="Inline text"
+          className="h-10 w-full rounded-xl border border-transparent bg-transparent px-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:px-3 dark:text-zinc-100 dark:focus:border-zinc-800"
+        />
+      )}
+
+      <div className={`flex items-center gap-1 ${multiline ? "self-end" : ""}`}>
+        <button
+          type="button"
+          onClick={handleSave}
+          aria-label="Save changes"
+          className="flex size-7 items-center justify-center rounded-lg bg-gray-900 transition-colors hover:bg-black dark:bg-zinc-100 dark:hover:bg-white"
+        >
+          <Check size={16} className="text-white dark:text-zinc-900" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 const EditableRow: FC<EditableRowProps> = ({
   icon,
   label,
@@ -104,115 +248,26 @@ const EditableRow: FC<EditableRowProps> = ({
         >
           <AnimatePresence mode="wait" initial={false}>
             {!editing ? (
-              <motion.div
-                key="view"
-                layout
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={spring}
+              <EditableRowView
+                value={value}
+                secondaryValue={secondaryValue}
+                type={type}
+                multiline={multiline}
+                isTime={isTime}
                 onClick={() => setEditing(true)}
-                className={`flex min-h-[40px] cursor-pointer ${multiline ? "flex-col gap-2 py-2.5" : "items-center justify-between"}`}
-              >
-                <div
-                  className={`text-[16px] font-medium text-gray-800 dark:text-zinc-200 ${multiline ? "w-full leading-relaxed" : "flex items-center gap-2"}`}
-                >
-                  {isTime ? (
-                    <div className="flex items-center gap-1.5 text-[15px] sm:text-[16px]">
-                      <span>{value}</span>
-                      <span className="mx-1 text-gray-300 dark:text-zinc-700">to</span>
-                      <span>{secondaryValue}</span>
-                    </div>
-                  ) : (
-                    <div
-                      className={
-                        multiline
-                          ? "text-[15px] wrap-break-word whitespace-pre-wrap sm:text-[16px]"
-                          : "max-w-[180px] truncate text-[15px] sm:max-w-[220px] sm:text-[16px]"
-                      }
-                    >
-                      {value}
-                    </div>
-                  )}
-                  {type === "url" && (
-                    <NoteBlank size={20} color="#b3b2b7" className="ml-1 inline" />
-                  )}
-                </div>
-                <div
-                  className={`flex size-7 items-center justify-center rounded-lg border border-gray-200 bg-[#fefefe] opacity-0 shadow-sm group-hover/content:opacity-100 dark:border-zinc-800 dark:bg-zinc-900 ${multiline ? "mt-1 self-end" : ""}`}
-                >
-                  <PencilSimple size={18} color="#B7B7B9" />
-                </div>
-              </motion.div>
+              />
             ) : (
-              <motion.div
-                key="edit"
-                layout
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={spring}
-                className={`flex min-h-[40px] w-full gap-2 ${multiline ? "flex-col py-2.5" : "items-center"}`}
-              >
-                {isTime ? (
-                  <div className="flex w-full gap-2">
-                    <input
-                      id={inputId}
-                      autoFocus
-                      type="text"
-                      value={v1}
-                      onChange={(e) => setV1(e.target.value)}
-                      className="h-10 w-full rounded-xl border border-transparent bg-transparent px-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:px-3 dark:text-zinc-100 dark:focus:border-zinc-800"
-                    />
-                    <input
-                      id={secondaryInputId}
-                      type="text"
-                      value={v2}
-                      onChange={(e) => setV2(e.target.value)}
-                      className="h-10 w-full rounded-xl border border-transparent bg-transparent px-2 text-[14px] font-medium text-[#2B2A35] outline-none focus:border-gray-100 sm:px-3 dark:text-zinc-100 dark:focus:border-zinc-800"
-                    />
-                  </div>
-                ) : multiline ? (
-                  <textarea
-                    id={inputId}
-                    autoFocus
-                    rows={3}
-                    value={v1}
-                    onChange={(e) => setV1(e.target.value)}
-                    className="w-full resize-none rounded-xl bg-transparent px-0 py-0 text-[15px] leading-relaxed font-medium text-[#2B2A35] outline-none sm:text-[16px] dark:text-zinc-100"
-                  />
-                ) : (
-                  <input
-                    id={inputId}
-                    autoFocus
-                    type="text"
-                    value={v1}
-                    onChange={(e) => setV1(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                    className="h-10 w-full rounded-xl bg-transparent text-[15px] font-medium text-[#2B2A35] outline-none sm:text-base dark:text-zinc-100"
-                  />
-                )}
-                <div
-                  className={`flex shrink-0 items-center gap-1 ${multiline ? "mt-1 self-end" : ""}`}
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleSave}
-                    className="flex size-7 items-center justify-center rounded-lg bg-black text-white dark:bg-zinc-100 dark:text-black"
-                  >
-                    <Check size={18} />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setEditing(false)}
-                    className="flex size-7 items-center justify-center rounded-lg bg-black text-white dark:bg-zinc-800"
-                  >
-                    <X size={18} color="#ffffff" />
-                  </motion.button>
-                </div>
-              </motion.div>
+              <EditableRowEdit
+                inputId={inputId}
+                secondaryInputId={secondaryInputId}
+                isTime={isTime}
+                multiline={multiline}
+                v1={v1}
+                v2={v2}
+                setV1={setV1}
+                setV2={setV2}
+                handleSave={handleSave}
+              />
             )}
           </AnimatePresence>
         </motion.div>

@@ -1,5 +1,5 @@
 import { ScriptOnce } from "@tanstack/react-router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export type Theme = "dark" | "light" | "system";
 
@@ -63,6 +63,43 @@ export function ThemeProvider({
   }, [theme, mounted]);
 
   useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable ||
+          target.closest?.("input, textarea, select, [contenteditable='true']"))
+      ) {
+        return;
+      }
+
+      if (
+        (event.key === "d" && !event.metaKey && !event.ctrlKey && !event.altKey) ||
+        (event.key.toLowerCase() === "d" && event.metaKey && event.shiftKey)
+      ) {
+        event.preventDefault();
+        setThemeState((prev) => {
+          const currentResolved =
+            prev === "system"
+              ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light"
+              : prev;
+          const next = currentResolved === "dark" ? "light" : "dark";
+          localStorage.setItem(storageKey, next);
+          return next;
+        });
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [storageKey]);
+
+  useEffect(() => {
     if (!mounted || theme !== "system") return;
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -71,13 +108,18 @@ export function ThemeProvider({
     return () => media.removeEventListener("change", onChange);
   }, [theme, mounted]);
 
-  const setTheme = (next: Theme) => {
-    localStorage.setItem(storageKey, next);
-    setThemeState(next);
-  };
+  const setTheme = useCallback(
+    (next: Theme) => {
+      localStorage.setItem(storageKey, next);
+      setThemeState(next);
+    },
+    [storageKey],
+  );
+
+  const contextValue = useMemo(() => ({ theme, setTheme }), [theme, setTheme]);
 
   return (
-    <ThemeProviderContext value={{ theme, setTheme }}>
+    <ThemeProviderContext value={contextValue}>
       <ScriptOnce>{getThemeScript(storageKey, defaultTheme)}</ScriptOnce>
       {children}
     </ThemeProviderContext>

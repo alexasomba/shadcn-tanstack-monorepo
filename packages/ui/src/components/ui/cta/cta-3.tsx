@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@workspace/ui/components/button";
+import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
+import { cn } from "@workspace/ui/lib/utils";
 import React from "react";
 import type { IconType } from "react-icons";
 import {
@@ -77,46 +78,52 @@ export default function Cta3({
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <Button
-              className="text-md h-12 rounded-none border-dashed border-primary/80 bg-primary/60 px-6 font-semibold text-white shadow-[inset_0_0px_4px_2px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_0px_4px_2px_rgba(0,0,0,0.4)]"
-              onClick={primaryCta.onClick}
-              render={
-                primaryCta.href ? (
-                  <a href={primaryCta.href} className="flex items-center justify-center gap-2">
-                    {primaryCta.label}
-                    <MdArrowOutward className="h-4 w-4" />
-                  </a>
-                ) : undefined
-              }
-            >
-              {primaryCta.href ? undefined : (
+            {primaryCta.href ? (
+              <a
+                href={primaryCta.href}
+                className={cn(
+                  buttonVariants(),
+                  "text-md flex h-12 items-center justify-center gap-2 rounded-none border-dashed border-primary/80 bg-primary/60 px-6 font-semibold text-white shadow-[inset_0_0px_4px_2px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_0px_4px_2px_rgba(0,0,0,0.4)]",
+                )}
+              >
+                {primaryCta.label}
+                <MdArrowOutward className="h-4 w-4" />
+              </a>
+            ) : (
+              <Button
+                className="text-md h-12 rounded-none border-dashed border-primary/80 bg-primary/60 px-6 font-semibold text-white shadow-[inset_0_0px_4px_2px_rgba(255,255,255,0.4)] dark:shadow-[inset_0_0px_4px_2px_rgba(0,0,0,0.4)]"
+                onClick={primaryCta.onClick}
+              >
                 <span className="flex items-center justify-center gap-2">
                   {primaryCta.label}
                   <MdArrowOutward className="h-4 w-4" />
                 </span>
-              )}
-            </Button>
+              </Button>
+            )}
 
-            <Button
-              variant="secondary"
-              className="h-12 gap-2 rounded-none border-dashed border-black/50 bg-muted/60 px-6 text-[15px] font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-zinc-400"
-              onClick={secondaryCta.onClick}
-              render={
-                secondaryCta.href ? (
-                  <a href={secondaryCta.href} className="flex items-center justify-center gap-2">
-                    <MdPlayArrow className="size-5 text-muted-foreground" />
-                    {secondaryCta.label}
-                  </a>
-                ) : undefined
-              }
-            >
-              {secondaryCta.href ? undefined : (
+            {secondaryCta.href ? (
+              <a
+                href={secondaryCta.href}
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "flex h-12 items-center justify-center gap-2 rounded-none border-dashed border-black/50 bg-muted/60 px-6 text-[15px] font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-zinc-400",
+                )}
+              >
+                <MdPlayArrow className="size-5 text-muted-foreground" />
+                {secondaryCta.label}
+              </a>
+            ) : (
+              <Button
+                variant="secondary"
+                className="h-12 gap-2 rounded-none border-dashed border-black/50 bg-muted/60 px-6 text-[15px] font-medium text-foreground shadow-none hover:bg-muted/80 dark:border-zinc-400"
+                onClick={secondaryCta.onClick}
+              >
                 <span className="flex items-center justify-center gap-2">
                   <MdPlayArrow className="size-5 text-muted-foreground" />
                   {secondaryCta.label}
                 </span>
-              )}
-            </Button>
+              </Button>
+            )}
           </div>
         </div>
 

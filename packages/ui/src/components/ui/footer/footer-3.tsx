@@ -1,4 +1,5 @@
-import { Button } from "@workspace/ui/components/button";
+import { Button, buttonVariants } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 import React from "react";
 
 export interface Footer3LinkGroup {
@@ -9,6 +10,7 @@ export interface Footer3LinkGroup {
 export interface Footer3SocialLink {
   icon: React.ReactNode;
   href: string;
+  label?: string;
 }
 
 export interface Footer3Props {
@@ -50,22 +52,19 @@ export function Footer3({
                   {socialLinks.length > 0 && (
                     <div className="flex items-center gap-3">
                       {socialLinks.map((link, index) => (
-                        <Button
+                        <a
                           key={index}
-                          variant="outline"
-                          size="icon"
-                          render={
-                            <a
-                              href={link.href}
-                              target="_blank"
-                              className=""
-                              rel="noopener noreferrer"
-                            >
-                              {link.icon}
-                            </a>
-                          }
-                          className="h-10 w-10 rounded-xl bg-muted text-muted-foreground shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.5)] transition-colors outline-none hover:text-foreground dark:shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.1)]"
-                        />
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={link.label}
+                          className={cn(
+                            buttonVariants({ variant: "outline", size: "icon" }),
+                            "h-10 w-10 rounded-xl bg-muted text-muted-foreground shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.5)] transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_2px_0_0px_rgba(255,255,255,0.1)]",
+                          )}
+                        >
+                          {link.icon}
+                        </a>
                       ))}
                     </div>
                   )}

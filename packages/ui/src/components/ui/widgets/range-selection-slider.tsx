@@ -78,7 +78,7 @@ export const RollingNumber: FC<RollingNumberProps> = ({ value, prefix = "" }) =>
       )}
     >
       {formatted.split("").map((char, index) => {
-        const isNumber = !isNaN(parseInt(char, 10));
+        const isNumber = !Number.isNaN(Number.parseInt(char, 10));
 
         if (!isNumber) {
           return (

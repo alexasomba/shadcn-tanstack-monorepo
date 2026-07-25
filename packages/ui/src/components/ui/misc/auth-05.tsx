@@ -5,6 +5,8 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
+import { toast } from "@workspace/ui/components/toast";
+import React from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { MdLock, MdEmail, MdArrowForward, MdAutoAwesome } from "react-icons/md";
@@ -43,6 +45,21 @@ export function Auth5({
   signUpHref = "#",
   forgotPasswordHref = "#",
 }: Auth5Props) {
+  const [isPending, setIsPending] = React.useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    toast.promise(
+      Promise.resolve(onSubmit?.(e)).finally(() => setIsPending(false)),
+      {
+        loading: "Signing in...",
+        success: "Signed in successfully!",
+        error: "Sign in failed.",
+      },
+    );
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col p-1 lg:flex-row">
       <section className="flex flex-1 flex-col items-center justify-center bg-background px-6 py-16 sm:px-10 lg:max-w-xl lg:px-16">
@@ -67,7 +84,7 @@ export function Auth5({
               type="button"
               className="h-10 gap-2 bg-muted text-sm font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0px_0px_0px_0.5px_rgba(0,0,0,0.08),0px_1px_2px_-1px_rgba(0,0,0,0.08),0px_2px_4px_0px_rgba(0,0,0,0.08)] dark:bg-muted dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0px_0px_0px_0.5px_rgba(255,255,255,0.03),0px_1px_2px_-1px_rgba(255,255,255,0.08),0px_2px_4px_0px_rgba(255,255,255,0.08)]"
             >
-              <FcGoogle className="h-4 w-4" />
+              <FcGoogle data-icon="inline-start" className="h-4 w-4" />
               Google
             </Button>
             <Button
@@ -75,7 +92,7 @@ export function Auth5({
               type="button"
               className="h-10 gap-2 bg-muted text-sm font-medium shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0px_0px_0px_0.5px_rgba(0,0,0,0.08),0px_1px_2px_-1px_rgba(0,0,0,0.08),0px_2px_4px_0px_rgba(0,0,0,0.08)] dark:bg-muted dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0px_0px_0px_0.5px_rgba(255,255,255,0.03),0px_1px_2px_-1px_rgba(255,255,255,0.08),0px_2px_4px_0px_rgba(255,255,255,0.08)]"
             >
-              <FaGithub className="h-4 w-4" />
+              <FaGithub data-icon="inline-start" className="h-4 w-4" />
               GitHub
             </Button>
           </div>
@@ -86,13 +103,7 @@ export function Auth5({
             <Separator className="flex-1" />
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit?.(e);
-            }}
-            className="space-y-5"
-          >
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
               <Label htmlFor="Auth5-email" className="text-sm font-medium">
                 Email address
@@ -102,6 +113,7 @@ export function Auth5({
                 <Input
                   id="Auth5-email"
                   type="email"
+                  autoComplete="email"
                   placeholder="you@company.com"
                   className="h-11 border-0 bg-muted pl-10 shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_1px_4px_0px_rgba(0,0,0,0.08)] focus-visible:border-primary/50 focus-visible:ring-primary/20"
                   required
@@ -126,7 +138,8 @@ export function Auth5({
                 <Input
                   id="Auth5-password"
                   type="password"
-                  placeholder="••••••••••"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
                   className="h-11 border-0 bg-muted pl-10 shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_1px_4px_0px_rgba(0,0,0,0.08)] focus-visible:border-primary/50 focus-visible:ring-primary/20"
                   required
                 />
@@ -145,9 +158,10 @@ export function Auth5({
 
             <Button
               type="submit"
-              className="h-11 w-full gap-2 bg-linear-to-b from-primary to-primary/70 font-semibold text-white shadow-sm"
+              disabled={isPending}
+              className="h-11 w-full gap-2 bg-linear-to-b from-primary to-primary/70 font-semibold text-white shadow-sm disabled:opacity-50"
             >
-              {submitLabel}
+              {isPending ? "Signing in..." : submitLabel}
               <MdArrowForward className="h-4 w-4" />
             </Button>
           </form>

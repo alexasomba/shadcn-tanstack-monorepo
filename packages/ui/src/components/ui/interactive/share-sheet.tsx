@@ -48,6 +48,9 @@ export const ShareSheet = ({ users, onShareComplete }: ShareSheetProps) => {
 
   return (
     <div className="relative flex items-center justify-center">
+      <output aria-live="polite" className="sr-only">
+        {status === "sending" ? "Sending..." : status === "success" ? "Sent successfully!" : ""}
+      </output>
       <motion.button
         onClick={() => status === "idle" && setStatus("open")}
         className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-[17px] bg-neutral-900 text-neutral-50 shadow-sm dark:bg-neutral-100 dark:text-neutral-900"

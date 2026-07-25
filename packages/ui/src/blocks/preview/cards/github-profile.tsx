@@ -26,7 +26,7 @@ export function GithubProfile() {
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Name</FieldLabel>
-              <Input id="name" placeholder="shadcn" />
+              <Input id="name" autoComplete="name" placeholder="shadcn" />
               <FieldDescription>
                 Your name may appear around GitHub where you contribute or are mentioned. You can
                 remove it at any time.

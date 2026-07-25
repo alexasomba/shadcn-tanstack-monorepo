@@ -56,10 +56,7 @@ export default function SplitActions({
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
-      <div
-        className="relative flex min-h-14 min-w-14 items-center justify-center"
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
+      <div className="relative flex min-h-14 min-w-14 items-center justify-center">
         <AnimatePresence mode="wait">
           {!isOpen && (
             <motion.button

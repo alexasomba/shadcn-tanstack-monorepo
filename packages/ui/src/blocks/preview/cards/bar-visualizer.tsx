@@ -127,35 +127,54 @@ function useMultibandVolume(
 
     let lastUpdate = 0;
 
+    function calculateBandChunks(
+      dataArray: Float32Array,
+      bands: number,
+      sliceStart: number,
+      sliceEnd: number,
+      chunkSize: number,
+      normalizeDbFn: (db: number) => number,
+    ): Array<number> {
+      const chunks: number[] = Array.from({ length: bands });
+      for (let i = 0; i < bands; i++) {
+        let sum = 0;
+        let count = 0;
+        const startIdx = sliceStart + i * chunkSize;
+        const endIdx = Math.min(sliceStart + (i + 1) * chunkSize, sliceEnd);
+
+        for (let j = startIdx; j < endIdx; j++) {
+          sum += normalizeDbFn(dataArray[j]);
+          count++;
+        }
+
+        chunks[i] = count > 0 ? sum / count : 0;
+      }
+      return chunks;
+    }
+
+    function hasBandsChanged(currentBands: Array<number>, newBands: Array<number>): boolean {
+      for (let i = 0; i < newBands.length; i++) {
+        if (Math.abs(newBands[i] - currentBands[i]) > 0.01) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     const updateVolume = (timestamp: number) => {
       if (timestamp - lastUpdate >= updateInterval) {
         analyser.getFloatFrequencyData(dataArray);
 
-        const chunks: number[] = Array.from({ length: bands });
+        const chunks = calculateBandChunks(
+          dataArray,
+          bands,
+          sliceStart,
+          sliceEnd,
+          chunkSize,
+          normalizeDb,
+        );
 
-        for (let i = 0; i < bands; i++) {
-          let sum = 0;
-          let count = 0;
-          const startIdx = sliceStart + i * chunkSize;
-          const endIdx = Math.min(sliceStart + (i + 1) * chunkSize, sliceEnd);
-
-          for (let j = startIdx; j < endIdx; j++) {
-            sum += normalizeDb(dataArray[j]);
-            count++;
-          }
-
-          chunks[i] = count > 0 ? sum / count : 0;
-        }
-
-        let hasChanged = false;
-        for (let i = 0; i < chunks.length; i++) {
-          if (Math.abs(chunks[i] - bandsRef.current[i]) > 0.01) {
-            hasChanged = true;
-            break;
-          }
-        }
-
-        if (hasChanged) {
+        if (hasBandsChanged(bandsRef.current, chunks)) {
           bandsRef.current = chunks;
           setFrequencyBands(chunks);
         }

@@ -45,7 +45,11 @@ export const QuickFeedback: FC<QuickFeedbackProps> = ({
   };
 
   return (
-    <div className="relative flex w-full items-center justify-center gap-4 bg-transparent px-4 transition-colors duration-500">
+    <div
+      role="status"
+      aria-live="polite"
+      className="relative flex w-full items-center justify-center gap-4 bg-transparent px-4 transition-colors duration-500"
+    >
       <MotionConfig transition={containerTransition}>
         <LayoutGroup>
           <div className="relative flex items-center justify-center gap-2">
@@ -131,6 +135,8 @@ export const QuickFeedbackButton: FC<QuickFeedbackButtonProps> = ({
         <AnimatePresence mode="popLayout" initial={false}>
           {isActive && (
             <motion.div
+              role="status"
+              aria-live="polite"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}

@@ -145,7 +145,7 @@ export const StepIndicator = ({ steps, tooltipDelay = 0, onStepChange }: StepInd
                 }
               }}
               onClick={() => onStepChange?.(index)}
-              className="group relative h-3 flex-1 cursor-pointer outline-none"
+              className="group relative h-3 flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <div
                 className={cn(

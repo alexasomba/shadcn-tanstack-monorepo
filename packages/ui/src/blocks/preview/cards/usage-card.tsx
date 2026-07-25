@@ -105,7 +105,7 @@ export function UsageCard() {
               key={item.name}
               size="xs"
               className="px-0 group-hover/item-group:bg-transparent"
-              render={<a href="#" />}
+              render={<a href="#" aria-label={item.name} />}
             >
               <ItemMedia variant="icon" className="text-primary">
                 <CircularGauge percentage={item.percentage} />

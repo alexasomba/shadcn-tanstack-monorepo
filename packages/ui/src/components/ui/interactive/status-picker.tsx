@@ -37,6 +37,9 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
 
   return (
     <div className="flex w-full items-center justify-center">
+      <output aria-live="polite" className="sr-only">
+        Status set to {activeItem?.name || "unknown"}
+      </output>
       <div className="flex items-center justify-center">
         <motion.div
           layout
@@ -261,14 +264,16 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
                         )}
                       </AnimatePresence>
 
-                      <div
+                      <button
+                        type="button"
+                        aria-label={`Select status ${item.name}`}
                         className="flex size-6 items-center justify-center transition-all duration-200 ease-in-out group-hover:scale-110"
                         onClick={() => {
                           setStatus(item.id);
                         }}
                       >
                         <div>{item.emoji}</div>
-                      </div>
+                      </button>
                     </motion.div>
                   ))}
 

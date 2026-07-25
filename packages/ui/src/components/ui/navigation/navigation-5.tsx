@@ -24,7 +24,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
 
 export function Navigation5() {
@@ -118,21 +118,21 @@ export function Navigation5() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Stack className="h-3.5 w-3.5" />
+                            <Stack data-icon="inline-start" className="h-3.5 w-3.5" />
                             Pipelines
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <GitBranch className="h-3.5 w-3.5" />
+                            <GitBranch data-icon="inline-start" className="h-3.5 w-3.5" />
                             Webhooks
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <TerminalWindow className="h-3.5 w-3.5" />
+                            <TerminalWindow data-icon="inline-start" className="h-3.5 w-3.5" />
                             CLI Tool
                           </Button>
                         </div>
@@ -259,6 +259,7 @@ export function Navigation5() {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="Open command menu"
                 className="rounded-full text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
               >
                 <Command className="size-4.5" />
@@ -266,6 +267,7 @@ export function Navigation5() {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="User profile"
                 className="rounded-full text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
               >
                 <User className="size-4.5" />
@@ -283,6 +285,7 @@ export function Navigation5() {
                     <Button
                       variant="ghost"
                       size="icon-lg"
+                      aria-label="Toggle menu"
                       className="rounded-full text-neutral-700 dark:text-neutral-300"
                     >
                       <List className="size-5" />
@@ -293,6 +296,7 @@ export function Navigation5() {
                   side="right"
                   className="flex w-[300px] flex-col gap-6 p-6 dark:bg-neutral-950"
                 >
+                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center text-orange-600 dark:text-orange-500">
                       <svg

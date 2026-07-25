@@ -93,14 +93,19 @@ export const notificationCatalog = rpc.catalog({
       }),
     )
     .body(({ input }) => `**[${input.level.toUpperCase()}]** Platform Notification`)
-    .embeds(({ input }) => [
-      {
-        title: input.title,
-        description: input.description,
-        color: input.level === "error" ? 0xe74c3c : input.level === "warn" ? 0xf1c40f : 0x3498db,
-        timestamp: new Date().toISOString(),
-      },
-    ]),
+    .embeds(({ input }) => {
+      let color = 0x3498db;
+      if (input.level === "error") color = 0xe74c3c;
+      else if (input.level === "warn") color = 0xf1c40f;
+      return [
+        {
+          title: input.title,
+          description: input.description,
+          color,
+          timestamp: new Date().toISOString(),
+        },
+      ];
+    }),
 });
 
 export type NotificationCatalog = typeof notificationCatalog;

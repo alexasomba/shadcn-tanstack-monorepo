@@ -60,11 +60,16 @@ export function TypographySpecimen() {
               <div className="grid grid-cols-2 gap-3">
                 <Field>
                   <FieldLabel htmlFor="feedback-name">Name</FieldLabel>
-                  <Input id="feedback-name" placeholder="Your name" />
+                  <Input id="feedback-name" autoComplete="name" placeholder="Your name" />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="feedback-email">Email</FieldLabel>
-                  <Input id="feedback-email" type="email" placeholder="you@example.com" />
+                  <Input
+                    id="feedback-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                  />
                 </Field>
               </div>
               <Field>

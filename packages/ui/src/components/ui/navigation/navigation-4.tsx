@@ -39,7 +39,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
 
 export function Navigation4() {
@@ -128,19 +128,20 @@ export function Navigation4() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Stack className="h-3.5 w-3.5" /> Pipelines
+                            <Stack data-icon="inline-start" className="h-3.5 w-3.5" /> Pipelines
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <GitBranch className="h-3.5 w-3.5" /> Webhooks
+                            <GitBranch data-icon="inline-start" className="h-3.5 w-3.5" /> Webhooks
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <TerminalWindow className="h-3.5 w-3.5" /> CLI Tool
+                            <TerminalWindow data-icon="inline-start" className="h-3.5 w-3.5" /> CLI
+                            Tool
                           </Button>
                         </div>
                       </div>
@@ -241,6 +242,7 @@ export function Navigation4() {
             <Input
               type="text"
               placeholder="Search components..."
+              aria-label="Search components"
               className="w-full rounded-lg border-neutral-200 bg-neutral-50 pr-4 pl-10 text-sm transition-all focus:ring-2 focus:ring-orange-600/20 dark:border-neutral-800 dark:bg-neutral-900"
             />
           </div>
@@ -313,6 +315,7 @@ export function Navigation4() {
                 render={
                   <Button
                     variant="ghost"
+                    aria-label="Toggle menu"
                     className="h-10 w-10 rounded-xl p-0 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
                   >
                     <List className="h-6 w-6" />
@@ -320,6 +323,7 @@ export function Navigation4() {
                 }
               />
               <SheetContent side="right" className="w-full sm:max-w-xs">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="flex h-full flex-col overflow-y-auto px-6 py-8">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -346,7 +350,11 @@ export function Navigation4() {
                   {/* Sheet Search */}
                   <div className="relative mb-6">
                     <MagnifyingGlass className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-                    <Input placeholder="Search..." className="rounded-lg pl-10" />
+                    <Input
+                      placeholder="Search..."
+                      aria-label="Search navigation"
+                      className="rounded-lg pl-10"
+                    />
                   </div>
 
                   <div className="flex flex-col gap-1 text-base font-medium">

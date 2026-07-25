@@ -4,14 +4,23 @@ Detailed architectural notes for the monorepo. Read the relevant section before 
 
 ## Cloudflare D1 + data-service
 
-- **Shared D1** binding is `DATABASE` on database `app-db`. Schema/migrations only in `packages/data-ops`.
+- **Shared D1** binding is `DB` on database `rentshortlet`. Schema/migrations only in `packages/data-ops`.
 - **Local D1 owner**: `apps/user-web/.wrangler/state`. admin-web, data-service, and agents persist to that path.
 - **Dev ports** (strict): user-web `8300`, admin-web `8301`, data-service `8302`, agents `8303`.
-- **user-web / admin-web → data-service**: only via Cloudflare **service binding** `DATA_SERVICE` (`env.DATA_SERVICE.fetch`). Use `dataServiceClient` from `src/lib/data-client.ts`. No public HTTP between Workers.
+- **TanStack Start apps are full-stack**: user-web and admin-web may access their own `DB`
+  bindings from server-only services, server functions, and server routes. Keep bindings, secrets,
+  and database access out of isomorphic loaders and browser components.
+- **Intentional user-web / admin-web → data-service calls**: use the Cloudflare **service binding**
+  `DATA_SERVICE` (`env.DATA_SERVICE.fetch`), never public HTTP between Workers. These calls are for
+  capabilities deliberately owned by data-service, not a mandatory backend hop for ordinary
+  first-party app requests.
 - Use `import { env } from "cloudflare:workers"` for bindings. Do **not** use `vinxi/http` `getEvent()` for env.
-- Use `createDatabase(env.DATABASE)` from `data-ops`. Shared queries live under `data-ops/queries/*`; Zod under `data-ops/zod-schema/*`.
+- Use `createDatabase(env.DB)` from `data-ops`. Shared queries live under `data-ops/queries/*`; Zod under `data-ops/zod-schema/*`.
 - **data-ops pack**: `vp run --filter data-ops build` → `vp pack` (tsdown `dist/`); workspace still resolves `src/` for DX.
-- **data-service** endpoints: `@hono/zod-openapi` under `src/endpoints/<resource>/`. Prefer data-ops queries. **Queues/cron stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
+- **data-service ownership**: define `@hono/zod-openapi` endpoints under
+  `src/endpoints/<resource>/` when a stable service contract is needed. It also owns workflows,
+  Durable Objects, queues, cron, and background tasks. Prefer data-ops queries. **Queues/cron
+  stubs**: `JOBS_QUEUE` + `scheduled` drain `outbox_events` (`src/jobs/`).
 - **SEO discovery (user-web)**: `/sitemap.xml`, `/robots.txt`, `/llms.txt` server routes (`src/lib/discovery.ts`).
 
 ## Auth Plugins

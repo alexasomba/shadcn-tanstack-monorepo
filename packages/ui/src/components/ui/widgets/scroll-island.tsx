@@ -1,5 +1,5 @@
 "use client";
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDownIcon } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -73,112 +73,112 @@ export function ScrollIsland({ topics }: ScrollIslandProps) {
   };
 
   const islandUI = (
-    <>
-      <MotionConfig
-        transition={{
-          type: "spring",
-          bounce: 0.2,
-          duration: 0.7,
+    <MotionConfig
+      transition={{
+        type: "spring",
+        bounce: 0.2,
+        duration: 0.7,
+      }}
+    >
+      <div
+        className="pointer-events-none fixed top-72 z-9999 flex justify-center pt-6 sm:top-32"
+        style={{
+          left: isMobile ? "0" : isScrollIslandPage ? "28%" : "20%",
+          width: "100%",
         }}
       >
-        <div
-          className="pointer-events-none fixed top-72 z-9999 flex justify-center pt-6 sm:top-32"
-          style={{
-            left: isMobile ? "0" : isScrollIslandPage ? "28%" : "20%",
-            width: "100%",
+        <motion.div
+          className={cn(
+            "pointer-events-auto flex flex-col items-center overflow-hidden border border-white/10 bg-neutral-900 shadow-2xl",
+          )}
+          initial={{
+            borderRadius: 32,
+          }}
+          animate={{
+            height: bounds.height > 0 ? bounds.height : "auto",
+            width: isOpen ? 400 : 240,
+            borderRadius: isOpen ? 24 : 32,
           }}
         >
-          <motion.div
-            className={cn(
-              "pointer-events-auto flex flex-col items-center overflow-hidden border border-white/10 bg-neutral-900 shadow-2xl",
-            )}
-            initial={{
-              borderRadius: 32,
-            }}
-            animate={{
-              height: bounds.height > 0 ? bounds.height : "auto",
-              width: isOpen ? 400 : 240,
-              borderRadius: isOpen ? 24 : 32,
-            }}
-          >
-            <div ref={ref} className={cn("flex w-full flex-col items-center px-4", isOpen && "")}>
-              <div
-                className="group flex h-13 w-full cursor-pointer items-center justify-between gap-8 select-none"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    layout
-                    className="relative h-7 w-7 shrink-0 rounded-full"
-                    style={{
-                      background: `conic-gradient(white ${scrollProgress}%, #333 0)`,
-                    }}
-                  >
-                    <div className="absolute inset-[2.5px] rounded-full bg-black" />
-                    <div className="absolute inset-0 flex items-center justify-center"></div>
-                  </motion.div>
-
-                  <motion.span layout className="text-lg font-medium text-white">
-                    Index
-                  </motion.span>
-
-                  <motion.div layout animate={{ rotate: isOpen ? 180 : 0 }}>
-                    <CaretDown size={20} className="text-neutral-400 group-hover:text-white" />
-                  </motion.div>
-                </div>
-
+          <div ref={ref} className={cn("flex w-full flex-col items-center px-4", isOpen && "")}>
+            <button
+              type="button"
+              aria-label="Toggle scroll island menu"
+              className="group flex h-13 w-full cursor-pointer items-center justify-between gap-8 border-0 bg-transparent p-0 text-left select-none"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <div className="flex items-center gap-2">
                 <motion.div
                   layout
-                  className="flex items-center justify-center rounded-full bg-zinc-800 px-2.5 text-lg font-bold text-zinc-200 tabular-nums"
+                  className="relative h-7 w-7 shrink-0 rounded-full"
+                  style={{
+                    background: `conic-gradient(white ${scrollProgress}%, #333 0)`,
+                  }}
                 >
-                  {Math.round(scrollProgress)}%
+                  <div className="absolute inset-[2.5px] rounded-full bg-black" />
+                  <div className="absolute inset-0 flex items-center justify-center"></div>
+                </motion.div>
+
+                <motion.span layout className="text-lg font-medium text-white">
+                  Index
+                </motion.span>
+
+                <motion.div layout animate={{ rotate: isOpen ? 180 : 0 }}>
+                  <CaretDownIcon size={20} className="text-neutral-400 group-hover:text-white" />
                 </motion.div>
               </div>
 
-              <AnimatePresence mode="popLayout">
-                {isOpen && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="custom-scrollbar max-h-[60vh] w-full overflow-y-auto pt-2 pb-4"
-                  >
-                    <div className="mx-2 mb-2 h-px bg-white/5" />
-                    {topics.map((topic) => (
-                      <button
-                        key={topic.id}
-                        onClick={() => {
-                          document.getElementById(topic.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center",
-                          });
-                          handleTopicClick(topic.id);
-                        }}
-                        className="w-full truncate rounded-xl py-2 text-left text-sm text-zinc-400 hover:text-white"
-                      >
-                        {topic.title}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        </div>
+              <motion.div
+                layout
+                className="flex items-center justify-center rounded-full bg-zinc-800 px-2.5 text-lg font-bold text-zinc-200 tabular-nums"
+              >
+                {Math.round(scrollProgress)}%
+              </motion.div>
+            </button>
 
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-9998 bg-black/40 backdrop-blur-sm"
-              onClick={() => setIsOpen(false)}
-            />
-          )}
-        </AnimatePresence>
-      </MotionConfig>
-    </>
+            <AnimatePresence mode="popLayout">
+              {isOpen && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="custom-scrollbar max-h-[60vh] w-full overflow-y-auto pt-2 pb-4"
+                >
+                  <div className="mx-2 mb-2 h-px bg-white/5" />
+                  {topics.map((topic) => (
+                    <button
+                      key={topic.id}
+                      onClick={() => {
+                        document.getElementById(topic.id)?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                        handleTopicClick(topic.id);
+                      }}
+                      className="w-full truncate rounded-xl py-2 text-left text-sm text-zinc-400 hover:text-white"
+                    >
+                      {topic.title}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9998 bg-black/40 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   );
 
   return (

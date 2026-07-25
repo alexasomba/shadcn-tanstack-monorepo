@@ -131,15 +131,17 @@ export default function Pricing2({
                   {discountText}
                 </span>
               )}
-              <span
+              <button
+                type="button"
                 className={cn(
-                  "cursor-pointer text-sm font-medium transition-colors md:text-base",
+                  "cursor-pointer border-0 bg-transparent p-0 text-sm font-medium transition-colors md:text-base",
                   !isMonthly ? "text-foreground" : "text-muted-foreground",
                 )}
                 onClick={() => setIsMonthly(false)}
+                aria-label={`Select ${yearlyLabel}`}
               >
                 {yearlyLabel}
-              </span>
+              </button>
             </div>
 
             <Switch
@@ -149,15 +151,17 @@ export default function Pricing2({
               aria-label="Toggle pricing period"
             />
 
-            <span
+            <button
+              type="button"
               className={cn(
-                "cursor-pointer text-sm font-medium transition-colors md:text-base",
+                "cursor-pointer border-0 bg-transparent p-0 text-sm font-medium transition-colors md:text-base",
                 isMonthly ? "text-foreground" : "text-muted-foreground",
               )}
               onClick={() => setIsMonthly(true)}
+              aria-label={`Select ${monthlyLabel}`}
             >
               {monthlyLabel}
-            </span>
+            </button>
           </div>
         </div>
 

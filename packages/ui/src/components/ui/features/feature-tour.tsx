@@ -87,14 +87,21 @@ export const FeatureTour: React.FC<FeatureTourProps> = ({
 
   return (
     <div
-      className="flex items-center justify-center"
-      onClick={closeOnBackdrop ? onClose : undefined}
+      className="relative flex items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-label="Feature tour"
     >
+      {closeOnBackdrop && (
+        <button
+          type="button"
+          aria-label="Close tour backdrop"
+          className="fixed inset-0 cursor-default border-0 bg-transparent p-0"
+          onClick={onClose}
+        />
+      )}
       <motion.div
         ref={containerRef}
-        onClick={(e) => e.stopPropagation()}
         initial={{
           opacity: 0,
           scale: 0.96,

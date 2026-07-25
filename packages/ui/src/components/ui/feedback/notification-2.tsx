@@ -181,7 +181,7 @@ export default function Notification2({
                 size="sm"
                 className="gap-1 rounded-lg text-xs font-semibold text-primary hover:bg-primary/5"
               >
-                <RiCheckDoubleFill className="h-3.5 w-3.5" />
+                <RiCheckDoubleFill data-icon="inline-start" className="h-3.5 w-3.5" />
                 Mark all read
               </Button>
             </div>

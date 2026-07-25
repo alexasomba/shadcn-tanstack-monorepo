@@ -149,10 +149,11 @@ function LoginPage() {
               <FieldGroup>
                 {isSignUp ? (
                   <Field>
-                    <FieldLabel htmlFor="name">Name</FieldLabel>
+                    <FieldLabel htmlFor="name">Full name</FieldLabel>
                     <Input
                       id="name"
                       type="text"
+                      placeholder="Alex"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
@@ -166,10 +167,11 @@ function LoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
                     required
                     autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Field>
 
@@ -178,32 +180,22 @@ function LoginPage() {
                   <Input
                     id="password"
                     type="password"
+                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    autoComplete={isSignUp ? "new-password" : "current-password"}
                   />
                 </Field>
 
                 {isSignUp ? (
                   <Field>
-                    <FieldLabel htmlFor="referral">Referral code (optional)</FieldLabel>
+                    <FieldLabel htmlFor="referralCode">Referral code (optional)</FieldLabel>
                     <Input
-                      id="referral"
+                      id="referralCode"
                       type="text"
+                      placeholder="REF-123"
                       value={referralCode}
-                      onChange={(e) => setReferralCode(normalizeReferralCode(e.target.value))}
-                      maxLength={8}
-                      autoComplete="off"
-                      spellCheck={false}
-                      placeholder="ABCD1234"
-                      className="font-mono tracking-wider uppercase"
+                      onChange={(e) => setReferralCode(e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      8 characters. Share links like{" "}
-                      <span className="font-mono">/login?ref=CODE</span>.
-                    </p>
                   </Field>
                 ) : null}
               </FieldGroup>

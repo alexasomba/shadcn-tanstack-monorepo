@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { toast } from "@workspace/ui/components/toast";
 import React, { useState } from "react";
 import {
   IoPerson,
@@ -53,13 +54,24 @@ export default function ProjectInquirySection({
     message: "",
   });
 
+  const [isPending, setIsPending] = useState(false);
+
   const updateField = (field: keyof ConsultationFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(formData);
+    setIsPending(true);
+    try {
+      toast.promise(Promise.resolve(onSubmit(formData)), {
+        loading: "Submitting inquiry...",
+        success: "Inquiry submitted successfully!",
+        error: "Failed to submit inquiry",
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -232,10 +244,11 @@ export default function ProjectInquirySection({
 
               <Button
                 type="submit"
+                disabled={isPending}
                 size="lg"
                 className="gap-2 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),inset_0_-1px_0_0_rgba(0,0,0,0.2)]"
               >
-                Submit Inquiry
+                {isPending ? "Submitting..." : "Submit Inquiry"}
                 <IoArrowForward className="h-4 w-4" />
               </Button>
             </form>

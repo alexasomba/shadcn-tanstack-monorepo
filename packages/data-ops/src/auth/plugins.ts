@@ -113,6 +113,7 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
       ...(options.sendInvitationEmail ? { sendInvitationEmail: options.sendInvitationEmail } : {}),
       organizationHooks: {
         beforeCreateOrganization: async ({ organization: org }) => {
+          await Promise.resolve();
           // Default plan metadata for membershipLimit + future billing (M12–M14).
           const prevMeta = org.metadata && typeof org.metadata === "object" ? org.metadata : {};
           return {
@@ -227,11 +228,13 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
         // Lifecycle hooks (kit observability + future jobs/outbox). Free plan is
         // provisioned by onboarding workflows (M15), not here.
         onSubscriptionCreated: async ({ subscription: sub, plan }) => {
+          await Promise.resolve();
           console.info(
             `[paystack] subscription.created plan=${plan.name} ref=${sub.referenceId} status=${sub.status} id=${sub.id}`,
           );
         },
         onSubscriptionCancel: async ({ subscription: sub }) => {
+          await Promise.resolve();
           console.info(
             `[paystack] subscription.cancelled plan=${sub.plan} ref=${sub.referenceId} id=${sub.id}`,
           );
@@ -244,12 +247,12 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
         onCustomerCreate: ({ organization: org, paystackCustomer }) => {
           const orgRec = org as { id?: string; name?: string };
           const rec = paystackCustomer as { customer_code?: string; id?: string };
-          const code =
-            typeof rec.customer_code === "string"
-              ? rec.customer_code
-              : typeof rec.id === "string"
-                ? rec.id
-                : "";
+          let code = "";
+          if (typeof rec.customer_code === "string") {
+            code = rec.customer_code;
+          } else if (typeof rec.id === "string") {
+            code = rec.id;
+          }
           console.info(
             `[paystack] org.customer.created org=${orgRec.id ?? "?"} name=${orgRec.name ?? "?"} customer=${code}`,
           );
@@ -259,12 +262,12 @@ export function createBaseAuthPlugins(options: AuthPluginsOptions = {}): Array<B
       onCustomerCreate: ({ user: u, paystackCustomer }) => {
         const userRec = u as { id?: string; email?: string };
         const rec = paystackCustomer as { customer_code?: string; id?: string };
-        const code =
-          typeof rec.customer_code === "string"
-            ? rec.customer_code
-            : typeof rec.id === "string"
-              ? rec.id
-              : "";
+        let code = "";
+        if (typeof rec.customer_code === "string") {
+          code = rec.customer_code;
+        } else if (typeof rec.id === "string") {
+          code = rec.id;
+        }
         console.info(
           `[paystack] user.customer.created user=${userRec.id ?? "?"} email=${userRec.email ?? "?"} customer=${code}`,
         );

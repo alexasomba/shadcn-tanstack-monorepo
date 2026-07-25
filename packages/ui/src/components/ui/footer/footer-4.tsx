@@ -2,6 +2,8 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Separator } from "@workspace/ui/components/separator";
+import { toast } from "@workspace/ui/components/toast";
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 export interface Footer4Link {
@@ -69,6 +71,8 @@ export function Footer4({
   legalLinks = [],
   copyright,
 }: Footer4Props) {
+  const [isPending, setIsPending] = useState(false);
+
   return (
     <footer className="w-full bg-background">
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-0 md:px-12">
@@ -95,14 +99,14 @@ export function Footer4({
                 </Badge>
               )}
 
-              <h2 className="text-3xl leading-tight font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                {tagline}
-              </h2>
+              {tagline && (
+                <h2 className="text-3xl font-normal tracking-tight text-foreground sm:text-4xl">
+                  {tagline}
+                </h2>
+              )}
 
               {description && (
-                <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
+                <p className="max-w-md text-sm text-muted-foreground">{description}</p>
               )}
             </div>
           </div>
@@ -118,18 +122,33 @@ export function Footer4({
 
               <form
                 className="flex flex-col gap-2.5 sm:flex-row"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsPending(true);
+                  try {
+                    toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
+                      loading: "Subscribing...",
+                      success: "Subscribed to newsletter!",
+                      error: "Subscription failed",
+                    });
+                  } finally {
+                    setIsPending(false);
+                  }
+                }}
               >
                 <Input
                   type="email"
                   placeholder={newsletterPlaceholder}
+                  autoComplete="email"
+                  aria-label="Email address"
                   className="w-full rounded-md border-transparent bg-muted py-5 pr-32 pl-6 shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_1px_0_0px_rgba(255,255,255,0.5)] outline-none focus-visible:border-none focus-visible:ring-1 focus-visible:ring-primary dark:shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_1px_0_0px_rgba(255,255,255,0.1)]"
                 />
                 <Button
                   type="submit"
+                  disabled={isPending}
                   className="shrink-0 rounded-lg border-primary px-5 py-5 text-sm font-medium shadow-[0_0_0_0.5px_rgba(0,0,0,0.03),0_2px_4px_0_rgba(0,0,0,0.05),inset_0_1px_0_0px_rgba(255,255,255,0.5)] text-shadow-2xs"
                 >
-                  {newsletterButtonLabel}
+                  {isPending ? "Subscribing..." : newsletterButtonLabel}
                 </Button>
               </form>
 

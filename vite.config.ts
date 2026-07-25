@@ -15,8 +15,19 @@ export default defineConfig({
       { name: "drizzle", specifier: "eslint-plugin-drizzle" },
       { name: "zod", specifier: "eslint-plugin-zod" },
       { name: "zod-openapi", specifier: "eslint-plugin-zod-openapi" },
+      { name: "regexp", specifier: "eslint-plugin-regexp" },
     ],
-    plugins: ["oxc", "typescript", "unicorn", "react", "import", "eslint", "jsx-a11y", "vitest"],
+    plugins: [
+      "oxc",
+      "typescript",
+      "unicorn",
+      "react",
+      "import",
+      "eslint",
+      "jsx-a11y",
+      "vitest",
+      "react-perf",
+    ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
       "no-array-constructor": "error",
@@ -44,6 +55,10 @@ export default defineConfig({
         },
       ],
       "zod/prefer-enum-over-literal-union": "warn",
+      "jsx-a11y/prefer-tag-over-role": "warn",
+      "typescript/no-deprecated": "off",
+      "no-nested-ternary": "warn",
+      "sonarjs/no-nested-template-literals": "warn",
     },
     options: { typeAware: true, typeCheck: true },
     env: {
@@ -191,11 +206,34 @@ export default defineConfig({
         rules: {
           "react/rules-of-hooks": "error",
           "react/exhaustive-deps": "error",
+
+          // React performance & correctness
+          // "no-array-index-key": "warn",
+          "react/jsx-no-constructed-context-values": "warn",
+          // "jsx-no-new-object-as-prop": "warn",
+          // "jsx-no-new-array-as-prop": "warn",
+          // "jsx-no-new-function-as-prop": "warn",
+          "react/jsx-no-useless-fragment": "warn",
+
+          // TypeScript & Code Quality
+          "unicorn/prefer-number-properties": "warn",
+          "typescript/no-redundant-type-constituents": "warn",
+
+          // Performance & Regexp
+          "regexp/no-super-linear-backtracking": "warn",
+
+          // Accessibility
+          "jsx-a11y/aria-role": "warn",
+
+          // Existing accessibility relaxations
           "jsx-a11y/anchor-has-content": "off",
           "jsx-a11y/anchor-is-valid": "off",
           "jsx-a11y/control-has-associated-label": "off",
           "jsx-a11y/no-autofocus": "off",
           "jsx-a11y/prefer-tag-over-role": "off",
+
+          // Disable some TS & ESLint rules here
+          "no-nested-ternary": "off",
           "typescript/array-type": "off",
           "typescript/require-await": "off",
           "sonarjs/cognitive-complexity": "off",

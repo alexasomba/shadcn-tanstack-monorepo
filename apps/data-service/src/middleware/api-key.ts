@@ -52,12 +52,12 @@ function classifyError(error: unknown): {
       ? (error as Record<string, unknown>)
       : ({} as Record<string, unknown>);
   const message = typeof err.message === "string" ? err.message.toLowerCase() : "";
-  const code =
-    typeof err.code === "string"
-      ? err.code.toUpperCase()
-      : typeof err.status === "number" || typeof err.status === "string"
-        ? String(err.status).toUpperCase()
-        : "";
+  let code = "";
+  if (typeof err.code === "string") {
+    code = err.code.toUpperCase();
+  } else if (typeof err.status === "number" || typeof err.status === "string") {
+    code = String(err.status).toUpperCase();
+  }
 
   const isForbidden =
     code.includes("LIMIT") ||

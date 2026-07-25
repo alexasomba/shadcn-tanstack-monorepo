@@ -15,7 +15,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet";
 import { cn } from "@workspace/ui/lib/utils";
 
 export function Navigation1() {
@@ -109,21 +109,21 @@ export function Navigation1() {
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <Stack className="h-3.5 w-3.5" />
+                            <Stack data-icon="inline-start" className="h-3.5 w-3.5" />
                             Pipelines
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <GitBranch className="h-3.5 w-3.5" />
+                            <GitBranch data-icon="inline-start" className="h-3.5 w-3.5" />
                             Webhooks
                           </Button>
                           <Button
                             variant="outline"
                             className="h-7 gap-1.5 rounded-full px-3 text-xs text-neutral-700 dark:text-neutral-300"
                           >
-                            <TerminalWindow className="h-3.5 w-3.5" />
+                            <TerminalWindow data-icon="inline-start" className="h-3.5 w-3.5" />
                             CLI Tool
                           </Button>
                         </div>
@@ -274,6 +274,7 @@ export function Navigation1() {
               side="right"
               className="flex w-[300px] flex-col gap-6 border-l border-neutral-200 bg-white p-6 text-neutral-900 sm:w-[400px] dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50"
             >
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="mb-4 flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center text-orange-600 dark:text-orange-500">
                   <svg

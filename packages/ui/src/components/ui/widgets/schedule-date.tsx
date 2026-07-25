@@ -1,5 +1,5 @@
 "use client";
-import { CaretLeft, CaretRight, Check, CaretDown } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon, CheckIcon, CaretDownIcon } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
@@ -65,7 +65,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
               onClick={() => setViewDate(new Date(year, month - 1, 1))}
               className="p-1 text-neutral-400 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white"
             >
-              <CaretLeft size={18} strokeWidth={2.5} />
+              <CaretLeftIcon size={18} strokeWidth={2.5} />
             </button>
           ) : (
             <div className="w-7" />
@@ -79,7 +79,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
               onClick={() => setViewDate(new Date(year, month + 1, 1))}
               className="p-1 text-neutral-400 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white"
             >
-              <CaretRight size={18} strokeWidth={2.5} />
+              <CaretRightIcon size={18} strokeWidth={2.5} />
             </button>
           ) : (
             <div className="w-7" />
@@ -110,10 +110,12 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
               currentDayDate < range.end;
 
             return (
-              <div
+              <button
+                type="button"
                 key={day}
                 onClick={() => handleDateClick(currentDayDate)}
-                className="group relative flex h-8 cursor-pointer items-center justify-center"
+                aria-label={`Select date ${currentDayDate.toLocaleDateString()}`}
+                className="group relative flex h-8 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
               >
                 {(isInRange || isStart || isEnd) && (
                   <div
@@ -146,7 +148,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
                     {day}
                   </span>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
@@ -178,7 +180,7 @@ export const ScheduleDate: React.FC<ScheduleDateProps> = ({ onApply, onCancel })
                 <span>{preset.label}</span>
                 {selectedPreset === preset.id && preset.id === "custom" && (
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="ml-2">
-                    <Check size={12} />
+                    <CheckIcon size={12} />
                   </motion.div>
                 )}
               </button>
@@ -242,7 +244,7 @@ const DateInput = ({ label, date }: { label: string; date: Date | null }) => (
           ? date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
           : "Select Date"}
       </span>
-      <CaretDown size={14} className="text-neutral-400 dark:text-neutral-500" />
+      <CaretDownIcon size={14} className="text-neutral-400 dark:text-neutral-500" />
     </div>
   </div>
 );

@@ -126,12 +126,14 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
             if (when.type === "no-schedule") {
               return "Not a valid schedule input";
             }
-            const input =
-              when.type === "scheduled"
-                ? when.date
-                : when.type === "delayed"
-                  ? when.delayInSeconds
-                  : when.cron;
+            let input: string | number | undefined;
+            if (when.type === "scheduled") {
+              input = when.date;
+            } else if (when.type === "delayed") {
+              input = when.delayInSeconds;
+            } else {
+              input = when.cron;
+            }
             if (!input) return "Invalid schedule type";
 
             const scheduleResult = await Result.tryPromise(() =>

@@ -1,5 +1,5 @@
 "use client";
-import { CaretDown, Check } from "@phosphor-icons/react";
+import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { FC, ChangeEvent } from "react";
@@ -90,7 +90,7 @@ const Dropdown: FC<DropdownProps> = ({ selected, onSelect, currencies }) => {
         <span className="text-xs font-semibold text-gray-700 sm:text-sm dark:text-zinc-200">
           {selected.code}
         </span>
-        <CaretDown
+        <CaretDownIcon
           className={`h-4 w-4 text-gray-400 transition-transform sm:h-5 sm:w-5 ${
             isOpen ? "rotate-180" : ""
           }`}
@@ -127,7 +127,7 @@ const Dropdown: FC<DropdownProps> = ({ selected, onSelect, currencies }) => {
                 </div>
 
                 {currency.code === selected.code && (
-                  <Check className="h-3.5 w-3.5 text-gray-400 sm:h-4 sm:w-4 dark:text-zinc-500" />
+                  <CheckIcon className="h-3.5 w-3.5 text-gray-400 sm:h-4 sm:w-4 dark:text-zinc-500" />
                 )}
               </button>
             ))}
@@ -227,8 +227,8 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
   const [independentField, setIndependentField] = useState<"from" | "to">("from");
 
   const convert = useCallback((amount: string, from: Currency, to: Currency): string => {
-    const val = parseFloat(amount);
-    if (isNaN(val)) return "";
+    const val = Number.parseFloat(amount);
+    if (Number.isNaN(val)) return "";
     const usd = val / from.rate;
     return (usd * to.rate).toFixed(2);
   }, []);
@@ -239,7 +239,7 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
 
   const handleFromChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (val === "" || /^\d*\.?\d*$/.test(val)) {
+    if (val === "" || /^\d*(?:\.\d*)?$/.test(val)) {
       setAmount(val);
       setIndependentField("from");
     }
@@ -247,7 +247,7 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
 
   const handleToChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    if (val === "" || /^\d*\.?\d*$/.test(val)) {
+    if (val === "" || /^\d*(?:\.\d*)?$/.test(val)) {
       setAmount(val);
       setIndependentField("to");
     }
@@ -273,19 +273,18 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
             <AnimatedNumber value={fromAmount} />
             <input
               title="from"
+              aria-label="From amount"
               value={fromAmount}
               onChange={handleFromChange}
-              className="absolute inset-0 w-full bg-transparent text-xl font-semibold tracking-[0.08em] text-transparent caret-[#2F2F33] outline-none sm:text-[24px] dark:caret-zinc-100"
+              className="absolute inset-0 w-full bg-transparent text-xl font-semibold tracking-[0.08em] text-transparent caret-[#2F2F33] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:text-[24px] dark:caret-zinc-100"
             />
           </div>
 
           <Dropdown
             selected={fromCurrency}
             currencies={currencies}
-            onSelect={(c) => {
-              setAmount(fromAmount);
-              setIndependentField("from");
-              setFromCurrency(c);
+            onSelect={(curr) => {
+              setFromCurrency(curr);
             }}
           />
         </div>
@@ -296,9 +295,10 @@ export const SwapCurrencyCard: FC<SwapCurrencyCardProps> = ({
             <AnimatedNumber value={toAmount} />
             <input
               title="to"
+              aria-label="To amount"
               value={toAmount}
               onChange={handleToChange}
-              className="absolute inset-0 w-full bg-transparent text-xl font-semibold tracking-[0.08em] text-transparent caret-[#2F2F33] outline-none sm:text-[24px] dark:caret-zinc-100"
+              className="absolute inset-0 w-full bg-transparent text-xl font-semibold tracking-[0.08em] text-transparent caret-[#2F2F33] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:text-[24px] dark:caret-zinc-100"
             />
           </div>
 

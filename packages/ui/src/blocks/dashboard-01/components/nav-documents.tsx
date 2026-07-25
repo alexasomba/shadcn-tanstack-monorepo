@@ -21,52 +21,58 @@ import {
 export function NavDocuments({
   items,
 }: {
-  items: {
+  items: Array<{
     name: string;
     url: string;
     icon: React.ReactNode;
-  }[];
+  }>;
 }) {
   const { isMobile } = useSidebar();
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Documents</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton render={<a href={item.url} />}>
-              {item.icon}
-              <span>{item.name}</span>
-            </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={<SidebarMenuAction showOnHover className="aria-expanded:bg-muted" />}
-              >
-                <DotsThreeOutlineIcon />
-                <span className="sr-only">More</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-24"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <FolderIcon />
-                  <span>Open</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ShareIcon />
-                  <span>Share</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
-                  <TrashIcon />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {items.length === 0 ? (
+          <SidebarMenuItem className="px-2 py-1.5 text-xs text-muted-foreground">
+            <span>No documents found</span>
           </SidebarMenuItem>
-        ))}
+        ) : (
+          items.map((item) => (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton render={<a href={item.url} aria-label={item.name} />}>
+                {item.icon}
+                <span>{item.name}</span>
+              </SidebarMenuButton>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={<SidebarMenuAction showOnHover className="aria-expanded:bg-muted" />}
+                >
+                  <DotsThreeOutlineIcon />
+                  <span className="sr-only">More</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-24"
+                  side={isMobile ? "bottom" : "right"}
+                  align={isMobile ? "end" : "start"}
+                >
+                  <DropdownMenuItem>
+                    <FolderIcon />
+                    <span>Open</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <ShareIcon />
+                    <span>Share</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive">
+                    <TrashIcon />
+                    <span>Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          ))
+        )}
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <DotsThreeOutlineIcon className="text-sidebar-foreground/70" />

@@ -86,7 +86,7 @@ export function ApiKeysSettingsPanel() {
     } finally {
       setLoading(false);
     }
-  }, [scope, org?.id]);
+  }, [scope, org]);
 
   useEffect(() => {
     void refresh();

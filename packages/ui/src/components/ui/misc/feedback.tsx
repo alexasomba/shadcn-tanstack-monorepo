@@ -134,6 +134,7 @@ export const FeedbackComponent: React.FC<FeedbackComponentProps> = ({ onSubmit }
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Type in your feedback (optional)"
+                      aria-label="Feedback comments"
                       className="h-32 w-full resize-none rounded-2xl border border-neutral-200 bg-neutral-100 p-4 text-neutral-800 transition-all outline-none focus:ring-2 focus:ring-black dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:focus:ring-white"
                     />
                   </motion.div>

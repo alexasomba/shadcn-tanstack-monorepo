@@ -40,17 +40,15 @@ export function NavMainVertical({
         <SidebarGroup key={item.title}>
           <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
           <SidebarMenu>
-            {item.items?.length ? (
-              <>
-                {item.items?.map((subItem) => (
+            {item.items?.length
+              ? item.items.map((subItem) => (
                   <SidebarMenuItem key={subItem.title}>
                     <SidebarMenuButton render={<a href={subItem.url} />}>
                       <span>{subItem.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
-              </>
-            ) : null}
+                ))
+              : null}
           </SidebarMenu>
         </SidebarGroup>
       ))}

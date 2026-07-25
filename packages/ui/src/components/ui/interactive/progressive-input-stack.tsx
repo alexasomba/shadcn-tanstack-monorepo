@@ -98,7 +98,8 @@ export const ProgressiveInputStack: React.FC<ProgressiveInputStackProps> = ({
                     value={formData[step.id] as string}
                     onChange={(e) => updateField(step.id, e.target.value)}
                     placeholder={step.placeholder}
-                    className="w-full bg-transparent text-lg font-semibold text-[#242426] outline-none placeholder:text-[#85858B]/70 dark:text-zinc-200 dark:placeholder:text-zinc-500"
+                    aria-label={step.placeholder || step.id}
+                    className="w-full bg-transparent text-lg font-semibold text-[#242426] placeholder:text-[#85858B]/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:text-zinc-200 dark:placeholder:text-zinc-500"
                   />
                 )}
 
@@ -110,6 +111,7 @@ export const ProgressiveInputStack: React.FC<ProgressiveInputStackProps> = ({
 
                     <button
                       onClick={() => updateField(step.id, !formData[step.id])}
+                      aria-label={step.label || step.id}
                       className={cn(
                         "relative flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors",
                         formData[step.id]

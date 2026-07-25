@@ -53,7 +53,7 @@ export const ContinuousTabs: FC<ContinuousTabsProps> = ({
             <button
               key={tab.id}
               onClick={() => handleChange(tab.id)}
-              className="relative rounded-full px-4 py-2 outline-none sm:px-6 sm:py-3"
+              className="relative rounded-full px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:px-6 sm:py-3"
             >
               {/* Active pill */}
               {isActive && (

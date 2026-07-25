@@ -126,13 +126,19 @@ const Table14 = () => {
                 <TableCell className="font-medium">{item.budget}</TableCell>
 
                 <TableCell className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Edit item"
+                    className="rounded-full"
+                  >
                     <HiPencil className="h-4 w-4" />
                   </Button>
 
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Delete item"
                     className="rounded-full transition-colors duration-200 hover:text-destructive"
                   >
                     <HiTrash className="h-4 w-4" />

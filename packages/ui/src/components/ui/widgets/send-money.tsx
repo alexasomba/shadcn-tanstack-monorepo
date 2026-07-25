@@ -1,5 +1,5 @@
 "use client";
-import { Buildings, CreditCard, Wallet, X } from "@phosphor-icons/react";
+import { BuildingsIcon, CreditCardIcon, WalletIcon, XIcon } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState } from "react";
 import { MdOutlineAddCard } from "react-icons/md";
@@ -69,9 +69,10 @@ const Header = ({
 
     <button
       onClick={onClose}
+      aria-label="Close"
       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
     >
-      <X size={20} strokeWidth={3} />
+      <XIcon size={20} strokeWidth={3} />
     </button>
   </div>
 );
@@ -90,6 +91,7 @@ const InputField = ({
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      aria-label={label}
       className="h-12 w-full rounded-xl border border-neutral-300 bg-white px-4 transition focus:border-neutral-900 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:focus:border-neutral-500"
     />
   </div>
@@ -108,7 +110,7 @@ const BankTransferView = ({
 
   return (
     <motion.div layout>
-      <Header title="Bank Transfer" icon={Buildings} onClose={onClose} id="bank" />
+      <Header title="Bank Transfer" icon={BuildingsIcon} onClose={onClose} id="bank" />
       <motion.div
         initial={{ opacity: 0, filter: "blur(4px)", y: 20 }}
         animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
@@ -155,7 +157,7 @@ const CardView = ({
 
   return (
     <motion.div>
-      <Header title="Debit/Credit Card" icon={CreditCard} onClose={onClose} id="card" />
+      <Header title="Debit/Credit Card" icon={CreditCardIcon} onClose={onClose} id="card" />
 
       <motion.div
         initial={{ opacity: 0, filter: "blur(4px)", y: 20 }}
@@ -228,7 +230,7 @@ const WalletView = ({
 
   return (
     <motion.div>
-      <Header title="Wallet" icon={Wallet} onClose={onClose} id="wallet" />
+      <Header title="Wallet" icon={WalletIcon} onClose={onClose} id="wallet" />
 
       <motion.div
         initial={{ opacity: 0, filter: "blur(4px)", y: 20 }}
@@ -288,19 +290,19 @@ export const SendMoney: React.FC<SendMoneyProps> = ({
                     id: "bank",
                     title: "Bank Transfer",
                     sub: "Transfer to bank account",
-                    icon: Buildings,
+                    icon: BuildingsIcon,
                   },
                   {
                     id: "card",
                     title: "Debit/Credit Card",
                     sub: "Send money from your card",
-                    icon: CreditCard,
+                    icon: CreditCardIcon,
                   },
                   {
                     id: "wallet",
                     title: "Wallet",
                     sub: "Transfer from your wallet",
-                    icon: Wallet,
+                    icon: WalletIcon,
                   },
                 ].map((opt) => (
                   <button

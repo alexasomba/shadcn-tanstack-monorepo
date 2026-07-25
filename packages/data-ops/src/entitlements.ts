@@ -47,12 +47,17 @@ function baseFromCatalog(planName: string): PlanEntitlements {
     KIT_PAYSTACK_PLANS.find((p) => p.name === "free");
   const name = catalog?.name ?? "free";
   const isPaid = name !== "free" && (catalog?.amount ?? 0) > 0;
+  let apiKeys = 5;
+  if (isPaid) {
+    apiKeys = name.startsWith("business") ? 50 : 20;
+  }
+
   return {
     plan: name,
     displayName: catalog?.displayName ?? "Essential",
     seats: catalog?.limits?.seats ?? 5,
     teams: catalog?.limits?.teams ?? 1,
-    apiKeys: isPaid ? (name.startsWith("business") ? 50 : 20) : 5,
+    apiKeys,
     features: isPaid ? { ...PAID_FEATURES } : { ...FREE_FEATURES },
     isPaid,
   };

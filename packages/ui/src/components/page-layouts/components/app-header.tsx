@@ -24,11 +24,11 @@ export function AppHeader() {
       </div>
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
-          <Button size="icon-sm" variant="ghost">
-            <Envelope className="size-4" />
+          <Button size="icon-sm" variant="ghost" aria-label="Messages">
+            <Envelope data-icon="inline-start" className="size-4" />
           </Button>
-          <Button size="icon-sm" variant="ghost" className="relative">
-            <Bell className="size-4" />
+          <Button size="icon-sm" variant="ghost" className="relative" aria-label="Notifications">
+            <Bell data-icon="inline-start" className="size-4" />
             <Badge className="absolute -top-2 left-full min-w-5 -translate-x-1/2 px-1 text-[10px]">
               5
             </Badge>

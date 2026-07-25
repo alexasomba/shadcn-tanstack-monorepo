@@ -1,6 +1,7 @@
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import React from "react";
+import { toast } from "@workspace/ui/components/toast";
+import React, { useState } from "react";
 
 export interface Newsletter1Props {
   heading: string;
@@ -19,6 +20,24 @@ export default function Newsletter1({
   disclaimer,
   onSubmit,
 }: Newsletter1Props) {
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    try {
+      if (onSubmit) {
+        toast.promise(Promise.resolve(onSubmit(e)), {
+          loading: "Subscribing...",
+          success: "Subscribed successfully!",
+          error: "Failed to subscribe",
+        });
+      }
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return (
     <div className="relative mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem] bg-primary px-6 py-16 text-center text-primary-foreground shadow-xl sm:rounded-[2.5rem] md:px-12 md:py-24 lg:py-28">
       <div className="pointer-events-none absolute top-0 left-0 opacity-20">
@@ -43,20 +62,23 @@ export default function Newsletter1({
         )}
 
         <form
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
           className="mx-auto mt-8 mb-6 flex w-full flex-col items-center gap-3 shadow-lg sm:mt-10 sm:max-w-xl sm:flex-row sm:gap-0 sm:rounded-full sm:bg-background sm:p-2"
         >
           <Input
             type="email"
             placeholder={placeholder}
+            autoComplete="email"
+            aria-label={placeholder || "Email address"}
             className="h-14 w-full rounded-full border-none bg-background px-6 text-base text-foreground shadow-sm ring-0 placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 sm:flex-1 sm:rounded-none sm:rounded-l-full sm:bg-transparent sm:shadow-none"
             required
           />
           <Button
             type="submit"
+            disabled={isPending}
             className="h-14 w-full shrink-0 rounded-full px-8 text-base font-semibold shadow-sm transition-transform hover:scale-[1.02] sm:w-auto sm:shadow-none"
           >
-            {buttonText}
+            {isPending ? "Subscribing..." : buttonText}
           </Button>
         </form>
 

@@ -36,7 +36,10 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} defaultOpen={item.isActive} render={<SidebarMenuItem />}>
-            <SidebarMenuButton tooltip={item.title} render={<a href={item.url} />}>
+            <SidebarMenuButton
+              tooltip={item.title}
+              render={<a href={item.url} aria-label={item.title} />}
+            >
               {item.icon}
               <span>{item.title}</span>
             </SidebarMenuButton>
@@ -52,7 +55,9 @@ export function NavMain({
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton render={<a href={subItem.url} />}>
+                        <SidebarMenuSubButton
+                          render={<a href={subItem.url} aria-label={subItem.title} />}
+                        >
                           <span>{subItem.title}</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>

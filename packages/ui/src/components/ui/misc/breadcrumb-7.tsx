@@ -53,7 +53,7 @@ const Breadcrumb7 = () => {
         </BreadcrumbSeparator>
         <BreadcrumbItem className="flex items-center">
           <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-sm px-1 py-0.5 text-muted-foreground outline-none hover:text-foreground">
+            <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-sm px-1 py-0.5 text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
               {open ? <FolderOpen className="size-3.5" /> : <Folder className="size-3.5" />}
               <span className="sr-only">{open ? "Open section menu" : "Open section menu"}</span>
             </DropdownMenuTrigger>

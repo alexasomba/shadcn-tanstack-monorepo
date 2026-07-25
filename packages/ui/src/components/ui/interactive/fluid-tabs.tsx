@@ -45,7 +45,7 @@ export const FluidTabs: FC<FluidTabsProps> = ({
           <button
             key={tab.id}
             onClick={() => handleChange(tab.id)}
-            className="group relative rounded-full px-3 py-2.5 outline-none sm:px-4 sm:py-3.5"
+            className="group relative rounded-full px-3 py-2.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:px-4 sm:py-3.5"
           >
             {isActive && (
               <motion.div

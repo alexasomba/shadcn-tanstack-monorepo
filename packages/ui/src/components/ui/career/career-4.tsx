@@ -251,9 +251,10 @@ export default function Career4({
           <input
             type="text"
             placeholder="Search roles"
+            aria-label="Search roles"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-muted-foreground"
+            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           />
         </div>
       </div>

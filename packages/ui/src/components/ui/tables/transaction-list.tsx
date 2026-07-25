@@ -80,7 +80,12 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
 
 function TransactionItem({ data, onClick }: { data: Transaction; onClick: () => void }) {
   return (
-    <div className="flex w-64 cursor-pointer gap-2" onClick={onClick}>
+    <button
+      type="button"
+      aria-label={`View transaction ${data.name}`}
+      className="flex w-64 cursor-pointer gap-2 border-0 bg-transparent p-0 text-left"
+      onClick={onClick}
+    >
       <motion.div
         className="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-800"
         layoutId={`icon-${data.id}`}
@@ -107,7 +112,7 @@ function TransactionItem({ data, onClick }: { data: Transaction; onClick: () => 
       >
         {data.amount}
       </motion.p>
-    </div>
+    </button>
   );
 }
 
@@ -122,12 +127,14 @@ function TransactionItemExpanded({ data, onClose }: { data: Transaction; onClose
           {data.icon}
         </motion.div>
 
-        <div
+        <button
+          type="button"
+          aria-label="Close transaction details"
           className="flex cursor-pointer items-center justify-center self-start rounded-full bg-zinc-300 p-2 dark:bg-zinc-700"
           onClick={onClose}
         >
           <X className="size-4" />
-        </div>
+        </button>
       </div>
 
       <div className="flex justify-between">

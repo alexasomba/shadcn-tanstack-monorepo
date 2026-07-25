@@ -23,6 +23,7 @@ export function ButtonLink({
 }: ButtonLinkProps) {
   return (
     <Button
+      nativeButton={false}
       variant={variant}
       size={size}
       className={className}

@@ -1,4 +1,4 @@
-import { Minus, Plus, X, CaretUp, CaretDown } from "@phosphor-icons/react";
+import { MinusIcon, PlusIcon, XIcon, CaretUpIcon, CaretDownIcon } from "@phosphor-icons/react";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import React, { useState } from "react";
 import { BiSolidPencil } from "react-icons/bi";
@@ -241,8 +241,8 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                       <AnimatedWord word={reminder.type} />
                     </div>
                     <div className="flex flex-col -space-y-1 text-neutral-400">
-                      <CaretUp size={14} strokeWidth={3} />
-                      <CaretDown size={14} strokeWidth={3} />
+                      <CaretUpIcon size={14} strokeWidth={3} />
+                      <CaretDownIcon size={14} strokeWidth={3} />
                     </div>
                   </motion.div>
 
@@ -257,9 +257,10 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                             value: Math.max(1, reminder.value - 1),
                           })
                         }
+                        aria-label="Decrease value"
                         className={softBtn}
                       >
-                        <Minus size={16} />
+                        <MinusIcon size={16} />
                       </button>
 
                       <NumberRoller value={reminder.value} />
@@ -270,9 +271,10 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                             value: reminder.value + 1,
                           })
                         }
+                        aria-label="Increase value"
                         className={softBtn}
                       >
-                        <Plus size={16} />
+                        <PlusIcon size={16} />
                       </button>
                     </div>
 
@@ -283,16 +285,17 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
                     >
                       <AnimatedWord word={reminder.unit} />
                       <div className="flex flex-col -space-y-1 text-neutral-400">
-                        <CaretUp size={14} strokeWidth={3} />
-                        <CaretDown size={14} strokeWidth={3} />
+                        <CaretUpIcon size={14} strokeWidth={3} />
+                        <CaretDownIcon size={14} strokeWidth={3} />
                       </div>
                     </motion.div>
 
                     <button
                       onClick={() => removeReminder(reminder.id)}
+                      aria-label="Remove reminder"
                       className="shrink-0 rounded-full border border-neutral-200 p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-red-500 sm:p-3 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
                     >
-                      <X size={18} strokeWidth={2.5} />
+                      <XIcon size={18} strokeWidth={2.5} />
                     </button>
                   </div>
                 </motion.div>
@@ -306,7 +309,7 @@ export const EventReminders: React.FC<EventRemindersProps> = ({
           onClick={addReminder}
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-neutral-100 py-3 font-semibold text-neutral-800 transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
-          <Plus size={18} strokeWidth={2.5} />
+          <PlusIcon size={18} strokeWidth={2.5} />
           Add Reminder
         </motion.button>
       </motion.div>

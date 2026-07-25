@@ -1218,12 +1218,11 @@ function processStoredContacts(
       phone: storedContact.phone || party?.phone || null,
       companyId: storedContact.companyId || null,
       companyName: storedContact.companyRecord?.name || storedContact.company || null,
-      lifecycle:
-        orderCount > 0
-          ? deriveLifecycle(orderCount, totalSpend)
-          : storedContact.status === "customer"
-            ? "Customer"
-            : "Lead",
+      lifecycle: (() => {
+        if (orderCount > 0) return deriveLifecycle(orderCount, totalSpend);
+        if (storedContact.status === "customer") return "Customer";
+        return "Lead";
+      })(),
       marketingStatus: storedContact.marketingStatus || "subscribed",
       orderCount,
       totalSpend,
@@ -2781,18 +2780,23 @@ async function buildCrmRecordTimeline(
     ),
   ];
 
-  const contactId =
-    objectKey === "contacts"
-      ? record.id
-      : typeof record.contactId === "string"
-        ? record.contactId
-        : record.contact?.id;
-  const customerId =
-    objectKey === "customers"
-      ? record.id
-      : typeof record.customerId === "string"
-        ? record.customerId
-        : record.customer?.id || null;
+  let contactId: string | null | undefined;
+  if (objectKey === "contacts") {
+    contactId = record.id;
+  } else if (typeof record.contactId === "string") {
+    contactId = record.contactId;
+  } else {
+    contactId = record.contact?.id;
+  }
+
+  let customerId: string | null | undefined;
+  if (objectKey === "customers") {
+    customerId = record.id;
+  } else if (typeof record.customerId === "string") {
+    customerId = record.customerId;
+  } else {
+    customerId = record.customer?.id || null;
+  }
 
   if (contactId) {
     const [notes, deals, tickets] = await Promise.all([

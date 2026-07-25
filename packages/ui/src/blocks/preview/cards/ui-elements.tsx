@@ -108,7 +108,7 @@ export function UIElements() {
             </InputGroup>
           </Field>
           <Field className="flex-1">
-            <Textarea placeholder="Message" className="resize-none" />
+            <Textarea placeholder="Message" className="resize-none" aria-label="Message" />
           </Field>
         </FieldGroup>
         <div className="flex items-center gap-2">
@@ -117,13 +117,17 @@ export function UIElements() {
             <Badge variant="secondary">Secondary</Badge>
             <Badge variant="outline">Outline</Badge>
           </div>
-          <RadioGroup defaultValue="apple" className="ml-auto flex w-fit gap-3">
-            <RadioGroupItem value="apple" />
-            <RadioGroupItem value="banana" />
+          <RadioGroup
+            defaultValue="apple"
+            className="ml-auto flex w-fit gap-3"
+            aria-label="Fruit selection"
+          >
+            <RadioGroupItem value="apple" aria-label="Apple" />
+            <RadioGroupItem value="banana" aria-label="Banana" />
           </RadioGroup>
           <div className="flex gap-3">
-            <Checkbox defaultChecked />
-            <Checkbox />
+            <Checkbox defaultChecked aria-label="Option 1" />
+            <Checkbox aria-label="Option 2" />
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -181,7 +185,7 @@ export function UIElements() {
               </DropdownMenuContent>
             </DropdownMenu>
           </ButtonGroup>
-          <Switch defaultChecked className="ml-auto" />
+          <Switch defaultChecked className="ml-auto" aria-label="Toggle setting" />
         </div>
       </CardContent>
     </Card>

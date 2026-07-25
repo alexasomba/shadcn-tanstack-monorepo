@@ -18,8 +18,16 @@ export function SidebarOptInForm() {
       <CardContent className="px-4">
         <form>
           <div className="grid gap-2.5">
-            <SidebarInput type="email" placeholder="Email" />
-            <Button className="w-full bg-sidebar-primary text-sidebar-primary-foreground shadow-none">
+            <SidebarInput
+              type="email"
+              placeholder="Email"
+              autoComplete="email"
+              aria-label="Email address"
+            />
+            <Button
+              type="submit"
+              className="w-full bg-sidebar-primary text-sidebar-primary-foreground shadow-none"
+            >
               Subscribe
             </Button>
           </div>

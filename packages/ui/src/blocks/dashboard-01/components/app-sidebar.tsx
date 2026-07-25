@@ -26,6 +26,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
 import * as React from "react";
 
@@ -149,17 +150,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
-            >
-              <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">Acme Inc.</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className="flex items-center justify-between">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="data-[slot=sidebar-menu-button]:p-1.5!"
+                render={<a href="#" aria-label="Acme Inc. Home" />}
+              >
+                <CommandIcon className="size-5!" />
+                <span className="text-base font-semibold">Acme Inc.</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarTrigger className="md:hidden" />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

@@ -205,11 +205,11 @@ export function Web3Dashboard({
           </div>
           <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="outline">
-              <Wallet className="size-4" />
+              <Wallet data-icon="inline-start" className="size-4" />
               Connect RPC
             </Button>
             <Button size="sm">
-              <Pulse className="size-4" />
+              <Pulse data-icon="inline-start" className="size-4" />
               Run health check
             </Button>
           </div>

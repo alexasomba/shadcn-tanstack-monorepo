@@ -118,6 +118,7 @@ export const AdaptiveSlider: FC<AdaptiveSliderProps> = ({
 
         <input
           title="range"
+          aria-label="Calorie range slider"
           type="range"
           min={min}
           max={max}

@@ -190,6 +190,7 @@ export const PredictiveText: React.FC<PredictiveInputProps> = ({
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
+            aria-label={placeholder || "Predictive text input"}
             className="w-full rounded-4xl border-none bg-neutral-100 px-5 py-3.5 pr-20 text-sm font-bold tracking-wide text-black shadow-sm transition-all outline-none placeholder:text-neutral-400 focus:ring-1 focus:ring-neutral-200 sm:rounded-[22px] sm:px-6 sm:py-4 sm:pr-24 sm:text-base dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-600 dark:focus:ring-neutral-800"
           />
 
@@ -198,6 +199,7 @@ export const PredictiveText: React.FC<PredictiveInputProps> = ({
               {text.length > 0 ? (
                 <motion.button
                   key="send-btn"
+                  aria-label="Submit message"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
@@ -216,6 +218,8 @@ export const PredictiveText: React.FC<PredictiveInputProps> = ({
                 >
                   <Image
                     size={20}
+                    alt="Upload image"
+                    aria-label="Upload image"
                     className="cursor-pointer transition-colors hover:text-neutral-600 dark:hover:text-neutral-400"
                   />
                   <Microphone

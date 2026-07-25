@@ -54,9 +54,11 @@ export const ShowQr = ({ value, buttonLabel = "Show QR Code", onCopy }: ShowQrPr
           <div ref={ref} className="">
             <AnimatePresence mode="popLayout" initial={false}>
               {!isExpanded ? (
-                <motion.div
+                <motion.button
                   key="collapsed"
-                  className="flex cursor-pointer items-center justify-center gap-1 px-4 py-3 font-medium text-neutral-900 dark:text-white"
+                  type="button"
+                  aria-label="Show QR code"
+                  className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 font-medium text-neutral-900 shadow-sm transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-neutral-950 dark:text-white dark:hover:bg-neutral-900"
                   onClick={() => setIsExpanded(true)}
                   initial={{ opacity: 0, filter: "blur(4px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -64,7 +66,7 @@ export const ShowQr = ({ value, buttonLabel = "Show QR Code", onCopy }: ShowQrPr
                 >
                   <IoQrCodeOutline className="size-6" />
                   <span>{buttonLabel}</span>
-                </motion.div>
+                </motion.button>
               ) : (
                 <motion.div
                   key="expanded"
@@ -95,8 +97,10 @@ export const ShowQr = ({ value, buttonLabel = "Show QR Code", onCopy }: ShowQrPr
                   </motion.div>
 
                   <div className="flex w-full items-center gap-2">
-                    <motion.div
-                      className="flex flex-1 cursor-pointer items-center justify-center gap-1 rounded-full border border-gray-200 bg-white p-2 text-lg font-medium dark:border-white/10 dark:bg-neutral-950"
+                    <motion.button
+                      type="button"
+                      aria-label="Copy link"
+                      className="flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-200 dark:hover:bg-neutral-900"
                       onClick={() => {
                         navigator.clipboard.writeText(value);
                         setIsCopied(true);
@@ -109,9 +113,11 @@ export const ShowQr = ({ value, buttonLabel = "Show QR Code", onCopy }: ShowQrPr
                       </motion.div>
                       <AnimatedText from="Copy" to="Copied" isCopied={isCopied} />
                       <motion.span layout>Link</motion.span>
-                    </motion.div>
+                    </motion.button>
 
-                    <div
+                    <button
+                      type="button"
+                      aria-label="Close QR code"
                       className="flex cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white p-2 dark:border-white/10 dark:bg-neutral-950"
                       onClick={() => {
                         setIsExpanded(false);
@@ -119,7 +125,7 @@ export const ShowQr = ({ value, buttonLabel = "Show QR Code", onCopy }: ShowQrPr
                       }}
                     >
                       <X />
-                    </div>
+                    </button>
                   </div>
                 </motion.div>
               )}

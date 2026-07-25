@@ -19,22 +19,42 @@ import {
   FieldLegend,
   FieldSet,
 } from "@workspace/ui/components/field";
+import { toast } from "@workspace/ui/components/toast";
+import * as React from "react";
 
 export function ContributionsActivity() {
+  const [isPending, setIsPending] = React.useState(false);
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Contributions & Activity</CardTitle>
-        <CardDescription>Manage your contributions and activity visibility.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form id="contributions-activity">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setIsPending(true);
+          toast
+            .promise(new Promise((resolve) => setTimeout(resolve, 800)), {
+              loading: "Saving activity preferences...",
+              success: "Preferences saved",
+              error: "Failed to save preferences",
+            })
+            .finally(() => setIsPending(false));
+        }}
+      >
+        <CardHeader>
+          <CardTitle>Contributions & Activity</CardTitle>
+          <CardDescription>Manage your contributions and activity visibility.</CardDescription>
+        </CardHeader>
+        <CardContent>
           <FieldGroup>
             <FieldSet>
               <FieldLegend className="sr-only">Contributions & activity</FieldLegend>
               <FieldGroup>
                 <Field orientation="horizontal">
-                  <Checkbox id="activity-private-profile" />
+                  <Checkbox
+                    id="activity-private-profile"
+                    name="private_profile"
+                    disabled={isPending}
+                  />
                   <FieldContent>
                     <FieldLabel htmlFor="activity-private-profile">
                       Make profile private and hide activity
@@ -49,13 +69,13 @@ export function ContributionsActivity() {
               </FieldGroup>
             </FieldSet>
           </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <Button form="contributions-activity" className="style-sera:w-full">
-          Save Changes
-        </Button>
-      </CardFooter>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" disabled={isPending} className="style-sera:w-full">
+            {isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

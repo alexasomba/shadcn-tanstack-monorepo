@@ -26,19 +26,16 @@ const collapsedConfig: Transition = {
   mass: 1,
 };
 
-export const SplitToEdit: FC<SplitToEditProps> = ({
-  initialHours = 2,
-  initialMinutes = 30,
-  onSave,
-}) => {
+function useSplitToEditState(
+  initialHours: number,
+  initialMinutes: number,
+  onSave?: (hours: number, minutes: number) => void,
+) {
   const [isExpanded, setIsExpanded] = useState(false);
-
   const [hours, setHours] = useState<number>(initialHours);
   const [minutes, setMinutes] = useState<number>(initialMinutes);
-
   const [tempHours, setTempHours] = useState<string>(String(initialHours));
   const [tempMinutes, setTempMinutes] = useState<string>(String(initialMinutes));
-
   const hoursInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,8 +62,8 @@ export const SplitToEdit: FC<SplitToEditProps> = ({
   };
 
   const handleSave = () => {
-    const h = Math.max(0, parseInt(tempHours) || 0);
-    const m = Math.min(59, Math.max(0, parseInt(tempMinutes) || 0));
+    const h = Math.max(0, Number.parseInt(tempHours) || 0);
+    const m = Math.min(59, Math.max(0, Number.parseInt(tempMinutes) || 0));
 
     setHours(h);
     setMinutes(m);
@@ -83,6 +80,37 @@ export const SplitToEdit: FC<SplitToEditProps> = ({
     if (e.key === "Enter") handleSave();
     if (e.key === "Escape") setIsExpanded(false);
   };
+
+  return {
+    isExpanded,
+    setIsExpanded,
+    tempHours,
+    setTempHours,
+    tempMinutes,
+    setTempMinutes,
+    hoursInputRef,
+    handleEdit,
+    handleSave,
+    handleKeyPress,
+  };
+}
+
+export const SplitToEdit: FC<SplitToEditProps> = ({
+  initialHours = 2,
+  initialMinutes = 30,
+  onSave,
+}) => {
+  const {
+    isExpanded,
+    tempHours,
+    setTempHours,
+    tempMinutes,
+    setTempMinutes,
+    hoursInputRef,
+    handleEdit,
+    handleSave,
+    handleKeyPress,
+  } = useSplitToEditState(initialHours, initialMinutes, onSave);
 
   return (
     <MotionConfig transition={isExpanded ? layoutConfig : collapsedConfig}>

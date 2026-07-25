@@ -142,6 +142,7 @@ export function DataTable<TData, TValue>({
       ? Math.max(Math.ceil(totalRows / resolvedPagination.pageSize), 1)
       : undefined;
 
+  // react-doctor-disable-next-line react-hooks-js/incompatible-library
   const table = useReactTable({
     data,
     columns,

@@ -98,14 +98,22 @@ export const CommandSearch: FC<Props> = ({ items = DEFAULT_ITEMS }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const active = document.activeElement as HTMLElement | null;
+      const isInput = (el: HTMLElement | null) =>
+        el &&
+        (el.tagName === "INPUT" ||
+          el.tagName === "TEXTAREA" ||
+          el.tagName === "SELECT" ||
+          el.isContentEditable ||
+          Boolean(el.closest?.("input, textarea, select, [contenteditable='true']")));
+
       if (
-        e.key.toLowerCase() === "f" &&
-        !isOpen &&
-        document.activeElement?.tagName !== "INPUT" &&
-        document.activeElement?.tagName !== "TEXTAREA"
+        (e.key.toLowerCase() === "k" || e.key.toLowerCase() === "f") &&
+        (e.metaKey || e.ctrlKey)
       ) {
         e.preventDefault();
-        setIsOpen(true);
+        setIsOpen((prev) => !prev);
       }
       if (e.key === "Escape" && isOpen) {
         e.preventDefault();
@@ -223,7 +231,9 @@ export const CommandSearch: FC<Props> = ({ items = DEFAULT_ITEMS }) => {
                   <input
                     ref={inputRef}
                     type="text"
-                    className="w-full bg-transparent text-base font-medium text-zinc-900 outline-none md:text-[15px] dark:text-white"
+                    aria-label="Search commands"
+                    placeholder="Search commands"
+                    className="w-full bg-transparent text-base font-medium text-zinc-900 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:text-[15px] dark:text-white"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}

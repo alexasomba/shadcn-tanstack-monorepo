@@ -5,11 +5,12 @@ vi.mock("data-ops", () => ({
     user: { id: string; role?: string | string[] | null },
     opts: { adminRoles: Array<string>; adminUserIds: Array<string> },
   ) => {
-    const roles = Array.isArray(user.role)
-      ? user.role
-      : typeof user.role === "string"
-        ? user.role.split(",")
-        : [];
+    let roles: Array<string> = [];
+    if (Array.isArray(user.role)) {
+      roles = user.role;
+    } else if (typeof user.role === "string") {
+      roles = user.role.split(",");
+    }
     if (roles.some((r) => opts.adminRoles.includes(r))) return true;
     return opts.adminUserIds.includes(user.id);
   },
