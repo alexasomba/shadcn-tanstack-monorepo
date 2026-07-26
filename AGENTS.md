@@ -8,6 +8,20 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 <!--VITE PLUS END-->
 
+<!-- intent-skills:start -->
+
+## Skill Loading
+
+Before editing files for a substantial task:
+
+- Run `pnpm dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
+- If a listed skill matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
+- Use the loaded `SKILL.md` guidance while making the change.
+- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
+- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
+
+<!-- intent-skills:end -->
+
 ## Critical Rules
 
 - **No push = not done.** Never leave a feature in a worktree without pushing.
@@ -66,6 +80,9 @@ See [docs/architecture.md](./docs/architecture.md) for D1 bindings, service bind
 See [packages/ui/AGENTS.md](./packages/ui/AGENTS.md) for component layers, Base UI conventions, icon guidelines, and styling standards.
 
 - **Data Fetching & State**: Do NOT use `useEffect` for async data fetching or state synchronization. Use TanStack Query (`useQuery` for reads, `useMutation` for writes) to manage async operations, caching, and state transitions.
+  - **Reads vs. Writes**: Use `useQuery` for reads and `useMutation` for writes/mutations.
+  - **Query Key Conventions**: Use structured array keys with relevant scoping dependencies (e.g., `["teams", orgId]`, `["passkeys", userId]`).
+  - **Cache Invalidation**: Never use state-busting version counters (`useState(0)`); call `queryClient.invalidateQueries({ queryKey: [...] })` inside `useMutation` `onSuccess` handlers.
 
 ## Result Pattern
 

@@ -1,6 +1,5 @@
-import { Alert, AlertDescription } from "@workspace/ui/components/alert";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
-import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
   Card,
   CardContent,
@@ -8,10 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@workspace/ui/components/empty";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import type { OrgTeam } from "#/lib/organization";
 import { canManageTeams } from "#/lib/organization";
@@ -40,6 +41,7 @@ function unknownErrorMessage(error: unknown, fallback: string): string {
 }
 
 export function TeamsSettingsPanel() {
+  const queryClient = useQueryClient();
   const activeState = useActiveOrganization();
   const memberState = useActiveMember();
   const active = activeState.data;
@@ -47,49 +49,87 @@ export function TeamsSettingsPanel() {
   const canManage = myRole ? canManageTeams(myRole) : false;
 
   const [name, setName] = useState("");
-  const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(null);
-  const [busy, setBusy] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [memberUserId, setMemberUserId] = useState("");
-  const [teams, setTeams] = useState<OrgTeam[]>([]);
-  const [teamsVersion, setTeamsVersion] = useState(0);
 
-  // Prefer listTeams() over active.teams — BA client atom types lag teams-enabled shape.
-  // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
-  useEffect(() => {
-    if (!active?.id) {
-      setTeams([]);
-      return;
-    }
-    let cancelled = false;
-    void listTeams()
-      .then((rows) => {
-        if (!cancelled) setTeams(rows as OrgTeam[]);
-      })
-      .catch(() => {
-        if (!cancelled) setTeams([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [active?.id, teamsVersion]);
+  const teamsQuery = useQuery({
+    queryKey: ["teams", active?.id],
+    queryFn: async () => {
+      if (!active?.id) return [];
+      return (await listTeams()) as OrgTeam[];
+    },
+    enabled: Boolean(active?.id),
+  });
 
-  const run = async (fn: () => Promise<void>, ok: string) => {
-    setBusy(true);
-    setBanner(null);
-    try {
-      await fn();
-      setTeamsVersion((v) => v + 1);
-      setBanner({ type: "ok", text: ok });
-    } catch (e) {
-      setBanner({
-        type: "err",
-        text: unknownErrorMessage(e, "Something went wrong"),
-      });
-    } finally {
-      setBusy(false);
-    }
+  const teams = teamsQuery.data ?? [];
+
+  const invalidateTeams = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["teams", active?.id] });
   };
+
+  const createTeamMutation = useMutation({
+    mutationFn: createTeam,
+    onSuccess: async () => {
+      await invalidateTeams();
+      toast.success("Team created");
+      setName("");
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to create team")),
+  });
+
+  const setActiveTeamMutation = useMutation({
+    mutationFn: setActiveTeam,
+    onSuccess: async (_, teamId) => {
+      await invalidateTeams();
+      const team = teams.find((t) => t.id === teamId);
+      toast.success(`Active team: ${team?.name ?? teamId}`);
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to set active team")),
+  });
+
+  const updateTeamMutation = useMutation({
+    mutationFn: updateTeam,
+    onSuccess: async () => {
+      await invalidateTeams();
+      toast.success("Team renamed");
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to rename team")),
+  });
+
+  const removeTeamMutation = useMutation({
+    mutationFn: removeTeam,
+    onSuccess: async () => {
+      await invalidateTeams();
+      toast.success("Team removed");
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to remove team")),
+  });
+
+  const addMemberMutation = useMutation({
+    mutationFn: addTeamMember,
+    onSuccess: async () => {
+      await invalidateTeams();
+      toast.success("Added to team");
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to add member to team")),
+  });
+
+  const removeMemberMutation = useMutation({
+    mutationFn: removeTeamMember,
+    onSuccess: async () => {
+      await invalidateTeams();
+      toast.success("Removed from team");
+    },
+    onError: (e) => toast.error(unknownErrorMessage(e, "Failed to remove member from team")),
+  });
+
+  const isBusy =
+    createTeamMutation.isPending ||
+    setActiveTeamMutation.isPending ||
+    updateTeamMutation.isPending ||
+    removeTeamMutation.isPending ||
+    addMemberMutation.isPending ||
+    removeMemberMutation.isPending;
 
   if (activeState.isPending) {
     return (
@@ -104,15 +144,8 @@ export function TeamsSettingsPanel() {
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Teams</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Select or create an organization first.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Select an active organization first.</p>
         </div>
-        <Card className="border-border/70 shadow-none">
-          <CardContent className="pt-6">
-            <ButtonLink to="/settings/organization">Go to Organization</ButtonLink>
-          </CardContent>
-        </Card>
       </div>
     );
   }
@@ -126,12 +159,6 @@ export function TeamsSettingsPanel() {
         </p>
       </div>
 
-      {banner ? (
-        <Alert variant={banner.type === "err" ? "destructive" : "default"}>
-          <AlertDescription>{banner.text}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <Card className="border-border/70 shadow-none">
         <CardHeader>
           <CardTitle className="text-base">Teams in this organization</CardTitle>
@@ -140,8 +167,15 @@ export function TeamsSettingsPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {teams.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No teams yet.</p>
+          {teams.length === 0 && !teamsQuery.isPending ? (
+            <Empty className="py-6">
+              <EmptyHeader>
+                <EmptyTitle>No teams found</EmptyTitle>
+                <EmptyDescription>
+                  Create a team below to subdivide organization members.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : (
             teams.map((team) => (
               <div
@@ -156,48 +190,40 @@ export function TeamsSettingsPanel() {
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={busy}
-                    onClick={() =>
-                      void run(async () => {
-                        await setActiveTeam(team.id);
-                      }, `Active team: ${team.name}`)
-                    }
+                    disabled={isBusy}
+                    onClick={() => setActiveTeamMutation.mutate(team.id)}
                   >
-                    Set active
+                    {setActiveTeamMutation.isPending ? "Setting…" : "Set active"}
                   </Button>
                   {canManage ? (
                     <>
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={busy}
+                        disabled={isBusy}
                         onClick={() => {
                           const next = window.prompt("Rename team", team.name);
                           if (!next?.trim()) return;
-                          void run(async () => {
-                            await updateTeam({ teamId: team.id, name: next.trim() });
-                          }, "Team renamed");
+                          updateTeamMutation.mutate({ teamId: team.id, name: next.trim() });
                         }}
                       >
-                        Rename
+                        {updateTeamMutation.isPending ? "Renaming…" : "Rename"}
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={busy || teams.length <= 1}
+                        disabled={isBusy || teams.length <= 1}
                         onClick={() => {
                           if (teams.length <= 1) return;
                           const ok = window.confirm(`Remove team “${team.name}”?`);
                           if (!ok) return;
-                          void run(async () => {
-                            await removeTeam({
-                              teamId: team.id,
-                              organizationId: active.id,
-                            });
-                          }, "Team removed");
+                          removeTeamMutation.mutate({
+                            teamId: team.id,
+                            organizationId: active.id,
+                          });
                         }}
                       >
-                        Remove
+                        {removeTeamMutation.isPending ? "Removing…" : "Remove"}
                       </Button>
                     </>
                   ) : null}
@@ -216,37 +242,32 @@ export function TeamsSettingsPanel() {
               <CardDescription>Members must already belong to the organization.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="team-name">Name</Label>
-                <Input
-                  id="team-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Engineering"
-                />
-              </div>
-              <Button
-                disabled={busy || !name.trim()}
-                onClick={async () => {
-                  setBusy(true);
-                  setBanner(null);
-                  try {
-                    await createTeam({ name: name.trim(), organizationId: active.id });
-                    setName("");
-                    setTeamsVersion((v) => v + 1);
-                    setBanner({ type: "ok", text: "Team created" });
-                  } catch (e) {
-                    setBanner({
-                      type: "err",
-                      text: unknownErrorMessage(e, "Something went wrong"),
-                    });
-                  } finally {
-                    setBusy(false);
-                  }
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!name.trim() || createTeamMutation.isPending) return;
+                  createTeamMutation.mutate({
+                    name: name.trim(),
+                    organizationId: active.id,
+                  });
                 }}
+                className="space-y-4"
               >
-                Create team
-              </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="team-name">Name</Label>
+                  <Input
+                    id="team-name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Engineering"
+                    required
+                    minLength={1}
+                  />
+                </div>
+                <Button type="submit" disabled={createTeamMutation.isPending || !name.trim()}>
+                  {createTeamMutation.isPending ? "Creating…" : "Create team"}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 
@@ -297,32 +318,28 @@ export function TeamsSettingsPanel() {
               <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
-                  disabled={busy || !selectedTeamId || !memberUserId}
+                  disabled={isBusy || !selectedTeamId || !memberUserId}
                   onClick={() =>
-                    void run(async () => {
-                      await addTeamMember({
-                        teamId: selectedTeamId,
-                        userId: memberUserId,
-                      });
-                    }, "Added to team")
+                    addMemberMutation.mutate({
+                      teamId: selectedTeamId,
+                      userId: memberUserId,
+                    })
                   }
                 >
-                  Add to team
+                  {addMemberMutation.isPending ? "Adding…" : "Add to team"}
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={busy || !selectedTeamId || !memberUserId}
+                  disabled={isBusy || !selectedTeamId || !memberUserId}
                   onClick={() =>
-                    void run(async () => {
-                      await removeTeamMember({
-                        teamId: selectedTeamId,
-                        userId: memberUserId,
-                      });
-                    }, "Removed from team")
+                    removeMemberMutation.mutate({
+                      teamId: selectedTeamId,
+                      userId: memberUserId,
+                    })
                   }
                 >
-                  Remove from team
+                  {removeMemberMutation.isPending ? "Removing…" : "Remove from team"}
                 </Button>
               </div>
             </CardContent>

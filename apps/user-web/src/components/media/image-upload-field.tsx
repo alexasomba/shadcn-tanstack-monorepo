@@ -130,6 +130,7 @@ export function ImageUploadField({
           accept={accept}
           aria-label={label || "Upload image"}
           aria-invalid={Boolean(error)}
+          aria-errormessage={error ? `image-upload-error-${kind}` : undefined}
           className="sr-only"
           disabled={disabled || busy}
           onChange={(e) => {
@@ -154,7 +155,7 @@ export function ImageUploadField({
         </div>
       </div>
 
-      {error ? <FieldError>{error}</FieldError> : null}
+      {error ? <FieldError id={`image-upload-error-${kind}`}>{error}</FieldError> : null}
     </Field>
   );
 }

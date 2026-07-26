@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
@@ -8,8 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@workspace/ui/components/empty";
 import { Separator } from "@workspace/ui/components/separator";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { SubscriptionRecord } from "#/lib/billing";
 import { formatSubDate, isActiveStatus } from "#/lib/billing";
@@ -38,24 +40,22 @@ function unknownErrorMessage(error: unknown, fallback: string): string {
 
 type TxRow = {
   id: string;
-  reference: string;
   amount: number;
   currency: string;
   status: string;
   plan?: string | null;
   createdAt?: Date | string;
+  reference?: string;
 };
 
 export function BillingSettingsPanel(props: {
   checkoutStatus?: string;
   checkoutReference?: string;
 }) {
+  const queryClient = useQueryClient();
   const orgState = useActiveOrganization();
   const org = orgState.data;
 
-  const [subs, setSubs] = useState<SubscriptionRecord[]>([]);
-  const [txs, setTxs] = useState<TxRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(() => {
     if (props.checkoutStatus === "success") {
@@ -77,30 +77,19 @@ export function BillingSettingsPanel(props: {
 
   const referenceId = org?.id;
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [s, t] = await Promise.all([
-        listSubscriptions(referenceId),
-        listTransactions(referenceId),
-      ]);
-      setSubs(s);
-      setTxs(t as TxRow[]);
-    } catch (e) {
-      setBanner({
-        type: "err",
-        text: unknownErrorMessage(e, "Failed to load billing"),
-      });
-      setSubs([]);
-      setTxs([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [referenceId]);
+  const subsQuery = useQuery({
+    queryKey: ["billing-subscriptions", referenceId],
+    queryFn: () => listSubscriptions(referenceId),
+  });
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const txsQuery = useQuery({
+    queryKey: ["billing-transactions", referenceId],
+    queryFn: async () => (await listTransactions(referenceId)) as TxRow[],
+  });
+
+  const subs = subsQuery.data ?? [];
+  const txs = txsQuery.data ?? [];
+  const loading = subsQuery.isLoading || txsQuery.isLoading;
 
   const run = async (fn: () => Promise<void>, ok: string) => {
     setBusy(true);
@@ -108,7 +97,10 @@ export function BillingSettingsPanel(props: {
     try {
       await fn();
       setBanner({ type: "ok", text: ok });
-      await refresh();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["billing-subscriptions", referenceId] }),
+        queryClient.invalidateQueries({ queryKey: ["billing-transactions", referenceId] }),
+      ]);
     } catch (e) {
       setBanner({
         type: "err",
@@ -179,8 +171,13 @@ export function BillingSettingsPanel(props: {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!loading && current === null ? (
-            <p className="text-sm text-muted-foreground">No subscription on file.</p>
+          {current === null && !loading ? (
+            <Empty className="py-6">
+              <EmptyHeader>
+                <EmptyTitle>No subscription found</EmptyTitle>
+                <EmptyDescription>No active subscription on file.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : null}
           {current !== null ? (
             <div className="space-y-2 rounded-xl border border-border/70 p-4 text-sm">

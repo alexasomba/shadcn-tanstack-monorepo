@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
 import { ButtonLink } from "@workspace/ui/components/button-link";
 import {
@@ -7,11 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@workspace/ui/components/empty";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select";
 import { Separator } from "@workspace/ui/components/separator";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { OrgInvitation, OrgRole } from "#/lib/organization";
 import { canInviteMembers, canManageMembers, ORG_ROLE_OPTIONS } from "#/lib/organization";
@@ -41,10 +43,10 @@ function unknownErrorMessage(error: unknown, fallback: string): string {
 }
 
 export function MembersSettingsPanel({ userId }: { userId: string }) {
+  const queryClient = useQueryClient();
   const activeState = useActiveOrganization();
   const memberState = useActiveMember();
 
-  const [inbound, setInbound] = useState<OrgInvitation[]>([]);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<OrgRole>("member");
   const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(null);
@@ -58,28 +60,15 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
     ? active.invitations.filter((i: { status: string }) => i.status === "pending")
     : [];
 
-  const refreshInbound = async () => {
-    try {
+  const inboundQuery = useQuery({
+    queryKey: ["org-user-invitations", active?.id],
+    queryFn: async () => {
       const data = await listUserInvitations();
-      setInbound(data as OrgInvitation[]);
-    } catch {
-      setInbound([]);
-    }
-  };
+      return (data as OrgInvitation[]) ?? [];
+    },
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    listUserInvitations()
-      .then((data) => {
-        if (!cancelled) setInbound(data as OrgInvitation[]);
-      })
-      .catch(() => {
-        if (!cancelled) setInbound([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [active?.id]);
+  const inbound = inboundQuery.data ?? [];
 
   const run = async (fn: () => Promise<void>, ok: string) => {
     setBusy(true);
@@ -87,7 +76,7 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
     try {
       await fn();
       setBanner({ type: "ok", text: ok });
-      await refreshInbound();
+      await queryClient.invalidateQueries({ queryKey: ["org-user-invitations"] });
     } catch (e) {
       setBanner({
         type: "err",
@@ -184,81 +173,92 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {active.members.map(
-            (member: {
-              id: string;
-              userId: string;
-              role: string;
-              user: { name?: string | null; email?: string | null };
-            }) => {
-              const isSelf = member.userId === userId;
-              const primaryRole = (member.role.split(",")[0] ?? "member") as OrgRole;
-              return (
-                <div
-                  key={member.id}
-                  className="flex flex-col gap-2 rounded-xl border border-border/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {member.user.name || member.user.email}
-                      {isSelf ? (
-                        <span className="ml-2 text-xs font-normal text-muted-foreground">You</span>
+          {active.members.length === 0 ? (
+            <Empty className="py-6">
+              <EmptyHeader>
+                <EmptyTitle>No members found</EmptyTitle>
+                <EmptyDescription>This organization has no members.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            active.members.map(
+              (member: {
+                id: string;
+                userId: string;
+                role: string;
+                user: { name?: string | null; email?: string | null };
+              }) => {
+                const isSelf = member.userId === userId;
+                const primaryRole = (member.role.split(",")[0] ?? "member") as OrgRole;
+                return (
+                  <div
+                    key={member.id}
+                    className="flex flex-col gap-2 rounded-xl border border-border/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
+                        {member.user.name || member.user.email}
+                        {isSelf ? (
+                          <span className="ml-2 text-xs font-normal text-muted-foreground">
+                            You
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">{member.user.email}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {canManage && !isSelf ? (
+                        <NativeSelect
+                          value={primaryRole}
+                          disabled={busy}
+                          onChange={(e) => {
+                            const next = e.target.value as OrgRole;
+                            void run(async () => {
+                              await updateMemberRole({
+                                memberId: member.id,
+                                role: next,
+                                organizationId: active.id,
+                              });
+                            }, "Role updated");
+                          }}
+                        >
+                          {ORG_ROLE_OPTIONS.map((opt) => (
+                            <NativeSelectOption key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </NativeSelectOption>
+                          ))}
+                        </NativeSelect>
+                      ) : (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs capitalize">
+                          {member.role}
+                        </span>
+                      )}
+                      {canManage && !isSelf ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={busy}
+                          onClick={() => {
+                            const ok = window.confirm(
+                              `Remove ${member.user.email} from ${active.name}?`,
+                            );
+                            if (!ok) return;
+                            void run(async () => {
+                              await removeMember({
+                                memberIdOrEmail: member.id,
+                                organizationId: active.id,
+                              });
+                            }, "Member removed");
+                          }}
+                        >
+                          Remove
+                        </Button>
                       ) : null}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{member.user.email}</p>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {canManage && !isSelf ? (
-                      <NativeSelect
-                        value={primaryRole}
-                        disabled={busy}
-                        onChange={(e) => {
-                          const next = e.target.value as OrgRole;
-                          void run(async () => {
-                            await updateMemberRole({
-                              memberId: member.id,
-                              role: next,
-                              organizationId: active.id,
-                            });
-                          }, "Role updated");
-                        }}
-                      >
-                        {ORG_ROLE_OPTIONS.map((opt) => (
-                          <NativeSelectOption key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    ) : (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs capitalize">
-                        {member.role}
-                      </span>
-                    )}
-                    {canManage && !isSelf ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() => {
-                          const ok = window.confirm(
-                            `Remove ${member.user.email} from ${active.name}?`,
-                          );
-                          if (!ok) return;
-                          void run(async () => {
-                            await removeMember({
-                              memberIdOrEmail: member.id,
-                              organizationId: active.id,
-                            });
-                          }, "Member removed");
-                        }}
-                      >
-                        Remove
-                      </Button>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            },
+                );
+              },
+            )
           )}
         </CardContent>
       </Card>
@@ -315,7 +315,7 @@ export function MembersSettingsPanel({ userId }: { userId: string }) {
                   });
                   setEmail("");
                   setBanner({ type: "ok", text: "Invitation sent" });
-                  await refreshInbound();
+                  await queryClient.invalidateQueries({ queryKey: ["org-user-invitations"] });
                 } catch (e) {
                   setBanner({
                     type: "err",

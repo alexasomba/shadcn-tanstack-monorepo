@@ -36,6 +36,7 @@ import { Route as DemoPortfolioRouteImport } from './routes/demo/portfolio'
 import { Route as DemoPreviewRouteImport } from './routes/demo/preview'
 import { Route as DemoStoreRouteImport } from './routes/demo/store'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
+import { Route as DemoTanstackDbRouteImport } from './routes/demo/tanstack-db'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTypesetRouteImport } from './routes/demo/typeset'
 import { Route as ScheduleIndexRouteImport } from './routes/schedule.index'
@@ -196,6 +197,11 @@ const DemoStoreRoute = DemoStoreRouteImport.update({
 const DemoTableRoute = DemoTableRouteImport.update({
   id: '/demo/table',
   path: '/demo/table',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTanstackDbRoute = DemoTanstackDbRouteImport.update({
+  id: '/demo/tanstack-db',
+  path: '/demo/tanstack-db',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -366,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/typeset': typeof DemoTypesetRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -421,6 +428,7 @@ export interface FileRoutesByTo {
   '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/typeset': typeof DemoTypesetRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -478,6 +486,7 @@ export interface FileRoutesById {
   '/demo/preview': typeof DemoPreviewRoute
   '/demo/store': typeof DemoStoreRoute
   '/demo/table': typeof DemoTableRoute
+  '/demo/tanstack-db': typeof DemoTanstackDbRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/typeset': typeof DemoTypesetRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
+    | '/demo/tanstack-db'
     | '/demo/tanstack-query'
     | '/demo/typeset'
     | '/speakers/$slug'
@@ -590,6 +600,7 @@ export interface FileRouteTypes {
     | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
+    | '/demo/tanstack-db'
     | '/demo/tanstack-query'
     | '/demo/typeset'
     | '/speakers/$slug'
@@ -646,6 +657,7 @@ export interface FileRouteTypes {
     | '/demo/preview'
     | '/demo/store'
     | '/demo/table'
+    | '/demo/tanstack-db'
     | '/demo/tanstack-query'
     | '/demo/typeset'
     | '/speakers/$slug'
@@ -701,6 +713,7 @@ export interface RootRouteChildren {
   DemoPreviewRoute: typeof DemoPreviewRoute
   DemoStoreRoute: typeof DemoStoreRoute
   DemoTableRoute: typeof DemoTableRoute
+  DemoTanstackDbRoute: typeof DemoTanstackDbRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoTypesetRoute: typeof DemoTypesetRoute
   SpeakersSlugRoute: typeof SpeakersSlugRoute
@@ -913,6 +926,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/table'
       fullPath: '/demo/table'
       preLoaderRoute: typeof DemoTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/tanstack-db': {
+      id: '/demo/tanstack-db'
+      path: '/demo/tanstack-db'
+      fullPath: '/demo/tanstack-db'
+      preLoaderRoute: typeof DemoTanstackDbRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -1159,6 +1179,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoPreviewRoute: DemoPreviewRoute,
   DemoStoreRoute: DemoStoreRoute,
   DemoTableRoute: DemoTableRoute,
+  DemoTanstackDbRoute: DemoTanstackDbRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoTypesetRoute: DemoTypesetRoute,
   SpeakersSlugRoute: SpeakersSlugRoute,

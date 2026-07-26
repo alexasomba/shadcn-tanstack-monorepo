@@ -2,7 +2,7 @@ import { ArrowLeft, Clock, Tag, User } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
+import { ButtonLink } from "@workspace/ui/components/button-link";
 import { allSpeakers, allTalks } from "content-collections";
 import { marked } from "marked";
 
@@ -29,16 +29,15 @@ function TalkDetailPage() {
 
       {/* Back navigation */}
       <div className="mx-auto max-w-7xl px-6 py-4">
-        <Button
+        <ButtonLink
+          to="/talks"
           variant="ghost"
           size="sm"
-          render={<Link to="/talks" />}
-          nativeButton={false}
           className="text-cream/60 hover:text-gold gap-2"
         >
           <ArrowLeft className="size-4" data-icon="inline-start" />
           <span>All Sessions</span>
-        </Button>
+        </ButtonLink>
       </div>
 
       {/* Hero image */}

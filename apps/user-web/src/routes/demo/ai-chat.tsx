@@ -192,7 +192,7 @@ function ChatPage() {
             {isLoading && (
               <div className="flex items-center justify-center">
                 <Button variant="destructive" size="sm" onClick={stop}>
-                  <Square className="size-4 fill-current" />
+                  <Square className="size-4 fill-current" data-icon="inline-start" />
                   Stop
                 </Button>
               </div>

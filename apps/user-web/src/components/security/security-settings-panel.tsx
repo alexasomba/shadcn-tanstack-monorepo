@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -6,11 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@workspace/ui/components/empty";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { QRCodeSVG } from "qrcode.react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { authClient } from "#/lib/auth-client";
 import type { PasskeyRecord } from "#/lib/security.queries";
@@ -38,6 +40,7 @@ function unknownErrorMessage(error: unknown, fallback: string): string {
 }
 
 export function SecuritySettingsPanel() {
+  const queryClient = useQueryClient();
   const { data: session, isPending, refetch } = authClient.useSession();
   const user = session?.user;
   const twoFactorEnabled = Boolean(user && "twoFactorEnabled" in user && user.twoFactorEnabled);
@@ -46,22 +49,23 @@ export function SecuritySettingsPanel() {
   const [totpCode, setTotpCode] = useState("");
   const [totpURI, setTotpURI] = useState<string | null>(null);
   const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
-  const [passkeys, setPasskeys] = useState<PasskeyRecord[]>([]);
   const [passkeyName, setPasskeyName] = useState("");
   const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const refreshPasskeys = useCallback(async () => {
-    try {
-      setPasskeys(await listPasskeys());
-    } catch {
-      setPasskeys([]);
-    }
-  }, []);
+  const passkeysQuery = useQuery({
+    queryKey: ["passkeys", user?.id],
+    queryFn: async () => {
+      try {
+        return await listPasskeys();
+      } catch {
+        return [];
+      }
+    },
+    enabled: Boolean(user?.id),
+  });
 
-  useEffect(() => {
-    void refreshPasskeys();
-  }, [refreshPasskeys, user?.id]);
+  const passkeys = passkeysQuery.data ?? [];
 
   const run = async (fn: () => Promise<void>, ok: string) => {
     setBusy(true);
@@ -69,7 +73,10 @@ export function SecuritySettingsPanel() {
     try {
       await fn();
       setBanner({ type: "ok", text: ok });
-      await refetch();
+      await Promise.all([
+        refetch(),
+        queryClient.invalidateQueries({ queryKey: ["passkeys", user?.id] }),
+      ]);
     } catch (e) {
       setBanner({
         type: "err",
@@ -327,7 +334,6 @@ export function SecuritySettingsPanel() {
         setPasskeyName={setPasskeyName}
         busy={busy}
         run={run}
-        refreshPasskeys={refreshPasskeys}
       />
 
       <Card className="border-border/70 shadow-none">
@@ -338,11 +344,6 @@ export function SecuritySettingsPanel() {
             signed cookie (30 days by default) so you can skip 2FA on that browser.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Clear site cookies or use a private window to force a new 2FA challenge.
-          </p>
-        </CardContent>
       </Card>
     </div>
   );
@@ -354,27 +355,28 @@ function SecurityPasskeysSection({
   setPasskeyName,
   busy,
   run,
-  refreshPasskeys,
 }: {
   passkeys: PasskeyRecord[];
   passkeyName: string;
-  setPasskeyName: (s: string) => void;
+  setPasskeyName: (v: string) => void;
   busy: boolean;
   run: (fn: () => Promise<void>, ok: string) => Promise<void>;
-  refreshPasskeys: () => Promise<void>;
 }) {
   return (
     <Card className="border-border/70 shadow-none">
       <CardHeader>
         <CardTitle className="text-base">Passkeys</CardTitle>
-        <CardDescription>
-          Passwordless sign-in with platform authenticators (Touch ID, Face ID, security keys).
-        </CardDescription>
+        <CardDescription>Biometric or security-key sign-in (WebAuthn / FIDO2).</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           {passkeys.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No passkeys registered.</p>
+            <Empty className="py-6">
+              <EmptyHeader>
+                <EmptyTitle>No passkeys found</EmptyTitle>
+                <EmptyDescription>No passkeys registered yet.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : (
             passkeys.map((pk) => (
               <div
@@ -395,7 +397,6 @@ function SecurityPasskeysSection({
                   onClick={() =>
                     void run(async () => {
                       await deletePasskey(pk.id);
-                      await refreshPasskeys();
                     }, "Passkey removed")
                   }
                 >
@@ -421,7 +422,6 @@ function SecurityPasskeysSection({
               void run(async () => {
                 await addPasskey(passkeyName.trim() || undefined);
                 setPasskeyName("");
-                await refreshPasskeys();
               }, "Passkey registered")
             }
           >

@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
@@ -9,7 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { useEffect, useState } from "react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@workspace/ui/components/empty";
+import { useState } from "react";
 import { z } from "zod";
 
 import SiteFooter from "#/components/marketing/SiteFooter";
@@ -30,21 +32,23 @@ function unknownErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-const searchSchema = z.object({
-  id: z.string().min(1),
-});
-
 export const Route = createFileRoute("/accept-invite")({
-  validateSearch: searchSchema,
-  beforeLoad: async ({ location, search }) => {
+  validateSearch: z.object({
+    id: z.string().catch(""),
+  }),
+  beforeLoad: async ({ search }) => {
     const session = await getSession();
-    if (!session) {
+    if (!session?.user) {
+      const callback = search.id
+        ? `/accept-invite?id=${encodeURIComponent(search.id)}`
+        : "/accept-invite";
       throw redirect({
         to: "/login",
-        search: {
-          redirect: `${location.pathname}?id=${encodeURIComponent(search.id)}`,
-        },
+        search: { redirect: callback },
       });
+    }
+    if (!search.id) {
+      throw redirect({ to: "/dashboard" });
     }
     return { user: session.user };
   },
@@ -58,59 +62,56 @@ function AcceptInvitePage() {
   const { id } = Route.useSearch();
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
-  const [details, setDetails] = useState<InvitationDetails | null>(null);
-  const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loadingInvite, setLoadingInvite] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    void getInvitation(id)
-      .then((data) => {
-        if (!cancelled) {
-          setDetails(data as InvitationDetails);
-        }
-      })
-      .catch((e: unknown) => {
-        if (!cancelled) {
-          setLoadError(
-            unknownErrorMessage(e, "Could not load invitation (verified email may be required)"),
-          );
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingInvite(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+  const invitationQuery = useQuery({
+    queryKey: ["invitation-details", id],
+    queryFn: async () => {
+      const data = await getInvitation(id);
+      return data as InvitationDetails;
+    },
+    enabled: Boolean(id),
+  });
 
-  const accept = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      await acceptInvitation(id);
+  const details = invitationQuery.data ?? null;
+  const loadingInvite = invitationQuery.isLoading;
+  const loadError = invitationQuery.isError
+    ? unknownErrorMessage(
+        invitationQuery.error,
+        "Could not load invitation (verified email may be required)",
+      )
+    : "";
+
+  const acceptMutation = useMutation({
+    mutationFn: () => acceptInvitation(id),
+    onSuccess: async () => {
       await navigate({ to: "/settings/members" });
-    } catch (e) {
+    },
+    onError: (e) => {
       setError(unknownErrorMessage(e, "Could not accept invitation"));
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectInvitation(id),
+    onSuccess: async () => {
+      await navigate({ to: "/dashboard" });
+    },
+    onError: (e) => {
+      setError(unknownErrorMessage(e, "Could not decline invitation"));
+    },
+  });
+
+  const loading = acceptMutation.isPending || rejectMutation.isPending;
+
+  const accept = () => {
+    setError("");
+    acceptMutation.mutate();
   };
 
-  const reject = async () => {
+  const reject = () => {
     setError("");
-    setLoading(true);
-    try {
-      await rejectInvitation(id);
-      await navigate({ to: "/dashboard" });
-    } catch (e) {
-      setError(unknownErrorMessage(e, "Could not decline invitation"));
-    } finally {
-      setLoading(false);
-    }
+    rejectMutation.mutate();
   };
 
   return (
@@ -142,27 +143,36 @@ function AcceptInvitePage() {
                 </p>
               </div>
             ) : (
-              <p className="rounded-xl border border-border/70 bg-muted/30 px-3 py-2 font-mono text-xs break-all">
-                {id}
-              </p>
+              <Empty className="py-4">
+                <EmptyHeader>
+                  <EmptyTitle>No invitation details found</EmptyTitle>
+                  <EmptyDescription className="font-mono text-xs break-all">
+                    Invitation ID: {id}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
             )}
 
             {error ? (
               <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>
+                  <p role="alert" aria-live="assertive">
+                    {error}
+                  </p>
+                </AlertDescription>
               </Alert>
             ) : null}
 
             <div className="flex flex-wrap gap-2">
-              <Button disabled={loading || Boolean(loadError)} onClick={() => void accept()}>
-                Accept invitation
+              <Button disabled={loading || Boolean(loadError)} onClick={() => accept()}>
+                {acceptMutation.isPending ? "Accepting…" : "Accept invitation"}
               </Button>
               <Button
                 variant="outline"
                 disabled={loading || Boolean(loadError)}
-                onClick={() => void reject()}
+                onClick={() => reject()}
               >
-                Decline
+                {rejectMutation.isPending ? "Declining…" : "Decline"}
               </Button>
               <ButtonLink to="/dashboard" variant="ghost" size="sm">
                 Skip

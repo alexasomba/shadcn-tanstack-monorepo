@@ -8,12 +8,14 @@ import { Toaster } from "sonner";
 
 import { AppErrorBoundary } from "#/components/app-error-boundary";
 import { CommandMenu } from "#/components/app-shell/command-menu";
+import { AppDevtoolsPluginEntry } from "#/components/devtools/app-devtools-plugin";
 import { useThemeHotkey } from "#/hooks/use-theme-hotkey";
 import { getTenant } from "#/lib/tenant.functions";
 import type { TenantContext } from "#/lib/tenant.functions";
-import { getLocale } from "#/paraglide/runtime";
 
 import "../../content-collections";
+import { getLocale } from "#/paraglide/runtime";
+
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import StoreDevtools from "../lib/demo-store-devtools";
 
@@ -164,6 +166,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
             StoreDevtools,
             TanStackQueryDevtools,
+            AppDevtoolsPluginEntry,
           ]}
         />
         <Scripts />

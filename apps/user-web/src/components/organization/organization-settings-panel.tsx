@@ -251,9 +251,13 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
               />
               {slugStatus ? (
                 slugStatus === "Available" ? (
-                  <FieldDescription>Slug is available</FieldDescription>
+                  <FieldDescription role="status" aria-live="polite">
+                    Slug is available
+                  </FieldDescription>
                 ) : (
-                  <FieldError>{slugStatus}</FieldError>
+                  <FieldError role="alert" aria-live="assertive">
+                    {slugStatus}
+                  </FieldError>
                 )
               ) : null}
             </Field>

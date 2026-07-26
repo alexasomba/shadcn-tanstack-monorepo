@@ -155,6 +155,11 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            const formEl = e.currentTarget;
+            if (!formEl.checkValidity()) {
+              formEl.reportValidity();
+              return;
+            }
             if (input.trim() && !isLoading) {
               handleSend();
             }
@@ -166,6 +171,8 @@ export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: R
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about speakers, sessions, techniques..."
               aria-label="Ask assistant a question"
+              required
+              minLength={1}
               disabled={isLoading}
               className="text-cream placeholder-cream/30 text-sm"
               rows={1}
