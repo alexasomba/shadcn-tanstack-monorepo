@@ -1,8 +1,9 @@
 import { parsePaystackMetadata } from "@alexasomba/better-auth-paystack/client";
+import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 
 import { verifyPaystackCallbackServerFn } from "#/lib/billing.functions";
@@ -38,94 +39,79 @@ function PaystackCallbackPage() {
   const verify = useServerFn(verifyPaystackCallbackServerFn);
   const search = Route.useSearch();
   const reference = search.reference ?? search.trxref;
-  const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
-  const [error, setError] = useState("");
-  const [successTitle, setSuccessTitle] = useState("Payment Successful!");
-  const [successMessage, setSuccessMessage] = useState("Redirecting you to billing…");
-  const processedRef = useRef(false);
+  const redirectedRef = useRef(false);
 
-  useEffect(() => {
-    if (reference === undefined || reference === "" || processedRef.current) return;
-    processedRef.current = true;
-    let isCancelled = false;
-    let timerId: ReturnType<typeof setTimeout> | undefined;
-
-    const run = async () => {
-      try {
-        const result = (await verify({
-          data: { reference },
-        })) as VerifyCallbackResult;
-
-        if (isCancelled) return;
-
-        if (result.data.status !== "success") {
-          throw new Error("Verification did not complete successfully");
-        }
-
-        const metadata = parsePaystackMetadata((result.data as { metadata?: unknown }).metadata);
-
-        const isTrial = metadata.isTrial === true || metadata.isTrial === "true";
-        const trialRequested =
-          metadata.trialRequested === true || metadata.trialRequested === "true";
-        const trialGranted = metadata.trialGranted === true || metadata.trialGranted === "true";
-        const trialPlan =
-          typeof metadata.plan === "string" && metadata.plan !== "" ? metadata.plan : null;
-        const productName =
-          typeof metadata.product === "string" && metadata.product !== "" ? metadata.product : null;
-        const isProration = metadata.type === "proration";
-
-        if (isTrial) {
-          setSuccessTitle("Trial Started!");
-          setSuccessMessage(
-            trialPlan !== null
-              ? `${trialPlan} is now in trial mode. Redirecting to billing…`
-              : "Your trial is active. Redirecting to billing…",
-          );
-        } else if (isProration) {
-          setSuccessTitle("Upgrade Successful!");
-          setSuccessMessage("Your prorated upgrade payment has been confirmed.");
-        } else if (trialRequested && trialGranted === false) {
-          setSuccessTitle("Subscription Activated");
-          setSuccessMessage(
-            trialPlan !== null
-              ? `Your ${trialPlan} trial was already used, so paid billing started immediately.`
-              : "Your previous trial was already used, so paid billing started immediately.",
-          );
-        } else if (trialPlan !== null) {
-          setSuccessTitle("Subscription Active!");
-          setSuccessMessage(
-            `Your ${trialPlan} subscription payment has been confirmed. Redirecting…`,
-          );
-        } else if (productName !== null) {
-          setSuccessTitle("Purchase Successful!");
-          setSuccessMessage(`${productName} has been paid for successfully. Redirecting…`);
-        } else {
-          setSuccessTitle("Payment Successful!");
-          setSuccessMessage("Redirecting you to billing…");
-        }
-
-        setStatus("success");
-        timerId = setTimeout(() => {
-          void router.navigate({
-            to: "/settings/billing",
-            search: { checkout: "success", reference },
-          });
-        }, 1800);
-      } catch (e: unknown) {
-        if (!isCancelled) {
-          setStatus("error");
-          setError(unknownErrorMessage(e, "Verification failed"));
-        }
+  const {
+    data: verificationResult,
+    isPending,
+    isError,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["paystack-verify-callback", reference],
+    queryFn: async () => {
+      if (!reference) throw new Error("No payment reference provided");
+      const result = (await verify({
+        data: { reference },
+      })) as VerifyCallbackResult;
+      if (result.data.status !== "success") {
+        throw new Error("Verification did not complete successfully");
       }
-    };
+      return result;
+    },
+    enabled: Boolean(reference),
+    staleTime: Infinity,
+  });
 
-    void run();
+  if (verificationResult && !redirectedRef.current && typeof window !== "undefined") {
+    redirectedRef.current = true;
+    setTimeout(() => {
+      void router.navigate({
+        to: "/settings/billing",
+        search: { checkout: "success", reference: reference ?? "" },
+      });
+    }, 1800);
+  }
 
-    return () => {
-      isCancelled = true;
-      if (timerId !== undefined) clearTimeout(timerId);
-    };
-  }, [reference, router, verify]);
+  const metadata = verificationResult
+    ? parsePaystackMetadata((verificationResult.data as { metadata?: unknown }).metadata)
+    : null;
+
+  let successTitle = "Payment Successful!";
+  let successMessage = "Redirecting you to billing…";
+
+  if (metadata) {
+    const isTrial = metadata.isTrial === true || metadata.isTrial === "true";
+    const trialRequested = metadata.trialRequested === true || metadata.trialRequested === "true";
+    const trialGranted = metadata.trialGranted === true || metadata.trialGranted === "true";
+    const trialPlan =
+      typeof metadata.plan === "string" && metadata.plan !== "" ? metadata.plan : null;
+    const productName =
+      typeof metadata.product === "string" && metadata.product !== "" ? metadata.product : null;
+    const isProration = metadata.type === "proration";
+
+    if (isTrial) {
+      successTitle = "Trial Started!";
+      successMessage =
+        trialPlan !== null
+          ? `${trialPlan} is now in trial mode. Redirecting to billing…`
+          : "Your trial is active. Redirecting to billing…";
+    } else if (isProration) {
+      successTitle = "Upgrade Successful!";
+      successMessage = "Your prorated upgrade payment has been confirmed.";
+    } else if (trialRequested && trialGranted === false) {
+      successTitle = "Subscription Activated";
+      successMessage =
+        trialPlan !== null
+          ? `Your ${trialPlan} trial was already used, so paid billing started immediately.`
+          : "Your previous trial was already used, so paid billing started immediately.";
+    } else if (trialPlan !== null) {
+      successTitle = "Subscription Active!";
+      successMessage = `Your ${trialPlan} subscription payment has been confirmed. Redirecting…`;
+    } else if (productName !== null) {
+      successTitle = "Purchase Successful!";
+      successMessage = `${productName} has been paid for successfully. Redirecting…`;
+    }
+  }
 
   if (reference === undefined || reference === "") {
     return (
@@ -148,17 +134,19 @@ function PaystackCallbackPage() {
       <Card className="w-full max-w-md border-border/70 shadow-none">
         <CardHeader role="status" aria-live="polite">
           <CardTitle className="text-center text-lg">
-            {status === "verifying" && "Verifying payment…"}
-            {status === "success" && successTitle}
-            {status === "error" && "Verification failed"}
+            {isPending && "Verifying payment…"}
+            {Boolean(verificationResult) && successTitle}
+            {isError && "Verification failed"}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center text-sm text-muted-foreground">
-          {status === "verifying" && <p>Please wait while we confirm your transaction.</p>}
-          {status === "success" && <p>{successMessage}</p>}
-          {status === "error" && (
+          {isPending && <p>Please wait while we confirm your transaction.</p>}
+          {Boolean(verificationResult) && <p>{successMessage}</p>}
+          {isError && (
             <div className="space-y-3">
-              <p className="text-destructive">{error}</p>
+              <p className="text-destructive">
+                {unknownErrorMessage(queryError, "Verification failed")}
+              </p>
               <Link className="text-foreground underline" to="/settings/billing">
                 Back to billing
               </Link>

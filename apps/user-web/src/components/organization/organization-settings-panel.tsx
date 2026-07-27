@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Badge } from "@workspace/ui/components/badge";
@@ -20,7 +21,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { UpgradeGate } from "#/components/billing/upgrade-gate";
 import { ImageUploadField } from "#/components/media/image-upload-field";
@@ -66,23 +67,19 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
   const [createSlug, setCreateSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [keepCurrent, setKeepCurrent] = useState(false);
-  const [slugStatus, setSlugStatus] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editSlug, setEditSlug] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [entitlements, setEntitlements] = useState<ClientEntitlements | null>(null);
   const [banner, setBanner] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   const orgs = listState.data ?? [];
   const active = activeState.data;
-  const myRole = memberState.data?.role ?? "";
-  const canUpdate = myRole ? canUpdateOrganization(myRole) : false;
-  const canDelete = myRole ? canDeleteOrganization(myRole) : false;
-  const canUseR2 = entitlements ? clientHasFeature(entitlements, "r2") : false;
 
-  // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
-  useEffect(() => {
+  // Sync edit form state when active organization changes during render
+  const [prevActiveId, setPrevActiveId] = useState<string | null>(null);
+  if (active?.id !== prevActiveId) {
+    setPrevActiveId(active?.id ?? null);
     if (active) {
       setEditName(active.name);
       setEditSlug(active.slug);
@@ -91,45 +88,42 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
       setEditName("");
       setEditSlug("");
       setLogoUrl(null);
-      setEntitlements(null);
     }
-  }, [active]);
+  }
 
-  useEffect(() => {
-    let cancelled = false;
-    if (!active?.id) return;
-    listSubscriptions(active.id)
-      .then((subs) => {
-        if (!cancelled) setEntitlements(resolveClientEntitlements(subs));
-      })
-      .catch(() => {
-        if (!cancelled) setEntitlements(resolveClientEntitlements([]));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [active?.id]);
+  // TanStack Query for entitlements
+  const { data: entitlements = null } = useQuery({
+    queryKey: ["org-entitlements", active?.id],
+    queryFn: async () => {
+      if (!active?.id) return resolveClientEntitlements([]);
+      const subs = await listSubscriptions(active.id);
+      return resolveClientEntitlements(subs);
+    },
+    enabled: !!active?.id,
+  });
 
-  useEffect(() => {
-    if (!slugTouched && createName.trim()) {
-      setCreateSlug(slugifyOrgName(createName));
+  // TanStack Query for organization slug availability check
+  const { data: slugStatus = null } = useQuery({
+    queryKey: ["org-slug-check", createSlug],
+    queryFn: async () => {
+      if (!createSlug.trim()) return null;
+      const res = await checkSlugAvailable(createSlug);
+      return res.available ? "Available" : (res.message ?? "Unavailable");
+    },
+    enabled: !!createSlug.trim(),
+  });
+
+  const myRole = memberState.data?.role ?? "";
+  const canUpdate = myRole ? canUpdateOrganization(myRole) : false;
+  const canDelete = myRole ? canDeleteOrganization(myRole) : false;
+  const canUseR2 = entitlements ? clientHasFeature(entitlements, "r2") : false;
+
+  const handleCreateNameChange = (name: string) => {
+    setCreateName(name);
+    if (!slugTouched && name.trim()) {
+      setCreateSlug(slugifyOrgName(name));
     }
-  }, [createName, slugTouched]);
-
-  useEffect(() => {
-    if (!createSlug.trim()) {
-      setSlugStatus(null);
-      return;
-    }
-    const timer = setTimeout(() => {
-      checkSlugAvailable(createSlug)
-        .then((res) => {
-          setSlugStatus(res.available ? "Available" : (res.message ?? "Unavailable"));
-        })
-        .catch(() => setSlugStatus(null));
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [createSlug]);
+  };
 
   const run = async (fn: () => Promise<void>, ok: string) => {
     setBusy(true);
@@ -233,7 +227,7 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
               <Input
                 id="org-name"
                 value={createName}
-                onChange={(e) => setCreateName(e.target.value)}
+                onChange={(e) => handleCreateNameChange(e.target.value)}
                 placeholder="Acme Inc"
                 autoComplete="organization"
               />
@@ -296,7 +290,6 @@ export function OrganizationSettingsPanel({ userId: _userId }: { userId: string 
                     setCreateName("");
                     setCreateSlug("");
                     setSlugTouched(false);
-                    setSlugStatus(null);
                     setBanner({ type: "ok", text: "Organization created" });
                   } catch (e) {
                     setBanner({

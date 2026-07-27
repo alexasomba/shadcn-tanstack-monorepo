@@ -6,7 +6,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Plus, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import type { TodoItem } from "#/lib/collections/todos";
@@ -174,7 +174,7 @@ function TanStackDBDemoPage() {
                       onClick={() => handleDeleteTodo(item.todo.id)}
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     >
-                      <Trash2 className="h-4 w-4" data-icon="inline-start" />
+                      <Trash className="h-4 w-4" data-icon="inline-start" />
                     </Button>
                   </div>
                 </li>
