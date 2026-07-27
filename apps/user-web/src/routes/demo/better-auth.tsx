@@ -1,4 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import { Button } from "@workspace/ui/components/button";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { Spinner } from "@workspace/ui/components/spinner";
 import { useState } from "react";
 
 import { authClient } from "#/lib/auth-client";
@@ -19,7 +25,7 @@ function BetterAuthDemo() {
   if (isPending) {
     return (
       <main className="demo-page demo-center">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-200 border-t-neutral-900 dark:border-neutral-800 dark:border-t-neutral-100" />
+        <Spinner className="size-6" />
       </main>
     );
   }
@@ -27,23 +33,20 @@ function BetterAuthDemo() {
   if (session?.user) {
     return (
       <main className="demo-page demo-center">
-        <section className="demo-panel w-full max-w-md space-y-6">
-          <div className="space-y-1.5">
+        <section className="demo-panel flex w-full max-w-md flex-col gap-6">
+          <div className="flex flex-col gap-1">
             <p className="island-kicker mb-2">Better Auth</p>
             <h1 className="demo-title">Welcome back</h1>
             <p className="demo-muted text-sm">You're signed in as {session.user.email}</p>
           </div>
 
           <div className="flex items-center gap-3">
-            {session.user.image ? (
-              <img src={session.user.image} alt="" className="h-10 w-10" />
-            ) : (
-              <div className="flex h-10 w-10 items-center justify-center bg-neutral-200 dark:bg-neutral-800">
-                <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                  {session.user.name?.charAt(0).toUpperCase() || "U"}
-                </span>
-              </div>
-            )}
+            <Avatar className="size-10">
+              <AvatarImage src={session.user.image ?? undefined} alt={session.user.name ?? ""} />
+              <AvatarFallback>
+                {session.user.name?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{session.user.name}</p>
               <p className="truncate text-xs text-neutral-500 dark:text-neutral-400">
@@ -52,14 +55,15 @@ function BetterAuthDemo() {
             </div>
           </div>
 
-          <button
+          <Button
+            variant="outline"
             onClick={() => {
               void authClient.signOut();
             }}
-            className="demo-button demo-button-secondary w-full"
+            className="w-full"
           >
             Sign out
-          </button>
+          </Button>
 
           <p className="demo-muted text-center text-xs">
             Built with{" "}
@@ -102,7 +106,7 @@ function BetterAuthDemo() {
           setError(result.error.message || "Sign in failed");
         }
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -120,62 +124,58 @@ function BetterAuthDemo() {
             : "Enter your email below to login to your account"}
         </p>
 
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          {isSignUp && (
-            <div className="grid gap-2">
-              <label htmlFor="name" className="text-sm leading-none font-medium">
-                Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="demo-input"
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <FieldGroup>
+            {isSignUp ? (
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                  required
+                />
+              </Field>
+            ) : null}
+
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 required
               />
-            </div>
-          )}
+            </Field>
 
-          <div className="grid gap-2">
-            <label htmlFor="email" className="text-sm leading-none font-medium">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="demo-input"
-              required
-            />
-          </div>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={isSignUp ? "new-password" : "current-password"}
+                required
+                minLength={8}
+              />
+            </Field>
+          </FieldGroup>
 
-          <div className="grid gap-2">
-            <label htmlFor="password" className="text-sm leading-none font-medium">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="demo-input"
-              required
-              minLength={8}
-            />
-          </div>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
 
-          {error && (
-            <div className="demo-alert demo-alert-danger">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
-
-          <button type="submit" disabled={loading} className="demo-button w-full">
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-400 border-t-white dark:border-neutral-600 dark:border-t-neutral-900" />
+                <Spinner className="size-4" />
                 <span>Please wait</span>
               </span>
             ) : isSignUp ? (
@@ -183,20 +183,21 @@ function BetterAuthDemo() {
             ) : (
               "Sign in"
             )}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-4 text-center">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError("");
             }}
-            className="demo-muted text-sm transition-colors hover:text-[var(--sea-ink)]"
+            className="w-full text-muted-foreground hover:text-foreground"
           >
             {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
-          </button>
+          </Button>
         </div>
 
         <p className="demo-muted mt-6 text-center text-xs">
@@ -215,3 +216,4 @@ function BetterAuthDemo() {
     </main>
   );
 }
+

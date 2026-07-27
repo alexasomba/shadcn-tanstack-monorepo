@@ -8,6 +8,7 @@ import type { Message } from "#/db-collections";
 function useStreamConnection(url: string, collection: Collection<any, any, any>) {
   const loadedRef = useRef(false);
 
+  // react-doctor-disable-next-line react-doctor/no-fetch-in-effect
   useEffect(() => {
     const fetchData = async () => {
       if (loadedRef.current) return;
@@ -32,6 +33,8 @@ function useStreamConnection(url: string, collection: Collection<any, any, any>)
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run stream fetch once on mount
+    // react-doctor-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 

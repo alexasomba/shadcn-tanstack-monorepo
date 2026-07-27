@@ -1,5 +1,8 @@
-import { Clock, Calendar, MapPin, CaretRight } from "@phosphor-icons/react";
+import { Calendar, CaretRight, MapPin } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Badge } from "@workspace/ui/components/badge";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { ToggleGroup, ToggleGroupItem } from "@workspace/ui/components/toggle-group";
 import { allTalks, allSpeakers } from "content-collections";
 import { useState } from "react";
 
@@ -65,12 +68,17 @@ function SchedulePage() {
         {/* Hero section */}
         <div className="relative px-6 py-16">
           <div className="mx-auto max-w-7xl text-center">
-            <div className="bg-copper/10 border-copper/30 text-copper-light mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium">
-              <Calendar className="h-4 w-4" />
-              <span>March 15-17, 2026</span>
-              <span className="text-copper/40 mx-2">•</span>
-              <MapPin className="h-4 w-4" />
-              <span>Paris, France</span>
+            <div>
+              <Badge
+                variant="outline"
+                className="border-copper/30 bg-copper/10 text-copper-light mb-6 inline-flex items-center gap-2 px-4 py-2 text-sm"
+              >
+                <Calendar className="size-4" />
+                <span>March 15-17, 2026</span>
+                <span className="text-copper/40 mx-2">•</span>
+                <MapPin className="size-4" />
+                <span>Paris, France</span>
+              </Badge>
             </div>
             <h1 className="font-display text-cream mb-4 text-5xl font-bold md:text-6xl">
               Conference <span className="text-gold italic">Schedule</span>
@@ -85,26 +93,28 @@ function SchedulePage() {
         {/* Day selector tabs */}
         <div className="mx-auto mb-12 max-w-7xl px-6">
           <div className="flex justify-center">
-            <div className="inline-flex rounded-2xl border border-border/50 bg-card/50 p-2">
+            <ToggleGroup
+              value={[String(selectedDay)]}
+              onValueChange={(val) => {
+                const nextDay = val[val.length - 1];
+                if (nextDay) setSelectedDay(Number(nextDay));
+              }}
+              variant="outline"
+              size="lg"
+            >
               {scheduleData.map((day) => (
-                <button
+                <ToggleGroupItem
                   key={day.day}
-                  onClick={() => setSelectedDay(day.day)}
-                  className={`font-display relative rounded-xl px-8 py-4 font-semibold transition-all duration-300 ${
-                    selectedDay === day.day
-                      ? "from-copper to-copper-dark text-charcoal shadow-copper/20 bg-gradient-to-br shadow-lg"
-                      : "text-cream/70 hover:text-cream hover:bg-card"
-                  }`}
+                  value={String(day.day)}
+                  className="font-display px-6 py-3 font-semibold"
                 >
-                  <span className="block text-xs tracking-wider uppercase opacity-75">
-                    {day.dayName}
-                  </span>
-                  <span className="block text-lg">
+                  <span className="block text-xs uppercase opacity-75">{day.dayName}</span>
+                  <span className="block text-base">
                     {day.date.split(",")[0].split(" ").slice(0, 2).join(" ")}
                   </span>
-                </button>
+                </ToggleGroupItem>
               ))}
-            </div>
+            </ToggleGroup>
           </div>
         </div>
 
@@ -126,7 +136,7 @@ function SchedulePage() {
             <div className="from-copper via-gold to-copper/30 absolute top-0 bottom-0 left-8 w-px bg-gradient-to-b md:left-12" />
 
             {/* Sessions */}
-            <div className="space-y-8">
+            <div className="flex flex-col gap-8">
               {currentDayData.sessions.map((session, index) => {
                 const talk = allTalks.find((t) => t.slug === session.talkSlug);
                 if (!talk) return null;
@@ -145,8 +155,8 @@ function SchedulePage() {
                       <div className="w-16 flex-shrink-0 pt-6 md:w-24">
                         <div className="relative">
                           {/* Timeline dot */}
-                          <div className="bg-charcoal border-gold group-hover:border-copper absolute top-0 -right-[13px] flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all group-hover:scale-110 md:-right-[17px]">
-                            <div className="bg-gold group-hover:bg-copper h-2 w-2 rounded-full transition-colors" />
+                          <div className="bg-charcoal border-gold group-hover:border-copper absolute top-0 -right-[13px] flex size-6 items-center justify-center rounded-full border-2 transition-transform group-hover:scale-110 md:-right-[17px]">
+                            <div className="bg-gold group-hover:bg-copper size-2 rounded-full transition-colors" />
                           </div>
                           <span className="font-display text-copper-light block text-right text-sm font-semibold md:text-base">
                             {session.time}
@@ -155,8 +165,8 @@ function SchedulePage() {
                       </div>
 
                       {/* Session card */}
-                      <div
-                        className="group-hover:border-gold/50 group-hover:shadow-gold/5 relative flex-1 overflow-hidden rounded-2xl border border-border/50 bg-card transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+                      <Card
+                        className="group-hover:border-gold/50 group-hover:shadow-gold/5 relative flex-1 overflow-hidden border-border/50 bg-card transition-[border-color,box-shadow,transform] duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
                         style={{
                           animationDelay: `${index * 100}ms`,
                         }}
@@ -166,21 +176,21 @@ function SchedulePage() {
                           <img
                             src={`/${talk.image}`}
                             alt={talk.title}
-                            className="h-full w-full object-cover opacity-30 transition-all duration-500 group-hover:scale-105 group-hover:opacity-40"
+                            className="size-full object-cover opacity-30 transition-[transform,opacity] duration-500 group-hover:scale-105 group-hover:opacity-40"
                           />
                           <div className="from-charcoal via-charcoal/95 to-charcoal/80 absolute inset-0 bg-gradient-to-r" />
                         </div>
 
                         {/* Content */}
-                        <div className="relative flex flex-col items-start gap-6 p-6 md:flex-row md:p-8">
+                        <CardContent className="relative flex flex-col items-start gap-6 p-6 md:flex-row md:p-8">
                           {/* Speaker image */}
                           {speaker && (
                             <div className="flex-shrink-0">
-                              <div className="border-gold/30 group-hover:border-gold/60 relative h-20 w-20 overflow-hidden rounded-xl border-2 shadow-lg transition-colors md:h-24 md:w-24">
+                              <div className="border-gold/30 group-hover:border-gold/60 relative size-20 overflow-hidden rounded-xl border-2 shadow-lg transition-colors md:size-24">
                                 <img
                                   src={`/${speaker.headshot}`}
                                   alt={speaker.name}
-                                  className="h-full w-full object-cover"
+                                  className="size-full object-cover"
                                 />
                                 <div className="from-charcoal/40 absolute inset-0 bg-gradient-to-t to-transparent" />
                               </div>
@@ -192,45 +202,47 @@ function SchedulePage() {
                             {/* Topics */}
                             <div className="mb-3 flex flex-wrap gap-2">
                               {talk.topics.slice(0, 3).map((topic) => (
-                                <span
+                                <Badge
                                   key={topic}
-                                  className="bg-gold/10 text-gold border-gold/20 rounded-full border px-2.5 py-0.5 text-xs font-medium tracking-wide uppercase"
+                                  variant="outline"
+                                  className="border-gold/20 bg-gold/10 text-gold tracking-wide uppercase"
                                 >
                                   {topic}
-                                </span>
+                                </Badge>
                               ))}
                             </div>
 
                             {/* Title */}
-                            <h3 className="font-display text-cream group-hover:text-gold mb-2 text-xl leading-tight font-semibold transition-colors md:text-2xl">
+                            <h3 className="font-display text-cream group-hover:text-gold mb-2 text-2xl font-bold transition-colors">
                               {talk.title}
                             </h3>
 
-                            {/* Speaker & Duration */}
-                            <div className="text-cream/60 mb-3 flex flex-wrap items-center gap-4 text-sm">
-                              <span className="text-copper-light font-medium">{talk.speaker}</span>
-                              <div className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5" />
-                                <span>{talk.duration}</span>
-                              </div>
-                            </div>
-
-                            {/* Speaker title if available */}
+                            {/* Speaker name */}
                             {speaker && (
-                              <p className="text-cream/50 font-body text-sm">
-                                {speaker.title} at {speaker.restaurant}
+                              <p className="text-cream/80 font-body mb-3 text-base">
+                                with{" "}
+                                <span className="text-cream font-semibold">{speaker.name}</span>
+                                <span className="text-cream/50"> • {speaker.restaurant}</span>
                               </p>
                             )}
+
+                            {/* Summary */}
+                            <p className="text-cream/60 font-body line-clamp-2 text-sm">
+                              {talk.content}
+                            </p>
                           </div>
 
-                          {/* Arrow indicator */}
-                          <div className="flex-shrink-0 self-center">
-                            <div className="bg-gold/10 border-gold/20 group-hover:bg-gold/20 group-hover:border-gold/40 flex h-10 w-10 items-center justify-center rounded-full border transition-all">
-                              <CaretRight className="text-gold h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+                          {/* Action indicator */}
+                          <div className="flex flex-shrink-0 items-center gap-2 self-center text-sm font-medium">
+                            <span className="text-gold/60 group-hover:text-gold opacity-0 transition-opacity group-hover:opacity-100">
+                              View Details
+                            </span>
+                            <div className="bg-copper/20 text-copper-light group-hover:bg-gold group-hover:text-charcoal flex size-10 items-center justify-center rounded-full transition-colors">
+                              <CaretRight className="size-5" />
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </CardContent>
+                      </Card>
                     </div>
                   </Link>
                 );
@@ -255,13 +267,13 @@ function SchedulePage() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/talks"
-                  className="from-copper to-copper-dark text-charcoal hover:shadow-copper/30 inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-6 py-3 font-semibold transition-all hover:scale-[1.02] hover:shadow-lg"
+                  className="from-copper to-copper-dark text-charcoal hover:shadow-copper/30 inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-6 py-3 font-semibold transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-lg"
                 >
                   Browse All Sessions
                 </Link>
                 <Link
                   to="/speakers"
-                  className="border-gold/50 text-gold hover:bg-gold/10 hover:border-gold inline-flex items-center gap-2 rounded-full border-2 px-6 py-3 font-semibold transition-all"
+                  className="border-gold/50 text-gold hover:bg-gold/10 hover:border-gold inline-flex items-center gap-2 rounded-full border-2 px-6 py-3 font-semibold transition-colors"
                 >
                   Meet the Speakers
                 </Link>

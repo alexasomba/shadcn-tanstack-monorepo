@@ -16,7 +16,10 @@ export function NavMain({
     <SidebarMenu>
       {items.map((item) => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton isActive={item.isActive} render={<a href={item.url} />}>
+          <SidebarMenuButton
+            isActive={item.isActive}
+            render={<a href={item.url} aria-label={item.title} />}
+          >
             {item.icon}
             <span>{item.title}</span>
           </SidebarMenuButton>

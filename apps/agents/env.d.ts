@@ -10,9 +10,15 @@ declare namespace Cloudflare {
     mainModule: typeof import("./src/server");
     durableNamespaces: "ChatAgent";
   }
-  interface Env extends __BaseEnv_Env {}
+  interface Env extends __BaseEnv_Env {
+    SENTRY_DSN?: string;
+    VITE_SENTRY_DSN?: string;
+  }
 }
-interface Env extends __BaseEnv_Env {}
+interface Env extends __BaseEnv_Env {
+  SENTRY_DSN?: string;
+  VITE_SENTRY_DSN?: string;
+}
 type StringifyValues<EnvType extends Record<string, unknown>> = {
   [Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };

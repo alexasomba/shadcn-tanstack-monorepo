@@ -161,7 +161,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<a href="#" />}>
+            <SidebarMenuButton size="lg" render={<a href="#" aria-label="Documentation v1.0.0" />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <RowsIcon className="size-4" />
               </div>
@@ -178,7 +178,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu className="gap-2">
             {data.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton render={<a href={item.url} className="font-medium" />}>
+                <SidebarMenuButton
+                  render={<a href={item.url} aria-label={item.title} className="font-medium" />}
+                >
                   {item.title}
                 </SidebarMenuButton>
                 {item.items?.length ? (
@@ -187,7 +189,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <SidebarMenuSubItem key={item.title}>
                         <SidebarMenuSubButton
                           isActive={item.isActive}
-                          render={<a href={item.url} />}
+                          render={<a href={item.url} aria-label={item.title} />}
                         >
                           {item.title}
                         </SidebarMenuSubButton>

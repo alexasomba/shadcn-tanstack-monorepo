@@ -1,4 +1,5 @@
 import { PaperPlaneRight, X, ChefHat, Cookie } from "@phosphor-icons/react";
+import { useStore } from "@tanstack/react-store";
 import { Store } from "@tanstack/store";
 import { useEffect, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
@@ -81,22 +82,12 @@ interface RemyAssistantProps {
 export const showRemyAssistant = new Store(false);
 
 export default function RemyAssistant({ speakerSlug, talkSlug, contextTitle }: RemyAssistantProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useStore(showRemyAssistant);
   const { messages, sendMessage, isLoading } = useConferenceChat(speakerSlug, talkSlug);
   const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const sub = showRemyAssistant.subscribe(() => {
-      setIsOpen(showRemyAssistant.state);
-    });
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
-
   const handleToggle = () => {
     const newState = !isOpen;
-    setIsOpen(newState);
     showRemyAssistant.setState(() => newState);
   };
 

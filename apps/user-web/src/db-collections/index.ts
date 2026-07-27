@@ -2,7 +2,7 @@ import { createCollection, localOnlyCollectionOptions } from "@tanstack/react-db
 import { z } from "zod";
 
 const MessageSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   text: z.string(),
   user: z.string(),
 });

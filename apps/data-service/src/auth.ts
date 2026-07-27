@@ -1,32 +1,120 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { betterAuth } from "better-auth";
+import { createAuth, createDatabase, getNotifyClient } from "data-ops";
+import type { Auth, AuthSession, AuthUser } from "data-ops";
 
-import * as schema from "../../../packages/data-ops/src/schema.js";
+import { logError, logInfo } from "./lib/log";
+import type { Bindings } from "./types";
 
-declare global {
-  var process: {
-    env: Record<string, string | undefined>;
-  };
+function readEnv(name: string): string | undefined {
+  try {
+    const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
+    const value = proc?.env?.[name];
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
-// A minimal mock Drizzle database instance to satisfy Better Auth schema generator
-const mockDb = {
-  $primary: "sqlite",
-  _: {
-    schema,
-    tableNamesMap: {},
-  },
-} as unknown as Parameters<typeof drizzleAdapter>[0];
-
-export const authConfig = {
-  database: drizzleAdapter(mockDb, {
-    provider: "sqlite",
-  }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  secret: process.env.BETTER_AUTH_SECRET || "development-secret-12345678901234567890",
+export type GetAuthOptions = {
+  baseURL?: string;
+  secret?: string;
+  RESEND_API_KEY?: string;
+  EMAIL_FROM?: string;
 };
 
-// Expose standard auth object for Better Auth CLI to read schema options
-export const auth = betterAuth(authConfig);
+/**
+ * Runtime Better Auth instance for the data-service Worker.
+ * Prefer binding secrets via wrangler (`BETTER_AUTH_SECRET` / `BETTER_AUTH_URL`).
+ */
+export function getAuth(d1: D1Database, options: GetAuthOptions = {}, bindings?: Bindings) {
+  const db = createDatabase(d1);
+  const notify = bindings ? getNotifyClient(bindings) : undefined;
+
+  return createAuth(db, {
+    appName: "Data Service",
+    baseURL: options.baseURL ?? readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8302",
+    secret: options.secret ?? readEnv("BETTER_AUTH_SECRET"),
+    RESEND_API_KEY: options.RESEND_API_KEY ?? readEnv("RESEND_API_KEY"),
+    EMAIL_FROM: options.EMAIL_FROM ?? readEnv("EMAIL_FROM"),
+
+    onUserSignup: async (user) => {
+      if (bindings?.USER_ONBOARDING_WORKFLOW) {
+        try {
+          await bindings.USER_ONBOARDING_WORKFLOW.create({
+            id: `wf-user-${user.id}-${Date.now()}`,
+            params: { userId: user.id },
+          });
+        } catch (err) {
+          logError("auth.workflow.user_onboarding_failed", { userId: user.id, error: err });
+        }
+      }
+    },
+
+    onOrgCreate: async (org) => {
+      if (bindings?.ORG_ONBOARDING_WORKFLOW) {
+        try {
+          await bindings.ORG_ONBOARDING_WORKFLOW.create({
+            id: `wf-org-${org.id}-${Date.now()}`,
+            params: { orgId: org.id },
+          });
+        } catch (err) {
+          logError("auth.workflow.org_onboarding_failed", { orgId: org.id, error: err });
+        }
+      }
+    },
+
+    sendVerificationEmail: async ({ user, url }) => {
+      if (notify) {
+        await notify.verifyEmail.send({
+          to: user.email,
+          input: { name: "User", url },
+        });
+      } else {
+        logInfo("auth.verifyEmail.console", { to: user.email });
+      }
+    },
+
+    sendResetPassword: async ({ user, url }) => {
+      if (notify) {
+        await notify.resetPassword.send({
+          to: user.email,
+          input: { name: "User", url },
+        });
+      } else {
+        logInfo("auth.resetPassword.console", { to: user.email });
+      }
+    },
+
+    sendInvitationEmail: async ({ email, organization, inviter, invitation }) => {
+      if (notify) {
+        const acceptUrl = `${options.baseURL ?? readEnv("BETTER_AUTH_URL") ?? "http://127.0.0.1:8302"}/accept-invite?id=${invitation.id}`;
+        await notify.orgInvitation.send({
+          to: email,
+          input: {
+            inviterName: inviter.user.name || "Admin",
+            organizationName: organization.name,
+            url: acceptUrl,
+          },
+        });
+      } else {
+        logInfo("auth.orgInvitation.console", { to: email, org: organization.name });
+      }
+    },
+
+    sendOTP: async ({ user, otp }) => {
+      if (notify) {
+        await notify.twoFactorOtp.send({
+          to: user.email,
+          input: { otp },
+        });
+      } else {
+        logInfo("auth.twoFactorOtp.console", { to: user.email });
+      }
+    },
+  });
+}
+
+export type DataServiceAuth = ReturnType<typeof getAuth>;
+export type { Auth, AuthSession, AuthUser };
+
+// CLI: use packages/data-ops (`vpr auth:generate` / `vpr auth:info`).
+// Runtime: getAuth(env.DATABASE) above.

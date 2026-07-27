@@ -4,18 +4,36 @@
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Dev HTTP port is dedicated; local D1 is shared via vite persistState
+  // pointing at apps/user-web/.wrangler/state (see vite.config.ts).
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 8301,
+    "inspector_port": 9231,
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+  },
   "ai": {
     "binding": "AI",
     "remote": true,
   },
   "d1_databases": [
     {
-      "binding": "DB",
-      "database_name": "data-service-db",
+      "binding": "DATABASE",
+      "database_name": "app-db",
       "database_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "migrations_dir": "../../packages/data-ops/src/drizzle/migrations",
+      "migrations_pattern": "../../packages/data-ops/src/drizzle/migrations/*/migration.sql",
     },
   ],
-  "dev": {
-    "inspector_port": 9231,
-  },
+  "services": [
+    {
+      "binding": "DATA_SERVICE",
+      "service": "data-service",
+    },
+  ],
 }

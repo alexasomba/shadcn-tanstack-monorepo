@@ -36,6 +36,7 @@ function DevtoolPanel() {
     fullName: fullName.state,
   }));
 
+  // react-doctor-disable-next-line react-doctor/effect-needs-cleanup
   useEffect(() => {
     return sdec.on("state", (e) => setState(e.payload));
   }, []);

@@ -1,13 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PaperPlaneRight, Square, Microphone, MicrophoneSlash, SpeakerHigh, SpeakerSlash, Spinner } from "@phosphor-icons/react";
+import {
+  Microphone,
+  MicrophoneSlash,
+  PaperPlaneRight,
+  SpeakerHigh,
+  SpeakerSlash,
+  Square,
+} from "@phosphor-icons/react";
+import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
+import { Bubble, BubbleContent } from "@workspace/ui/components/bubble";
+import { Button } from "@workspace/ui/components/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupTextarea,
+} from "@workspace/ui/components/input-group";
+import { Message, MessageAvatar, MessageContent } from "@workspace/ui/components/message";
+import { Spinner } from "@workspace/ui/components/spinner";
 import { useEffect, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 
 import GuitarRecommendation from "#/components/demo-GuitarRecommendation";
 import { useAudioRecorder } from "#/hooks/demo-useAudioRecorder";
 import { useTTS } from "#/hooks/demo-useTTS";
-import { useGuitarRecommendationChat } from "#/lib/demo-ai-hook";
 import type { ChatMessages } from "#/lib/demo-ai-hook";
+import { useGuitarRecommendationChat } from "#/lib/demo-ai-hook";
 
 import "./ai-chat.css";
 
@@ -69,70 +86,80 @@ function Messages({
 
   return (
     <div ref={messagesContainerRef} className="min-h-0 flex-1 overflow-y-auto pb-4">
-      <div className="mx-auto w-full max-w-3xl px-4">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-4">
         {messages.map((message) => {
           const textContent = getTextContent(message.parts);
           const isPlaying = playingId === message.id;
+          const isAssistant = message.role === "assistant";
 
           return (
-            <div
-              key={message.id}
-              className={`p-4 ${
-                message.role === "assistant" ? "bg-[var(--chip-bg)]" : "bg-transparent"
-              }`}
-            >
-              <div className="mx-auto flex w-full max-w-3xl items-start gap-4">
-                {message.role === "assistant" ? (
-                  <div className="mt-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--lagoon-deep)] text-sm font-medium text-white">
-                    AI
-                  </div>
-                ) : (
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--sea-ink-soft)] text-sm font-medium text-white">
-                    Y
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  {message.parts.map((part, index) => {
-                    if (part.type === "text" && part.content) {
-                      return (
-                        <div className="prose prose-sm max-w-none min-w-0 flex-1" key={index}>
-                          <Streamdown>{part.content}</Streamdown>
-                        </div>
-                      );
+            <Message key={message.id} align={isAssistant ? "start" : "end"}>
+              <MessageAvatar>
+                <Avatar className="size-8">
+                  <AvatarFallback
+                    className={
+                      isAssistant
+                        ? "bg-[var(--lagoon-deep)] text-white"
+                        : "bg-[var(--sea-ink-soft)] text-white"
                     }
-                    // Guitar recommendation card
-                    if (
-                      part.type === "tool-call" &&
-                      part.name === "recommendGuitar" &&
-                      part.output
-                    ) {
-                      return (
-                        <div key={part.id} className="mx-auto max-w-[80%]">
-                          <GuitarRecommendation id={String(part.output?.id)} />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-                {/* TTS button for assistant messages */}
-                {message.role === "assistant" && textContent && (
-                  <button
-                    onClick={() => (isPlaying ? onStopSpeak() : onSpeak(textContent, message.id))}
-                    className="demo-muted flex-shrink-0 p-2 transition-colors hover:text-[var(--lagoon-deep)]"
-                    title={isPlaying ? "Stop speaking" : "Read aloud"}
                   >
-                    {isPlaying ? <SpeakerSlash className="h-4 w-4" /> : <SpeakerHigh className="h-4 w-4" />}
-                  </button>
-                )}
-              </div>
-            </div>
+                    {isAssistant ? "AI" : "Y"}
+                  </AvatarFallback>
+                </Avatar>
+              </MessageAvatar>
+
+              <MessageContent>
+                {message.parts.map((part) => {
+                  if (part.type === "text" && part.content) {
+                    return (
+                      <Bubble
+                        key={part.content}
+                        variant={isAssistant ? "muted" : "default"}
+                        align={isAssistant ? "start" : "end"}
+                      >
+                        <BubbleContent>
+                          <div className="prose prose-sm max-w-none min-w-0">
+                            <Streamdown>{part.content}</Streamdown>
+                          </div>
+                        </BubbleContent>
+                      </Bubble>
+                    );
+                  }
+                  // Guitar recommendation card
+                  if (
+                    part.type === "tool-call" &&
+                    part.name === "recommendGuitar" &&
+                    part.output
+                  ) {
+                    return (
+                      <div key={part.id} className="mx-auto max-w-[80%]">
+                        <GuitarRecommendation id={String(part.output?.id)} />
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+              </MessageContent>
+
+              {/* TTS button for assistant messages */}
+              {isAssistant && textContent ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => (isPlaying ? onStopSpeak() : onSpeak(textContent, message.id))}
+                  title={isPlaying ? "Stop speaking" : "Read aloud"}
+                >
+                  {isPlaying ? <SpeakerSlash className="size-4" /> : <SpeakerHigh className="size-4" />}
+                </Button>
+              ) : null}
+            </Message>
           );
         })}
       </div>
     </div>
   );
 }
+
 
 function ChatPage() {
   const [input, setInput] = useState("");
@@ -161,49 +188,56 @@ function ChatPage() {
         <Messages messages={messages} playingId={playingId} onSpeak={speak} onStopSpeak={stopTTS} />
 
         <Layout>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {isLoading && (
               <div className="flex items-center justify-center">
-                <button onClick={stop} className="demo-button demo-button-danger">
-                  <Square className="h-4 w-4 fill-current" />
+                <Button variant="destructive" size="sm" onClick={stop}>
+                  <Square className="size-4 fill-current" data-icon="inline-start" />
                   Stop
-                </button>
+                </Button>
               </div>
             )}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (input.trim()) {
+                const formEl = e.currentTarget;
+                if (!formEl.checkValidity()) {
+                  formEl.reportValidity();
+                  return;
+                }
+                if (input.trim() && !isLoading) {
                   sendMessage(input);
                   setInput("");
                 }
               }}
             >
-              <div className="relative mx-auto flex max-w-xl items-center gap-2">
-                <button
+              <div className="mx-auto flex max-w-xl items-center gap-2">
+                <Button
                   type="button"
                   onClick={handleMicClick}
                   disabled={isLoading || isTranscribing}
-                  className={`demo-button p-3 ${
-                    isRecording ? "demo-button-danger" : "demo-button-secondary"
-                  } disabled:opacity-50`}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="icon"
+                  className={isRecording ? "animate-pulse" : ""}
                   title={isRecording ? "Stop recording" : "Start recording"}
                 >
                   {isTranscribing ? (
-                    <Spinner className="h-4 w-4 animate-spin" />
+                    <Spinner className="size-4" />
                   ) : isRecording ? (
-                    <MicrophoneSlash className="h-4 w-4" />
+                    <MicrophoneSlash className="size-4" />
                   ) : (
-                    <Microphone className="h-4 w-4" />
+                    <Microphone className="size-4" />
                   )}
-                </button>
+                </Button>
 
-                <div className="relative flex-1">
-                  <textarea
+                <InputGroup className="flex-1">
+                  <InputGroupTextarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type something clever..."
-                    className="demo-textarea pr-12 text-sm"
+                    aria-label="Chat message input"
+                    required
+                    minLength={1}
                     rows={1}
                     style={{ minHeight: "44px", maxHeight: "200px" }}
                     disabled={isLoading}
@@ -220,14 +254,18 @@ function ChatPage() {
                       }
                     }}
                   />
-                  <button
-                    type="submit"
-                    disabled={!input.trim() || isLoading}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 p-2 text-[var(--lagoon-deep)] transition-colors hover:text-[var(--sea-ink)] disabled:text-[var(--sea-ink-soft)]"
-                  >
-                    <PaperPlaneRight className="h-4 w-4" />
-                  </button>
-                </div>
+                  <InputGroupAddon align="end">
+                    <Button
+                      type="submit"
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Send message"
+                      disabled={!input.trim() || isLoading}
+                    >
+                      <PaperPlaneRight className="size-4" />
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
               </div>
             </form>
           </div>
@@ -240,3 +278,4 @@ function ChatPage() {
 export const Route = createFileRoute("/demo/ai-chat")({
   component: ChatPage,
 });
+

@@ -1,59 +1,44 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getDB, todos, desc } from "data-ops";
-import { z } from "zod";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { useState } from "react";
 
-const getTodos = createServerFn({
-  method: "GET",
-}).handler(async () => {
-  // @ts-expect-error - vinxi/http is a platform-specific import
-  const { getEvent } = await import("vinxi/http");
-  const d1 = getEvent()?.context?.cloudflare?.env?.DB;
-  const db = getDB(d1);
-  return await db.query.todos.findMany({
-    orderBy: [desc(todos.createdAt)],
-  });
-});
-
-const createTodo = createServerFn({
-  method: "POST",
-})
-  .validator(
-    z.object({
-      title: z.string().min(1, "Title is required"),
-    }),
-  )
-  .handler(async ({ data }) => {
-    // @ts-expect-error - vinxi/http is a platform-specific import
-    const { getEvent } = await import("vinxi/http");
-    const d1 = getEvent()?.context?.cloudflare?.env?.DB;
-    const db = getDB(d1);
-    await db.insert(todos).values({ title: data.title });
-    return { success: true };
-  });
+import { createTodo, getTodos } from "#/lib/todos.functions";
 
 export const Route = createFileRoute("/demo/drizzle")({
   component: DemoDrizzle,
   loader: async () => await getTodos(),
+  pendingComponent: () => (
+    <div className="flex items-center justify-center p-6 text-sm text-muted-foreground">
+      Loading todos...
+    </div>
+  ),
 });
 
 function DemoDrizzle() {
   const router = useRouter();
-  const todos = Route.useLoaderData();
+  const todosList = Route.useLoaderData();
+  const createTodoFn = useServerFn(createTodo);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const title = formData.get("title") as string;
 
-    if (!title) return;
+    if (!title || isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
-      await createTodo({ data: { title } });
-      router.invalidate();
+      await createTodoFn({ data: { title } });
+      await router.invalidate();
       (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error("Failed to create todo:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -61,19 +46,26 @@ function DemoDrizzle() {
     <main className="demo-page demo-center">
       <section className="demo-panel w-full max-w-2xl">
         <header className="mb-8 flex items-center gap-4">
-          <span className="demo-card flex h-14 w-14 items-center justify-center p-3">
-            <img src="/drizzle.svg" alt="Drizzle Logo" className="h-8 w-8" />
+          <span className="demo-card flex size-14 items-center justify-center p-3">
+            <img src="/drizzle.svg" alt="Drizzle Logo" className="size-8" />
           </span>
           <div>
             <p className="island-kicker mb-2">Database</p>
-            <h1 className="demo-title">Drizzle Demo</h1>
+            <h1 className="demo-title">Drizzle + D1 Demo</h1>
+            <p className="demo-muted mt-1 text-sm">
+              Authenticated RPCs via <code>requireAuthMiddleware</code>.{" "}
+              <Link to="/login" search={{ redirect: "/demo/drizzle" }} className="underline">
+                Sign in
+              </Link>{" "}
+              if the loader redirects.
+            </p>
           </div>
         </header>
 
         <h2 className="demo-section-title mb-4">Todos</h2>
 
-        <ul className="mb-6 space-y-3">
-          {todos.map((todo) => (
+        <ul className="mb-6 flex flex-col gap-3">
+          {todosList.map((todo) => (
             <li key={todo.id} className="demo-list-item">
               <div className="flex items-center justify-between">
                 <span className="font-medium">{todo.title}</span>
@@ -81,49 +73,51 @@ function DemoDrizzle() {
               </div>
             </li>
           ))}
-          {todos.length === 0 && (
+          {todosList.length === 0 && (
             <li className="demo-list-item demo-muted text-center">
               No todos yet. Create one below!
             </li>
           )}
         </ul>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
-          <input
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formEl = e.currentTarget;
+            if (!formEl.checkValidity()) {
+              formEl.reportValidity();
+              return;
+            }
+            void handleSubmit(e);
+          }}
+          className="flex flex-col gap-2 sm:flex-row"
+        >
+          <Input
             type="text"
             name="title"
+            aria-label="Add a new todo"
             placeholder="Add a new todo..."
-            className="demo-input min-w-0 flex-1"
+            disabled={isSubmitting}
+            required
+            minLength={1}
+            className="min-w-0 flex-1"
           />
-          <button type="submit" className="demo-button whitespace-nowrap">
-            Add Todo
-          </button>
+          <Button type="submit" disabled={isSubmitting} className="whitespace-nowrap">
+            {isSubmitting ? "Adding..." : "Add Todo"}
+          </Button>
         </form>
 
-        <div className="demo-card mt-8">
-          <h3 className="demo-section-title mb-2">Powered by Drizzle ORM</h3>
-          <p className="demo-muted mb-4 text-sm">
-            Next-generation ORM for Node.js & TypeScript with PostgreSQL
-          </p>
-          <div className="space-y-2 text-sm">
-            <p className="font-medium">Setup Instructions:</p>
-            <ol className="demo-muted list-inside list-decimal space-y-2">
-              <li>
-                Configure your <code>DATABASE_URL</code> in .env.local
-              </li>
-              <li>
-                Run: <code>npx -y drizzle-kit generate</code>
-              </li>
-              <li>
-                Run: <code>npx -y drizzle-kit migrate</code>
-              </li>
-              <li>
-                Optional: <code>npx -y drizzle-kit studio</code>
-              </li>
-            </ol>
-          </div>
-        </div>
+        <Card className="mt-8 border-border/70 shadow-none">
+          <CardContent className="pt-6">
+            <h3 className="demo-section-title mb-2">Security note</h3>
+            <p className="demo-muted text-sm">
+              <code>getTodos</code> / <code>createTodo</code> enforce session on the server function
+              itself — route guards alone are not enough for RPCs.
+            </p>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );
 }
+

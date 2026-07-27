@@ -37,7 +37,8 @@ function DevtoolPanel() {
   }));
 
   useEffect(() => {
-    return sdec.on("state", (e) => setState(e.payload));
+    const unsubscribe = sdec.on("state", (e) => setState(e.payload));
+    return () => unsubscribe();
   }, []);
 
   return (

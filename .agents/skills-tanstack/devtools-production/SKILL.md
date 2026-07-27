@@ -61,13 +61,7 @@ function App() {
   return (
     <>
       <YourApp />
-      <TanStackDevtools
-        plugins={
-          [
-            /* ... */
-          ]
-        }
-      />
+      <TanStackDevtools plugins={[/* ... */]} />
     </>
   );
 }
@@ -136,13 +130,7 @@ function App() {
   return (
     <>
       <YourApp />
-      <TanStackDevtools
-        plugins={
-          [
-            /* ... */
-          ]
-        }
-      />
+      <TanStackDevtools plugins={[/* ... */]} />
     </>
   );
 }
@@ -190,13 +178,7 @@ function App() {
   return (
     <>
       <YourApp />
-      <TanStackDevtools
-        plugins={
-          [
-            /* ... */
-          ]
-        }
-      />
+      <TanStackDevtools plugins={[/* ... */]} />
     </>
   );
 }
@@ -214,11 +196,7 @@ URL parameter is present:
     requireUrlFlag: true,
     urlFlag: "debug", // visit ?debug to show devtools
   }}
-  plugins={
-    [
-      /* ... */
-    ]
-  }
+  plugins={[/* ... */]}
 />
 ```
 
@@ -277,15 +255,7 @@ let DevtoolsComponent: React.ComponentType = () => null;
 
 if (__DEV__) {
   const { TanStackDevtools } = await import("@tanstack/react-devtools");
-  DevtoolsComponent = () => (
-    <TanStackDevtools
-      plugins={
-        [
-          /* ... */
-        ]
-      }
-    />
-  );
+  DevtoolsComponent = () => <TanStackDevtools plugins={[/* ... */]} />;
 }
 
 function App() {
@@ -406,13 +376,7 @@ function App() {
   return (
     <>
       <YourApp />
-      <TanStackDevtools
-        plugins={
-          [
-            /* ... */
-          ]
-        }
-      />
+      <TanStackDevtools plugins={[/* ... */]} />
     </>
   );
 }

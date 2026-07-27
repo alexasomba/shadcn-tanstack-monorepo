@@ -1,3 +1,8 @@
-<type>: <short description>
+# Multi-agent worktrees: commit in .worktrees/* (detached) or small fixes on preview.
+# Integrate with: pnpm worktree:merge <name> --message "feat: … Fixes #N"
+# See AGENTS.md → Multi-agent–safe Git
 
-Fixes #
+# <type>: <short description>
+#
+# Fixes #
+

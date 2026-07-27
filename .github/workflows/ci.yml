@@ -2,22 +2,64 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, preview]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".vscode/**"
   pull_request:
-    branches:
-      - main
+    branches: [main, preview]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".vscode/**"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
           cache: true
+
       - run: vp install
-      - run: vp check
-      - run: vp test
-      - run: vp build
+
+      # Experimental: reuse Vite Task cache across runs (guide/github-actions-cache).
+      # Only helps `vp run` / `vpr` tasks — not bare `vp check` / `vp test`.
+      - name: Restore Vite Task cache
+        id: vite-task-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-
+
+      # Pre-generate content collections and paraglide so types are available for the check step
+      - name: Generate content collections and paraglide
+        run: |
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match content-collections:build || true
+          vp run --filter user-web-app --filter admin-web-app --fail-if-no-match paraglide:compile || true
+
+      - run: vpr ci:check
+      - run: vpr ci:test
+      - run: vpr build
+
+      - name: Save Vite Task cache
+        if: success()
+        uses: actions/cache/save@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: ${{ steps.vite-task-cache.outputs.cache-primary-key }}

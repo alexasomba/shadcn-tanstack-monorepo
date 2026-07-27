@@ -4,6 +4,7 @@ import { ollamaText } from "@tanstack/ai-ollama";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { getAiBinding } from "#/lib/cloudflare-env";
 import {
   getSpeakerBySlug,
   getTalkBySlug,
@@ -61,21 +62,7 @@ ${talkSlug ? `CONTEXT: The user is viewing the session with slug "${talkSlug}".`
 
 Remember: You are the friendly face of Haute Pâtisserie 2026. Make every attendee feel welcome and excited about the culinary journey ahead!`;
 
-          let binding: unknown = undefined;
-          try {
-            // @ts-expect-error - vinxi/http is a platform-specific import that does not have type declarations in this package
-            const { getEvent } = await import("vinxi/http");
-            const event = getEvent();
-            binding = event?.context?.cloudflare?.env?.AI;
-          } catch {
-            // Fallback
-          }
-
-          if (!binding) {
-            binding =
-              (process.env as Record<string, unknown>).AI ||
-              (globalThis as Record<string, unknown>).AI;
-          }
+          const binding = getAiBinding();
 
           const adapter = binding
             ? createWorkersAiChat("@cf/meta/llama-3-8b-instruct", {

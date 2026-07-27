@@ -12,6 +12,8 @@ import * as Sentry from "@sentry/tanstackstart-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
+import { Button } from "@workspace/ui/components/button";
+import { Spinner } from "@workspace/ui/components/spinner";
 
 export const Route = createFileRoute("/demo/sentry/testing")({
   component: RouteComponent,
@@ -88,6 +90,7 @@ const goodServerFunc = createServerFn({
 
 // 3D Button Component inspired by Sentry wizard
 function SentryButton({
+
   children,
   onClick,
   variant = "primary",
@@ -101,38 +104,20 @@ function SentryButton({
   loading?: boolean;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={disabled || loading}
-      className={`demo-button w-full px-6 py-4 text-base ${variant === "error" ? "demo-button-danger" : ""}`}
+      variant={variant === "error" ? "destructive" : "default"}
+      size="lg"
+      className="w-full text-base"
     >
-      {loading && (
-        <svg
-          className="h-5 w-5 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-      )}
+      {loading ? <Spinner className="size-5" /> : null}
       {children}
-    </button>
+    </Button>
   );
 }
+
 
 // Feature Card Component
 function FeatureCard({
@@ -268,13 +253,7 @@ function RouteComponent() {
   const [results, setResults] = useState<
     Record<string, { type: "success" | "error"; spanOp: string }>
   >({});
-  const [sentryConfigured, setSentryConfigured] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // Check if Sentry DSN environment variable is set
-    const hasDsn = !!import.meta.env.VITE_SENTRY_DSN;
-    setSentryConfigured(hasDsn);
-  }, []);
+  const [sentryConfigured] = useState<boolean>(() => !!import.meta.env.VITE_SENTRY_DSN);
 
   // Don't show warning until we've checked on the client
   const showWarning = sentryConfigured === false;

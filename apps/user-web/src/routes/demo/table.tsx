@@ -17,6 +17,17 @@ import type {
   FilterFn,
   SortingFn,
 } from "@tanstack/react-table";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@workspace/ui/components/table";
 import React from "react";
 
 import { makeData } from "#/data/demo-table-data";
@@ -60,6 +71,7 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
       rowB.columnFiltersMeta[columnId]?.itemRank,
     );
   }
+
 
   // Provide an alphanumeric fallback for when the item ranks are equal
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
@@ -105,6 +117,7 @@ function TableDemo() {
   const [data, setData] = React.useState<Person[]>(() => makeData(5_000));
   const refreshData = () => setData((_old) => makeData(50_000)); // stress test
 
+  // react-doctor-disable-next-line react-hooks-js/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -144,26 +157,25 @@ function TableDemo() {
         <DebouncedInput
           value={globalFilter ?? ""}
           onChange={(value) => setGlobalFilter(String(value))}
-          className="demo-input"
           placeholder="Search all columns..."
         />
       </div>
       <div className="h-4" />
-      <div className="demo-table-shell">
-        <table className="demo-table text-sm">
-          <thead>
+      <div className="rounded-xl border border-border/70 overflow-hidden bg-card">
+        <Table>
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <th key={header.id} colSpan={header.colSpan} className="px-4 py-3 text-left">
+                    <TableHead key={header.id} colSpan={header.colSpan}>
                       {header.isPlaceholder ? null : (
                         <>
                           <div
                             {...{
                               className: header.column.getCanSort()
-                                ? "cursor-pointer select-none transition-colors hover:text-[var(--lagoon-deep)]"
-                                : "",
+                                ? "cursor-pointer select-none transition-colors hover:text-foreground font-semibold"
+                                : "font-semibold",
                               onClick: header.column.getToggleSortingHandler(),
                             }}
                           >
@@ -180,59 +192,63 @@ function TableDemo() {
                           ) : null}
                         </>
                       )}
-                    </th>
+                    </TableHead>
                   );
                 })}
-              </tr>
+              </TableRow>
             ))}
-          </thead>
-          <tbody>
+          </TableHeader>
+          <TableBody>
             {table.getRowModel().rows.map((row) => {
               return (
-                <tr key={row.id} className="transition-colors">
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => {
                     return (
-                      <td key={cell.id} className="px-4 py-3">
+                      <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
+                      </TableCell>
                     );
                   })}
-                </tr>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
       <div className="h-4" />
-      <div className="demo-muted flex flex-wrap items-center gap-2">
-        <button
-          className="demo-button demo-button-secondary"
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => table.setPageIndex(0)}
           disabled={!table.getCanPreviousPage()}
         >
           {"<<"}
-        </button>
-        <button
-          className="demo-button demo-button-secondary"
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           {"<"}
-        </button>
-        <button
-          className="demo-button demo-button-secondary"
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
           {">"}
-        </button>
-        <button
-          className="demo-button demo-button-secondary"
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => table.setPageIndex(table.getPageCount() - 1)}
           disabled={!table.getCanNextPage()}
         >
           {">>"}
-        </button>
+        </Button>
         <span className="flex items-center gap-1">
           <div>Page</div>
           <strong>
@@ -240,39 +256,45 @@ function TableDemo() {
           </strong>
         </span>
         <span className="flex items-center gap-1">
-          | Go to page:
-          <input
+          <label htmlFor="go-to-page-input">Go to page:</label>
+          <Input
+            id="go-to-page-input"
             type="number"
+            aria-label="Go to page"
             defaultValue={table.getState().pagination.pageIndex + 1}
             onChange={(e) => {
               const page = e.target.value ? Number(e.target.value) - 1 : 0;
               table.setPageIndex(page);
             }}
-            className="demo-input demo-input-fit py-1"
+            className="w-20"
           />
         </span>
-        <select
+        <NativeSelect
+          id="page-size-select"
+          aria-label="Page size"
           value={table.getState().pagination.pageSize}
           onChange={(e) => {
             table.setPageSize(Number(e.target.value));
           }}
-          className="demo-select demo-input-fit py-1"
+          className="w-32"
         >
           {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
+            <NativeSelectOption key={pageSize} value={pageSize}>
               Show {pageSize}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
+        </NativeSelect>
       </div>
-      <div className="demo-muted mt-4">{table.getPrePaginationRowModel().rows.length} Rows</div>
+      <div className="mt-4 text-xs text-muted-foreground">
+        {table.getPrePaginationRowModel().rows.length} Rows
+      </div>
       <div className="mt-4 flex gap-2">
-        <button onClick={() => rerender()} className="demo-button">
+        <Button variant="outline" size="sm" onClick={() => rerender()}>
           Force Rerender
-        </button>
-        <button onClick={() => refreshData()} className="demo-button">
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => refreshData()}>
           Refresh Data
-        </button>
+        </Button>
       </div>
       <pre className="demo-code-block mt-4 overflow-auto">
         {JSON.stringify(
@@ -297,7 +319,6 @@ function Filter({ column }: { column: Column<any, unknown> }) {
       value={(columnFilterValue ?? "") as string}
       onChange={(value) => column.setFilterValue(value)}
       placeholder={`Search...`}
-      className="demo-input py-1"
     />
   );
 }
@@ -313,11 +334,13 @@ function DebouncedInput({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+  const [prevInitialValue, setPrevInitialValue] = React.useState(initialValue);
   const [value, setValue] = React.useState(initialValue);
 
-  React.useEffect(() => {
+  if (initialValue !== prevInitialValue) {
+    setPrevInitialValue(initialValue);
     setValue(initialValue);
-  }, [initialValue]);
+  }
 
   React.useEffect(() => {
     const timeout = setTimeout(() => {
@@ -327,5 +350,13 @@ function DebouncedInput({
     return () => clearTimeout(timeout);
   }, [value]);
 
-  return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />;
+  return (
+    <Input
+      aria-label="Search table"
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
 }
+

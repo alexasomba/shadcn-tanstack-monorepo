@@ -1,28 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 
-import { getAuth } from "./auth";
+import { requireAuthMiddleware } from "./auth.middleware";
+import { readSessionFromRequest } from "./auth.server";
 
+/** Public: current session or null (safe for login/`beforeLoad` UX). */
 export const getSession = createServerFn({ method: "GET" }).handler(async () => {
-  const headers = getRequestHeaders();
-  // @ts-expect-error - vinxi/http is a platform-specific import
-  const { getEvent } = await import("vinxi/http");
-  const db = getEvent()?.context?.cloudflare?.env?.DB;
-  const auth = getAuth(db);
-  return await auth.api.getSession({ headers });
+  return await readSessionFromRequest();
 });
 
-export const ensureSession = createServerFn({ method: "GET" }).handler(async () => {
-  const headers = getRequestHeaders();
-  // @ts-expect-error - vinxi/http is a platform-specific import
-  const { getEvent } = await import("vinxi/http");
-  const db = getEvent()?.context?.cloudflare?.env?.DB;
-  const auth = getAuth(db);
-  const session = await auth.api.getSession({ headers });
-
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
-  return session;
-});
+/**
+ * Private: require a session on the RPC endpoint.
+ * Prefer attaching `requireAuthMiddleware` to domain server functions.
+ */
+export const ensureSession = createServerFn({ method: "GET" })
+  .middleware([requireAuthMiddleware])
+  .handler(async ({ context }) => {
+    return { user: context.user, session: context.session };
+  });

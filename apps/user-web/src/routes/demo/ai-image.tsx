@@ -1,6 +1,13 @@
+import { DownloadSimple, ImageIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Image, Spinner, DownloadSimple } from "@phosphor-icons/react";
-import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
+import { Button } from "@workspace/ui/components/button";
+import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select";
+import { Spinner } from "@workspace/ui/components/spinner";
+import { Textarea } from "@workspace/ui/components/textarea";
+import { useState } from "react";
 
 const SIZES = ["1024x1024", "1536x1024", "1024x1536", "auto"];
 
@@ -39,8 +46,8 @@ function ImagePage() {
       }
 
       setImages(data.images);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +74,7 @@ function ImagePage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch {
       // Failed to download image
     }
   };
@@ -76,33 +83,32 @@ function ImagePage() {
     <main className="demo-page demo-page-wide">
       <div>
         <div className="mb-6 flex items-center gap-3">
-          <Image className="h-8 w-8 text-[var(--lagoon-deep)]" />
+          <ImageIcon aria-hidden="true" className="text-[var(--lagoon-deep)] size-8" />
           <h1 className="demo-title">Image Generation</h1>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-4">
+          <FieldGroup>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Size</label>
-                <select
+              <Field>
+                <FieldLabel htmlFor="image-size">Size</FieldLabel>
+                <NativeSelect
+                  id="image-size"
                   value={size}
                   onChange={(e) => setSize(e.target.value)}
                   disabled={isLoading}
-                  className="demo-select text-sm"
                 >
                   {SIZES.map((s) => (
-                    <option key={s} value={s}>
+                    <NativeSelectOption key={s} value={s}>
                       {s}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
-                  Count
-                </label>
-                <input
+                </NativeSelect>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="image-count">Count</FieldLabel>
+                <Input
+                  id="image-count"
                   type="number"
                   value={numberOfImages}
                   onChange={(e) =>
@@ -111,61 +117,66 @@ function ImagePage() {
                   min={1}
                   max={4}
                   disabled={isLoading}
-                  className="demo-input text-sm"
                 />
-              </div>
+              </Field>
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">Prompt</label>
-              <textarea
+            <Field>
+              <FieldLabel htmlFor="image-prompt">Prompt</FieldLabel>
+              <Textarea
+                id="image-prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 disabled={isLoading}
                 rows={6}
-                className="demo-textarea text-sm"
                 placeholder="Describe the image you want to generate..."
               />
-            </div>
+            </Field>
 
-            <button
+            <Button
               onClick={handleGenerate}
               disabled={isLoading || !prompt.trim()}
-              className="demo-button w-full"
+              className="w-full"
             >
               {isLoading ? (
-                <>
-                  <Spinner className="h-5 w-5 animate-spin" />
+                <span role="status" aria-live="polite" className="flex items-center justify-center gap-2">
+                  <Spinner className="size-4" />
                   Generating...
-                </>
+                </span>
               ) : (
                 "Generate Image"
               )}
-            </button>
-          </div>
+            </Button>
+          </FieldGroup>
 
           <div className="demo-panel lg:col-span-2">
             <h2 className="demo-section-title mb-4">Generated Images</h2>
 
-            {error && <div className="demo-alert demo-alert-danger mb-4">{error}</div>}
+            {error ? (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
 
             {images.length > 0 ? (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {images.map((image, index) => (
-                    <div key={index} className="group relative">
+                    <div key={getImageSrc(image)} className="group relative">
                       <img
                         src={getImageSrc(image)}
-                        alt={`Generated image ${index + 1}`}
+                        alt={image.revisedPrompt || prompt || `Generated image ${index + 1}`}
                         className="w-full rounded-lg border border-[var(--line)]"
                       />
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="icon"
                         onClick={() => handleDownload(image, index)}
-                        className="demo-button absolute top-2 right-2 p-2 opacity-0 transition-opacity group-hover:opacity-100"
+                        className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100"
                         title="Download image"
                       >
-                        <DownloadSimple className="h-4 w-4" />
-                      </button>
+                        <DownloadSimple className="size-4" />
+                      </Button>
                       {image.revisedPrompt && (
                         <p className="demo-muted mt-2 text-xs italic">
                           Revised: {image.revisedPrompt}
@@ -177,7 +188,7 @@ function ImagePage() {
               </div>
             ) : !error && !isLoading ? (
               <div className="demo-muted flex h-64 flex-col items-center justify-center">
-                <Image className="mb-4 h-16 w-16 opacity-50" />
+                <ImageIcon aria-hidden="true" className="mb-4 size-16 opacity-50" />
                 <p>Enter a prompt and click "Generate Image" to create an image.</p>
               </div>
             ) : null}
@@ -191,3 +202,4 @@ function ImagePage() {
 export const Route = createFileRoute("/demo/ai-image")({
   component: ImagePage,
 });
+
